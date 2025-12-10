@@ -899,9 +899,8 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Preview -->
                 <div id="importStep2" style="display: none;">
-                    <div
+                    <div id="extractionSuccess"
                         style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem;">
                         <h3 style="color: #22c55e; margin-bottom: 0.5rem;">✅ Extraction Complete!</h3>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
@@ -921,6 +920,22 @@
                                 <div style="font-size: 0.75rem; color: var(--text-muted);">Missing Answers</div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Debug panel when 0 questions -->
+                    <div id="debugPanel"
+                        style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: #ef4444; margin-bottom: 0.5rem;">⚠️ No Questions Detected</h3>
+                        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                            The PDF format might not be recognized. Here's the extracted text:
+                        </p>
+                        <textarea id="debugText" readonly
+                            style="width: 100%; height: 150px; font-family: monospace; font-size: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem; color: var(--text-secondary);"></textarea>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.75rem;">
+                            💡 <strong>Tip:</strong> Try using the Python tool for complex PDFs:<br>
+                            <code
+                                style="background: var(--bg-tertiary); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">python tools/extract_mcq.py yourfile.pdf output.json</code>
+                        </p>
                     </div>
 
                     <div
@@ -993,34 +1008,32 @@
         </div>
     </div>
 
-    <!-- Mock Tests Modal (placeholder) -->
+    <!-- Mock Tests Modal -->
     <div class="modal" id="testsModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
                 <h2>📝 Mock Tests</h2>
                 <span class="modal-close" id="testsModalClose">&times;</span>
             </div>
             <div class="modal-body">
-                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                    Mock tests management coming soon!<br>
-                    <small>This will connect to Supabase to list and manage all tests.</small>
-                </p>
+                <div id="testsModalList" style="max-height: 500px; overflow-y: auto;">
+                    <!-- Populated dynamically -->
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Questions Modal (placeholder) -->
+    <!-- Questions Modal -->
     <div class="modal" id="questionsModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
                 <h2>❓ Questions Bank</h2>
                 <span class="modal-close" id="questionsModalClose">&times;</span>
             </div>
             <div class="modal-body">
-                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                    Questions management coming soon!<br>
-                    <small>This will connect to Supabase to list and manage all questions.</small>
-                </p>
+                <div id="questionsModalList" style="max-height: 500px; overflow-y: auto;">
+                    <!-- Populated dynamically -->
+                </div>
             </div>
         </div>
     </div>
@@ -1083,6 +1096,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
 
+    <!-- Admin Data Manager -->
+    <script src="../js/admin-data.js"></script>
+
     <!-- PDF.js Library for PDF extraction -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
@@ -1133,20 +1149,126 @@
         // Mock Tests nav
         document.getElementById('navTests').addEventListener('click', (e) => {
             e.preventDefault();
+            renderTestsModalContent();
             testsModal.classList.add('active');
         });
         document.getElementById('testsModalClose').addEventListener('click', () => {
             testsModal.classList.remove('active');
         });
 
+        // Render tests in modal
+        function renderTestsModalContent() {
+            const container = document.getElementById('testsModalList');
+            const tests = adminData.getAllTests();
+
+            if (tests.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                        <p>No tests created yet.</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="testsModal.classList.remove('active'); document.getElementById('createTestBtn').click();">
+                            + Create First Test
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = tests.map(test => {
+                const subject = adminData.getSubjectByValue(test.subject_id) || { icon: '📝', name_en: test.subject_id };
+                const qCount = adminData.getQuestionsByTestId(test.id).length;
+                return `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.75rem; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-size: 2rem;">${subject.icon}</span>
+                            <div>
+                                <div style="font-weight: 600;">${test.name_en}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                    ${subject.name_en} • ${qCount} questions • ${test.time_limit} min
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-outline" onclick="viewTestQuestions('${test.id}')">View Questions</button>
+                            <button class="btn btn-sm btn-ghost" style="color: var(--error-500);" onclick="deleteTest('${test.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // Questions nav
         document.getElementById('navQuestions').addEventListener('click', (e) => {
             e.preventDefault();
+            renderQuestionsModalContent();
             questionsModal.classList.add('active');
         });
         document.getElementById('questionsModalClose').addEventListener('click', () => {
             questionsModal.classList.remove('active');
         });
+
+        // Render questions in modal
+        function renderQuestionsModalContent() {
+            const container = document.getElementById('questionsModalList');
+            const tests = adminData.getAllTests();
+            let totalQuestions = 0;
+
+            let html = '';
+
+            tests.forEach(test => {
+                const questions = adminData.getQuestionsByTestId(test.id);
+                totalQuestions += questions.length;
+                const subject = adminData.getSubjectByValue(test.subject_id) || { icon: '📝', name_en: test.subject_id };
+
+                if (questions.length > 0) {
+                    html += `
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span>${subject.icon}</span> ${test.name_en} 
+                                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(${questions.length} questions)</span>
+                            </h4>
+                            ${questions.slice(0, 5).map((q, i) => `
+                                <div style="padding: 0.75rem; background: var(--bg-tertiary); border-radius: 0.5rem; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                    <strong>Q${q.question_number}:</strong> ${(q.question_text_en || '').substring(0, 100)}${(q.question_text_en || '').length > 100 ? '...' : ''}
+                                    <span style="color: #22c55e; margin-left: 0.5rem;">Answer: ${(q.correct_option || 'a').toUpperCase()}</span>
+                                </div>
+                            `).join('')}
+                            ${questions.length > 5 ? `<p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">... and ${questions.length - 5} more questions</p>` : ''}
+                        </div>
+                    `;
+                }
+            });
+
+            if (totalQuestions === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❓</div>
+                        <p>No questions added yet.</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="questionsModal.classList.remove('active'); document.getElementById('navImport').click();">
+                            📥 Import Questions
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="padding: 0.75rem 1rem; background: var(--primary-500); color: white; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;">
+                    📊 Total: ${totalQuestions} questions across ${tests.length} tests
+                </div>
+                ${html}
+            `;
+        }
+
+        // View test questions
+        function viewTestQuestions(testId) {
+            testsModal.classList.remove('active');
+            const questions = adminData.getQuestionsByTestId(testId);
+            const test = adminData.getTestById(testId);
+
+            alert(`📝 ${test.name_en}\n\n${questions.length} questions\n\nFull question viewer coming soon!`);
+        }
+        window.viewTestQuestions = viewTestQuestions;
 
         // Subjects nav
         document.getElementById('navSubjects').addEventListener('click', (e) => {
@@ -1227,8 +1349,8 @@
                     const data = pdfExtractor.toJSON(testName, subject);
                     const summary = pdfExtractor.getSummary();
 
-                    // Show preview
-                    showImportPreview(data, summary);
+                    // Show preview with raw text for debug
+                    showImportPreview(data, summary, pdfExtractor.rawText);
 
                 } catch (err) {
                     console.error('PDF extraction error:', err);
@@ -1250,7 +1372,7 @@
             }
         });
 
-        function showImportPreview(data, summary = null) {
+        function showImportPreview(data, summary = null, rawText = '') {
             // Hide step 1, show step 2
             document.getElementById('importStep1').style.display = 'none';
             document.getElementById('importStep2').style.display = 'block';
@@ -1266,6 +1388,21 @@
             } else {
                 document.getElementById('statWithAnswers').textContent = total;
                 document.getElementById('statMissing').textContent = '0';
+            }
+
+            // Show debug panel if 0 questions
+            const debugPanel = document.getElementById('debugPanel');
+            const successPanel = document.getElementById('extractionSuccess');
+
+            if (total === 0) {
+                debugPanel.style.display = 'block';
+                successPanel.style.display = 'none';
+                document.getElementById('debugText').value = rawText || 'No text extracted from PDF';
+                document.getElementById('confirmImportBtn').disabled = true;
+            } else {
+                debugPanel.style.display = 'none';
+                successPanel.style.display = 'block';
+                document.getElementById('confirmImportBtn').disabled = false;
             }
 
             // Build preview table
@@ -1291,7 +1428,6 @@
                 tbody.appendChild(row);
             }
 
-            document.getElementById('confirmImportBtn').disabled = false;
             window.importData = data;
         }
 
@@ -1301,20 +1437,32 @@
             document.getElementById('importStep2').style.display = 'none';
             document.getElementById('dropZone').style.display = 'block';
             document.getElementById('extractionProgress').style.display = 'none';
+            document.getElementById('debugPanel').style.display = 'none';
+            document.getElementById('extractionSuccess').style.display = 'block';
             document.getElementById('confirmImportBtn').disabled = true;
         });
 
         // Confirm import
         document.getElementById('confirmImportBtn').addEventListener('click', () => {
             if (window.importData) {
-                // In production, this would save to Supabase
+                // Save to adminData manager
+                const newTest = adminData.importTestWithQuestions(window.importData);
                 const count = window.importData.total_questions || window.importData.questions.length;
-                alert('✅ Successfully imported ' + count + ' questions!\n\nNote: In the full version, this will be saved to Supabase database.');
+
+                // Update dashboard
+                updateDashboardStats();
+                refreshTestsTable();
+
+                alert('✅ Successfully imported "' + newTest.name_en + '" with ' + count + ' questions!');
                 importModal.classList.remove('active');
+
                 // Reset for next import
                 document.getElementById('importStep1').style.display = 'block';
                 document.getElementById('importStep2').style.display = 'none';
                 document.getElementById('dropZone').style.display = 'block';
+                document.getElementById('importTestName').value = '';
+                document.getElementById('jsonInput').value = '';
+                window.importData = null;
             }
         });
 
@@ -1331,19 +1479,110 @@
                 name_hi: document.getElementById('testNameHi').value,
                 subject: document.getElementById('testSubject').value,
                 difficulty: document.getElementById('testDifficulty').value,
-                questions: parseInt(document.getElementById('testQuestions').value),
-                time: parseInt(document.getElementById('testTime').value),
-                mark_correct: parseFloat(document.getElementById('markCorrect').value),
-                mark_wrong: parseFloat(document.getElementById('markWrong').value),
+                questions: parseInt(document.getElementById('testQuestions').value) || 0,
+                time: parseInt(document.getElementById('testTime').value) || 120,
+                mark_correct: parseFloat(document.getElementById('markCorrect').value) || 2,
+                mark_wrong: parseFloat(document.getElementById('markWrong').value) || 0.66,
                 source: document.getElementById('testSource').value,
                 description: document.getElementById('testDescription').value
             };
 
-            console.log('Test Data:', testData);
-            alert('✅ Test created successfully!\n\nNote: In the full version, this will be saved to Supabase database.');
+            // Save using adminData manager
+            const newTest = adminData.createTest(testData);
+
+            // Update stats on dashboard
+            updateDashboardStats();
+            refreshTestsTable();
+
+            alert('✅ Test "' + newTest.name_en + '" created successfully!');
             testModal.classList.remove('active');
             form.reset();
         });
+
+        // Update dashboard stats
+        function updateDashboardStats() {
+            const stats = adminData.getStats();
+            const statCards = document.querySelectorAll('.admin-stat-card .value');
+            if (statCards.length >= 4) {
+                statCards[0].textContent = stats.totalTests;
+                statCards[1].textContent = stats.totalQuestions.toLocaleString();
+                // statCards[2] = users (keep as is for now)
+                statCards[3].textContent = stats.activeKeys;
+            }
+        }
+
+        // Refresh tests table
+        function refreshTestsTable() {
+            const tbody = document.getElementById('testsTableBody');
+            if (!tbody) return;
+
+            const tests = adminData.getAllTests();
+
+            if (tests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No tests created yet. Click "Create New Test" to get started.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = tests.map(test => {
+                const subject = adminData.getSubjectByValue(test.subject_id) || { icon: '📝', name_en: test.subject_id };
+                return `
+                    <tr data-test-id="${test.id}">
+                        <td>
+                            <div class="title-cell">
+                                <div class="test-icon">${subject.icon}</div>
+                                <div>
+                                    <strong>${test.name_en}</strong>
+                                    ${test.name_hi ? `<div class="text-muted" style="font-size:0.75rem;">${test.name_hi}</div>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td>${subject.name_en}</td>
+                        <td>${test.total_questions}</td>
+                        <td>${test.time_limit} min</td>
+                        <td>${test.attempts || 0}</td>
+                        <td><span class="badge badge-new">${test.is_active ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-icon" title="Edit" onclick="editTest('${test.id}')">✏️</button>
+                                <button class="btn-icon" title="Add Questions" onclick="openAddQuestions('${test.id}')">❓</button>
+                                <button class="btn-icon delete" title="Delete" onclick="deleteTest('${test.id}')">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Delete test handler
+        function deleteTest(testId) {
+            const test = adminData.getTestById(testId);
+            if (!test) return;
+
+            if (confirm(`Delete test "${test.name_en}"?\n\nThis will also delete all associated questions.`)) {
+                adminData.deleteTest(testId);
+                updateDashboardStats();
+                refreshTestsTable();
+                alert('✅ Test deleted successfully!');
+            }
+        }
+
+        // Make delete function global
+        window.deleteTest = deleteTest;
+        window.editTest = (id) => alert('Edit feature coming soon! Test ID: ' + id);
+        window.openAddQuestions = (id) => {
+            document.getElementById('importTestName').value = adminData.getTestById(id)?.name_en || '';
+            importModal.classList.add('active');
+        };
+
+        // Initialize on load
+        updateDashboardStats();
+        refreshTestsTable();
 
         // ===== ACCESS KEYS MANAGEMENT =====
         const keysModal = document.getElementById('keysModal');
@@ -1360,47 +1599,37 @@
             keysModal.classList.remove('active');
         });
 
-        // Generate random key
+        // Generate random key - use adminData manager
         function generateKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let key = '';
-            for (let i = 0; i < 4; i++) {
-                if (i > 0) key += '-';
-                for (let j = 0; j < 4; j++) {
-                    key += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-            }
-            return key;
+            return adminData.generateKeyString();
         }
 
         // Generate new key
         document.getElementById('generateKeyBtn').addEventListener('click', () => {
-            const newKey = {
-                key: generateKey(),
-                createdAt: new Date().toISOString(),
-                validDays: 3,
-                used: false,
-                usedAt: null
-            };
+            const newKey = adminData.createKey();
 
-            generatedKeys.unshift(newKey);
+            // Also update legacy storage for backward compatibility
+            generatedKeys.unshift({
+                key: newKey.key,
+                createdAt: newKey.created_at,
+                validDays: 3,
+                used: newKey.used,
+                usedAt: newKey.used_at
+            });
             localStorage.setItem('admin_keys', JSON.stringify(generatedKeys));
 
-            // Also add to valid keys list (simulating backend)
-            const validKeys = JSON.parse(localStorage.getItem('valid_keys') || '["UPSC-2024-MOCK","TEST-1234-5678","DEMO-ACCESS-KEY"]');
-            if (!validKeys.includes(newKey.key)) {
-                validKeys.push(newKey.key);
-                localStorage.setItem('valid_keys', JSON.stringify(validKeys));
-            }
-
+            updateDashboardStats();
             renderKeysList();
+
+            alert('🔑 New key generated: ' + newKey.key);
         });
 
         // Render keys list
         function renderKeysList() {
             const container = document.getElementById('keysList');
+            const keys = adminData.getAllKeys();
 
-            if (generatedKeys.length === 0) {
+            if (keys.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
                         <p>No keys generated yet. Click "Generate New Key" to create one.</p>
@@ -1409,14 +1638,14 @@
                 return;
             }
 
-            container.innerHTML = generatedKeys.map((k, i) => `
+            container.innerHTML = keys.map(k => `
                 <div class="key-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.75rem; margin-bottom: 0.75rem;">
                     <div>
                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.125rem; font-weight: 600; color: ${k.used ? 'var(--text-muted)' : '#60a5fa'};">
                             ${k.key}
                         </div>
                         <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
-                            Created: ${new Date(k.createdAt).toLocaleDateString()} • 
+                            Created: ${new Date(k.created_at).toLocaleDateString()} • 
                             ${k.used ? '✓ Used' : '🟢 Available'}
                         </div>
                     </div>
@@ -1424,7 +1653,7 @@
                         <button class="btn btn-sm btn-outline" onclick="copyKey('${k.key}')" title="Copy">
                             📋 Copy
                         </button>
-                        <button class="btn btn-sm btn-ghost" onclick="deleteKey(${i})" title="Delete" style="color: var(--error-500);">
+                        <button class="btn btn-sm btn-ghost" onclick="deleteKeyById('${k.id}')" title="Delete" style="color: var(--error-500);">
                             🗑️
                         </button>
                     </div>
@@ -1439,7 +1668,16 @@
             });
         }
 
-        // Delete key
+        // Delete key by ID
+        function deleteKeyById(keyId) {
+            if (confirm('Delete this key?')) {
+                adminData.deleteKey(keyId);
+                updateDashboardStats();
+                renderKeysList();
+            }
+        }
+
+        // Legacy delete by index (for backward compatibility)
         function deleteKey(index) {
             if (confirm('Delete this key?')) {
                 generatedKeys.splice(index, 1);
