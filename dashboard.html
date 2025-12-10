@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gen-Z Mocks Dashboard - View your subjects and mock tests">
+    <title>Dashboard - Gen-Z Mocks</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        /* ===== MODERN DASHBOARD STYLES ===== */
+
+        /* Animated Background - Dark Theme */
+        body {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #1e3a5f);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        /* Light Theme Background */
+        body.light-theme {
+            background: linear-gradient(-45deg, #f0f4ff, #e8f0fe, #f5f3ff, #eef2ff);
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Glass Navbar */
+        .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        body.light-theme .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        body.light-theme .access-info-bar {
+            background: rgba(34, 197, 94, 0.08);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .dashboard-header {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .welcome-text {
+            margin-bottom: var(--spacing-xs);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .welcome-text span {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-muted);
+        }
+
+        /* Access Key Display */
+        .access-info-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .access-info-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .access-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .access-expires {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .access-key-display {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Cards with Glow */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.tests {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        }
+
+        .stat-icon.correct {
+            background: linear-gradient(135deg, #22c55e, #4ade80);
+        }
+
+        .stat-icon.accuracy {
+            background: linear-gradient(135deg, #f97316, #fb923c);
+        }
+
+        .stat-icon.streak {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+
+        .stat-info .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-info .label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-title h2 {
+            font-size: 1.5rem;
+        }
+
+        .view-all {
+            color: var(--primary-400);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            transition: color 0.3s ease;
+        }
+
+        .view-all:hover {
+            color: #60a5fa;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        /* Test Cards */
+        .test-list-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .subject-filter {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+            color: white;
+        }
+
+        .test-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .test-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-xl);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .test-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateX(8px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(59, 130, 246, 0.1);
+        }
+
+        .test-card-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .test-subject-icon {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .test-card:hover .test-subject-icon {
+            transform: scale(1.1);
+        }
+
+        .test-subject-icon.polity {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .test-subject-icon.history {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .test-subject-icon.geography {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .test-subject-icon.economy {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .test-subject-icon.environment {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .test-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .test-title-hi {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        body.lang-hi .test-title-hi {
+            display: block;
+        }
+
+        body.lang-hi .test-title-en {
+            display: none;
+        }
+
+        .test-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .test-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .test-card-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .test-score {
+            text-align: right;
+            margin-right: var(--spacing-md);
+        }
+
+        .test-score .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success-500);
+        }
+
+        .test-score .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Badge Styles */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .badge-completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .badge-attempted {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+        }
+
+        /* Sidebar Cards */
+        .activity-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-full);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.completed {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .activity-icon.started {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .activity-icon.improved {
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .activity-text {
+            flex: 1;
+        }
+
+        .activity-text p {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .activity-text .time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Chart Bars */
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            height: 120px;
+        }
+
+        .chart-bar {
+            width: 30px;
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .chart-bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+
+        /* Quick Start CTA */
+        .quick-start {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(139, 92, 246, 0.8));
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quick-start h3 {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .quick-start p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .test-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+            }
+
+            .test-card-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .access-info-bar {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                <span class="icon">🚀</span>
+                <span>Gen-Z Mocks</span>
+            </a>
+
+            <ul class="navbar-nav">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="progress.html">Progress</a></li>
+                <li><a href="admin/index.html">Admin</a></li>
+            </ul>
+
+            <div class="navbar-actions">
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Mode">
+                    <span class="icon-sun">☀️</span>
+                    <span class="icon-moon">🌙</span>
+                </button>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle">
+                    <span class="active" data-lang="en">EN</span>
+                    <span data-lang="hi">हिं</span>
+                </div>
+
+                <div class="user-menu">
+                    <span class="access-key-display" id="keyDisplay">KEY: ****</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Access Info Bar -->
+            <div class="access-info-bar" id="accessBar">
+                <div class="access-info-left">
+                    <span class="access-badge">✓ Access Active</span>
+                    <span class="access-expires" id="expiresText">Expires in 3 days</span>
+                </div>
+                <span class="access-key-display" id="fullKeyDisplay">UPSC-2024-MOCK</span>
+            </div>
+
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1 class="welcome-text">
+                    Welcome back, <span>Aspirant</span> 👋
+                </h1>
+                <p class="dashboard-subtitle">Continue your preparation journey. You're doing great!</p>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row stagger-children">
+                <div class="stat-card">
+                    <div class="stat-icon tests">📝</div>
+                    <div class="stat-info">
+                        <div class="value">12</div>
+                        <div class="label">Tests Completed</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon correct">✅</div>
+                    <div class="stat-info">
+                        <div class="value">847</div>
+                        <div class="label">Correct Answers</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon accuracy">📊</div>
+                    <div class="stat-info">
+                        <div class="value">72%</div>
+                        <div class="label">Overall Accuracy</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon streak">🔥</div>
+                    <div class="stat-info">
+                        <div class="value">5</div>
+                        <div class="label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Test List -->
+                <div class="test-list-section">
+                    <div class="section-title">
+                        <h2>Mock Tests</h2>
+                        <a href="#" class="view-all">View All →</a>
+                    </div>
+
+                    <!-- Subject Filter -->
+                    <div class="subject-filter">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="polity">⚖️ Polity</button>
+                        <button class="filter-btn" data-filter="history">📜 History</button>
+                        <button class="filter-btn" data-filter="geography">🌍 Geography</button>
+                        <button class="filter-btn" data-filter="economy">📊 Economy</button>
+                        <button class="filter-btn" data-filter="environment">🌱 Environment</button>
+                    </div>
+
+                    <!-- Test List -->
+                    <div class="test-list" id="testList">
+                        <!-- Tests will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Recent Activity -->
+                    <div class="activity-card">
+                        <h3 class="mb-lg">Recent Activity</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon completed">✅</div>
+                                <div class="activity-text">
+                                    <p>Completed <strong>Polity Test 3</strong></p>
+                                    <span class="time">Score: 76% • 2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon started">▶️</div>
+                                <div class="activity-text">
+                                    <p>Started <strong>History Test 5</strong></p>
+                                    <span class="time">45/100 completed • Yesterday</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon improved">📈</div>
+                                <div class="activity-text">
+                                    <p>Improved in <strong>Geography</strong></p>
+                                    <span class="time">+12% accuracy • 2 days ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon completed">✅</div>
+                                <div class="activity-text">
+                                    <p>Completed <strong>Economy Test 2</strong></p>
+                                    <span class="time">Score: 68% • 3 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Progress -->
+                    <div class="activity-card mt-xl">
+                        <h3 class="mb-lg">Weekly Progress</h3>
+                        <div class="chart-bars">
+                            <div class="chart-bar" style="height: 40%;" title="Mon"></div>
+                            <div class="chart-bar" style="height: 65%;" title="Tue"></div>
+                            <div class="chart-bar" style="height: 45%;" title="Wed"></div>
+                            <div class="chart-bar" style="height: 80%;" title="Thu"></div>
+                            <div class="chart-bar" style="height: 55%;" title="Fri"></div>
+                            <div class="chart-bar" style="height: 90%;" title="Sat"></div>
+                            <div class="chart-bar" style="height: 70%;" title="Sun"></div>
+                        </div>
+                        <p class="text-center text-muted mt-md" style="font-size: 0.8rem;">
+                            You answered 156 questions this week
+                        </p>
+                    </div>
+
+                    <!-- Quick Start -->
+                    <div class="quick-start">
+                        <div>
+                            <h3>Quick Start</h3>
+                            <p>Resume your last test</p>
+                        </div>
+                        <a href="test.html" class="btn btn-accent">Continue →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ===== ACCESS CHECK =====
+        function checkAccess() {
+            const accessData = localStorage.getItem('genz_session');
+            if (accessData) {
+                const { key, sessionExpiry } = JSON.parse(accessData);
+                if (Date.now() < sessionExpiry) {
+                    return { valid: true, key, sessionExpiry };
+                } else {
+                    localStorage.removeItem('genz_session');
+                }
+            }
+            return { valid: false };
+        }
+
+        // Check access on page load
+        const access = checkAccess();
+        if (!access.valid) {
+            // Redirect to login page
+            window.location.href = 'index.html';
+        } else {
+            // Show access info
+            const daysLeft = Math.ceil((access.sessionExpiry - Date.now()) / (24 * 60 * 60 * 1000));
+            document.getElementById('expiresText').textContent =
+                daysLeft > 1 ? `Session expires in ${daysLeft} days` : 'Session expires tomorrow';
+            document.getElementById('fullKeyDisplay').textContent = access.key;
+            document.getElementById('keyDisplay').textContent = 'KEY: ' + access.key.slice(0, 4) + '...';
+        }
+
+        // ===== MOCK TEST DATA =====
+        const mockTests = [
+            {
+                id: 1,
+                titleEn: 'Polity Mock Test 1',
+                titleHi: 'राजव्यवस्था मॉक टेस्ट 1',
+                subject: 'polity',
+                icon: '⚖️',
+                questions: 100,
+                time: 120,
+                difficulty: 'Moderate',
+                status: 'new',
+                score: null
+            },
+            {
+                id: 2,
+                titleEn: 'Polity Mock Test 2',
+                titleHi: 'राजव्यवस्था मॉक टेस्ट 2',
+                subject: 'polity',
+                icon: '⚖️',
+                questions: 50,
+                time: 60,
+                difficulty: 'Easy',
+                status: 'completed',
+                score: 76
+            },
+            {
+                id: 3,
+                titleEn: 'History Mock Test 1',
+                titleHi: 'इतिहास मॉक टेस्ट 1',
+                subject: 'history',
+                icon: '📜',
+                questions: 100,
+                time: 120,
+                difficulty: 'Moderate',
+                status: 'new',
+                score: null
+            },
+            {
+                id: 4,
+                titleEn: 'Geography Mock Test 1',
+                titleHi: 'भूगोल मॉक टेस्ट 1',
+                subject: 'geography',
+                icon: '🌍',
+                questions: 75,
+                time: 90,
+                difficulty: 'Moderate',
+                status: 'completed',
+                score: 68
+            },
+            {
+                id: 5,
+                titleEn: 'Economy Mock Test 1',
+                titleHi: 'अर्थव्यवस्था मॉक टेस्ट 1',
+                subject: 'economy',
+                icon: '📊',
+                questions: 50,
+                time: 60,
+                difficulty: 'Difficult',
+                status: 'attempted',
+                score: 45
+            },
+            {
+                id: 6,
+                titleEn: 'Environment Mock Test 1',
+                titleHi: 'पर्यावरण मॉक टेस्ट 1',
+                subject: 'environment',
+                icon: '🌱',
+                questions: 50,
+                time: 60,
+                difficulty: 'Easy',
+                status: 'new',
+                score: null
+            }
+        ];
+
+        const testList = document.getElementById('testList');
+
+        function renderTests(filter = 'all') {
+            const filtered = filter === 'all'
+                ? mockTests
+                : mockTests.filter(t => t.subject === filter);
+
+            testList.innerHTML = filtered.map(test => `
+                <div class="test-card" data-subject="${test.subject}">
+                    <div class="test-card-left">
+                        <div class="test-subject-icon ${test.subject}">${test.icon}</div>
+                        <div class="test-info">
+                            <div class="test-title">
+                                <span class="test-title-en">${test.titleEn}</span>
+                                <span class="test-title-hi">${test.titleHi}</span>
+                            </div>
+                            <div class="test-meta">
+                                <span>📝 ${test.questions} Questions</span>
+                                <span>⏱️ ${test.time} min</span>
+                                <span>📊 ${test.difficulty}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="test-card-right">
+                        ${test.score !== null ? `
+                            <div class="test-score">
+                                <div class="value">${test.score}%</div>
+                                <div class="label">Last Score</div>
+                            </div>
+                        ` : ''}
+                        <span class="badge badge-${test.status}">${test.status === 'new' ? 'New' :
+                    test.status === 'completed' ? 'Completed' : 'Attempted'
+                }</span>
+                        <a href="test.html?id=${test.id}" class="btn btn-primary btn-sm">
+                            ${test.status === 'new' ? 'Start Test' :
+                    test.status === 'completed' ? 'Retake' : 'Continue'}
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initial render
+        renderTests();
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderTests(btn.dataset.filter);
+            });
+        });
+
+        // Language Toggle
+        const langToggle = document.querySelector('.lang-toggle');
+        langToggle.addEventListener('click', (e) => {
+            if (e.target.dataset.lang) {
+                document.querySelectorAll('.lang-toggle span').forEach(s => s.classList.remove('active'));
+                e.target.classList.add('active');
+                document.body.classList.toggle('lang-hi', e.target.dataset.lang === 'hi');
+            }
+        });
+
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Check saved theme
+        const savedTheme = localStorage.getItem('genz_theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('genz_theme', isLight ? 'light' : 'dark');
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Gen-Z Mocks - Practice for all government exams with bilingual mock tests, track your progress, and ace your preparation">
+    <title>Gen-Z Mocks - Practice & Excel</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        /* ===== ADVANCED MODERN UI EFFECTS ===== */
+
+        /* Animated Gradient Background - Dark Theme */
+        body {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #1e3a5f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* Light Theme Background */
+        body.light-theme {
+            background: linear-gradient(-45deg, #f0f4ff, #e8f0fe, #f5f3ff, #eef2ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(59, 130, 246, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glassmorphism Enhancement */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Glow Effects */
+        .glow {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.15),
+                0 0 80px rgba(59, 130, 246, 0.1),
+                0 0 120px rgba(59, 130, 246, 0.05);
+        }
+
+        .glow-accent {
+            box-shadow: 0 0 40px rgba(249, 115, 22, 0.2),
+                0 0 80px rgba(249, 115, 22, 0.1);
+        }
+
+        /* Neon Text */
+        .neon-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5),
+                0 0 20px rgba(59, 130, 246, 0.3),
+                0 0 40px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse-glow 4s ease-in-out infinite 2s;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-text h1 span {
+            display: block;
+        }
+
+        /* Animated Gradient Text */
+        .text-gradient-animated {
+            background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6, #60a5fa);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Premium Button Styles */
+        .btn-premium {
+            position: relative;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .hero-stat {
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Animated Hero Card */
+        .hero-visual {
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .hero-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transform: rotateY(-5deg) rotateX(5deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(59, 130, 246, 0.1);
+            animation: float-card 6s ease-in-out infinite;
+        }
+
+        @keyframes float-card {
+
+            0%,
+            100% {
+                transform: rotateY(-5deg) rotateX(5deg) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(-5deg) rotateX(5deg) translateY(-10px);
+            }
+        }
+
+        .hero-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-card-timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #60a5fa;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+
+        .hero-question {
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-question-num {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-question-text {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .hero-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .hero-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .hero-option:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .hero-option.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .hero-option-letter {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .hero-option.selected .hero-option-letter {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        /* Floating Badges with Animation */
+        .floating-badge {
+            position: absolute;
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: float-badge 4s ease-in-out infinite;
+        }
+
+        .floating-badge-1 {
+            top: -20px;
+            left: -40px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation-delay: 0s;
+        }
+
+        .floating-badge-2 {
+            bottom: 40px;
+            right: -60px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation-delay: 2s;
+        }
+
+        @keyframes float-badge {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .badge-icon {
+            font-size: 1.5rem;
+        }
+
+        .badge-text strong {
+            display: block;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-text span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        /* Glass Feature Cards */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #f472b6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 40px rgba(59, 130, 246, 0.1);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border-radius: 1rem;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Subjects Section */
+        .subjects {
+            padding: 6rem 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Subject Cards with Hover Effects */
+        .subject-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-accent, linear-gradient(90deg, #3b82f6, #8b5cf6));
+        }
+
+        .subject-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 60px var(--card-glow, rgba(59, 130, 246, 0.2));
+        }
+
+        .subject-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .subject-card:hover .subject-icon {
+            transform: scale(1.2);
+        }
+
+        .subject-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .subject-count {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Subject Colors */
+        .subject-polity {
+            --card-accent: linear-gradient(90deg, #3b82f6, #60a5fa);
+            --card-glow: rgba(59, 130, 246, 0.3);
+        }
+
+        .subject-history {
+            --card-accent: linear-gradient(90deg, #f59e0b, #fbbf24);
+            --card-glow: rgba(245, 158, 11, 0.3);
+        }
+
+        .subject-geography {
+            --card-accent: linear-gradient(90deg, #10b981, #34d399);
+            --card-glow: rgba(16, 185, 129, 0.3);
+        }
+
+        .subject-economy {
+            --card-accent: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            --card-glow: rgba(139, 92, 246, 0.3);
+        }
+
+        .subject-environment {
+            --card-accent: linear-gradient(90deg, #22c55e, #4ade80);
+            --card-glow: rgba(34, 197, 94, 0.3);
+        }
+
+        .subject-science {
+            --card-accent: linear-gradient(90deg, #06b6d4, #22d3ee);
+            --card-glow: rgba(6, 182, 212, 0.3);
+        }
+
+        .subject-current {
+            --card-accent: linear-gradient(90deg, #ef4444, #f87171);
+            --card-glow: rgba(239, 68, 68, 0.3);
+        }
+
+        .subject-culture {
+            --card-accent: linear-gradient(90deg, #ec4899, #f472b6);
+            --card-glow: rgba(236, 72, 153, 0.3);
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .cta-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(139, 92, 246, 0.8));
+            border-radius: 2rem;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            animation: rotate-glow 10s linear infinite;
+        }
+
+        @keyframes rotate-glow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .cta-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .cta-card p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #60a5fa;
+        }
+
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* ===== KEY-BASED AUTH MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 3rem;
+            width: 100%;
+            max-width: 440px;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5),
+                0 0 60px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Access Key Input */
+        .key-input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .key-input::placeholder {
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: none;
+        }
+
+        .key-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2),
+                0 0 30px rgba(59, 130, 246, 0.1);
+        }
+
+        .key-input.error {
+            border-color: #ef4444;
+            animation: shake 0.5s ease;
+        }
+
+        .key-input.success {
+            border-color: #22c55e;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .key-error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .key-error.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .access-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 1rem;
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .access-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .access-btn:hover::before {
+            left: 100%;
+        }
+
+        .access-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .access-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .access-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .access-info {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .access-info p {
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+
+        .access-info .highlight {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        /* Validity Badge */
+        .validity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8125rem;
+            color: #22c55e;
+            margin-top: 1rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-ctas {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <div class="container navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                <span class="icon">🚀</span>
+                <span>Gen-Z Mocks</span>
+            </a>
+
+            <ul class="navbar-nav">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#subjects">Subjects</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+
+            <div class="navbar-actions">
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Mode">
+                    <span class="icon-sun">☀️</span>
+                    <span class="icon-moon">🌙</span>
+                </button>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle">
+                    <span class="active" data-lang="en">EN</span>
+                    <span data-lang="hi">हिं</span>
+                </div>
+
+                <button class="btn btn-primary btn-premium" id="accessBtn">🔑 Enter Access Key</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text animate-slideUp">
+                    <h1>
+                        <span>Master Your</span>
+                        <span class="text-gradient-animated">Exam Preparation</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Practice for all government exams with bilingual mock tests, track your progress, and analyze
+                        your performance.
+                        SSC, UPSC, Banking, Railways - everything in one platform.
+                    </p>
+                    <div class="hero-ctas">
+                        <button class="btn btn-accent btn-lg btn-premium glow-accent" id="startBtn">
+                            🔑 Activate Access
+                            <span>→</span>
+                        </button>
+                        <button class="btn btn-outline btn-lg" id="browseBtn">
+                            Browse Tests
+                        </button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">1000+</div>
+                            <div class="hero-stat-label">Questions</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">50+</div>
+                            <div class="hero-stat-label">Mock Tests</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">8</div>
+                            <div class="hero-stat-label">Subjects</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual animate-fadeIn">
+                    <div class="hero-card">
+                        <div class="hero-card-header">
+                            <span>Polity Mock Test 1</span>
+                            <span class="hero-card-timer">⏱️ 1:45:32</span>
+                        </div>
+                        <div class="hero-question">
+                            <div class="hero-question-num">Q.15 of 100</div>
+                            <div class="hero-question-text">
+                                With reference to the Constituent Assembly of India, consider the following pairs.
+                            </div>
+                        </div>
+                        <div class="hero-options">
+                            <div class="hero-option">
+                                <span class="hero-option-letter">a</span>
+                                <span>Only one</span>
+                            </div>
+                            <div class="hero-option selected">
+                                <span class="hero-option-letter">b</span>
+                                <span>Only two</span>
+                            </div>
+                            <div class="hero-option">
+                                <span class="hero-option-letter">c</span>
+                                <span>All three</span>
+                            </div>
+                            <div class="hero-option">
+                                <span class="hero-option-letter">d</span>
+                                <span>None</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="floating-badge floating-badge-1">
+                        <span class="badge-icon">🌐</span>
+                        <div class="badge-text">
+                            <strong>Bilingual</strong>
+                            <span>English & Hindi</span>
+                        </div>
+                    </div>
+
+                    <div class="floating-badge floating-badge-2">
+                        <span class="badge-icon">📊</span>
+                        <div class="badge-text">
+                            <strong>78%</strong>
+                            <span>Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything You Need to <span class="text-gradient-animated">Excel</span></h2>
+                <p>Comprehensive tools designed specifically for UPSC aspirants</p>
+            </div>
+
+            <div class="features-grid stagger-children">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Set-based Mock Tests</h3>
+                    <p>Take complete mock tests with customizable time limits and marking schemes. Just like the real
+                        exam.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Bilingual Support</h3>
+                    <p>Switch between English and Hindi instantly with a single click. Same questions in both languages.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Detailed Analytics</h3>
+                    <p>Track your progress with comprehensive analytics. Identify weak areas and improve strategically.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <h3>Detailed Explanations</h3>
+                    <p>Every question comes with comprehensive explanations with source references for deeper learning.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant Results</h3>
+                    <p>Get immediate results with topic-wise breakdown and comparison with your previous attempts.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Practice anywhere, anytime on any device. Fully responsive design for seamless experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subjects Section -->
+    <section class="subjects" id="subjects">
+        <div class="container">
+            <div class="section-header">
+                <h2>All Government Exam <span class="text-gradient-animated">Subjects</span> Covered</h2>
+                <p>Comprehensive coverage for SSC, UPSC, Banking, Railways and more</p>
+            </div>
+
+            <div class="subject-grid stagger-children">
+                <div class="subject-card subject-polity">
+                    <div class="subject-icon">⚖️</div>
+                    <div class="subject-name">Indian Polity</div>
+                    <div class="subject-count">15 Tests</div>
+                </div>
+
+                <div class="subject-card subject-history">
+                    <div class="subject-icon">📜</div>
+                    <div class="subject-name">History</div>
+                    <div class="subject-count">12 Tests</div>
+                </div>
+
+                <div class="subject-card subject-geography">
+                    <div class="subject-icon">🌍</div>
+                    <div class="subject-name">Geography</div>
+                    <div class="subject-count">10 Tests</div>
+                </div>
+
+                <div class="subject-card subject-economy">
+                    <div class="subject-icon">📊</div>
+                    <div class="subject-name">Economy</div>
+                    <div class="subject-count">8 Tests</div>
+                </div>
+
+                <div class="subject-card subject-environment">
+                    <div class="subject-icon">🌱</div>
+                    <div class="subject-name">Environment</div>
+                    <div class="subject-count">6 Tests</div>
+                </div>
+
+                <div class="subject-card subject-science">
+                    <div class="subject-icon">🔬</div>
+                    <div class="subject-name">Science & Tech</div>
+                    <div class="subject-count">8 Tests</div>
+                </div>
+
+                <div class="subject-card subject-current">
+                    <div class="subject-icon">📰</div>
+                    <div class="subject-name">Current Affairs</div>
+                    <div class="subject-count">10 Tests</div>
+                </div>
+
+                <div class="subject-card subject-culture">
+                    <div class="subject-icon">🎨</div>
+                    <div class="subject-name">Art & Culture</div>
+                    <div class="subject-count">5 Tests</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-card glow">
+                <h2>Ready to Ace Your Government Exams?</h2>
+                <p>Get your access key and start practicing for SSC, UPSC, Banking & more!</p>
+                <button class="btn btn-accent btn-lg btn-premium" id="ctaBtn">
+                    🔑 Activate Now
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="https://t.me/the_siddhartha" target="_blank">📱 Contact Admin</a>
+            </div>
+            <div class="footer-copy">
+                © 2024 Gen-Z Mocks. Developed by <strong>Siddhartha Vardhan Singh</strong>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Access Key Modal -->
+    <div class="modal-overlay" id="keyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-icon">🔐</span>
+                <h3 class="modal-title">Enter Access Key</h3>
+                <p class="modal-subtitle">Enter your unique access key to unlock all tests</p>
+            </div>
+
+            <form id="keyForm">
+                <div class="key-input-group">
+                    <input type="text" class="key-input" id="accessKey" placeholder="XXXX-XXXX-XXXX" maxlength="14"
+                        autocomplete="off" required>
+                    <p class="key-error" id="keyError">Invalid access key. Please try again.</p>
+                </div>
+
+                <button type="submit" class="access-btn" id="submitKey">
+                    🚀 Unlock Access
+                </button>
+            </form>
+
+            <div class="access-info">
+                <div class="validity-badge">
+                    ✓ 3 Days Session (Keys work forever)
+                </div>
+                <p style="margin-top: 1rem;">
+                    Don't have a key? <a href="https://t.me/the_siddhartha" target="_blank" class="highlight">📱 Contact
+                        Admin on Telegram</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ACCESS KEY SYSTEM =====
+        // Default keys + any keys generated by admin (keys work forever, sessions last 3 days)
+        const DEFAULT_KEYS = ['GENZ-2024-MOCK', 'TEST-1234-5678', 'DEMO-ACCESS-KEY'];
+
+        function getValidKeys() {
+            const adminKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
+            return [...new Set([...DEFAULT_KEYS, ...adminKeys])];
+        }
+
+        const SESSION_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days session (key works forever)
+
+        // Check if session is still active (key works forever, session lasts 3 days)
+        function checkAccess() {
+            const accessData = localStorage.getItem('genz_session');
+            if (accessData) {
+                const { key, sessionExpiry } = JSON.parse(accessData);
+                if (Date.now() < sessionExpiry) {
+                    return true; // Session still active
+                } else {
+                    localStorage.removeItem('genz_session'); // Session expired, need to re-login with same key
+                }
+            }
+            return false;
+        }
+
+        // Grant session (3 days) - key works forever, can re-login after session expires
+        function grantAccess(key) {
+            const accessData = {
+                key: key,
+                sessionExpiry: Date.now() + SESSION_DURATION,
+                loginAt: Date.now()
+            };
+            localStorage.setItem('genz_session', JSON.stringify(accessData));
+        }
+
+        // Auto-redirect if already has access
+        if (checkAccess()) {
+            // User already logged in, can directly access dashboard
+            // Optional: Auto-redirect
+            // window.location.href = 'dashboard.html';
+        }
+
+        // ===== MODAL HANDLING =====
+        const keyModal = document.getElementById('keyModal');
+        const keyForm = document.getElementById('keyForm');
+        const keyInput = document.getElementById('accessKey');
+        const keyError = document.getElementById('keyError');
+
+        function openKeyModal() {
+            if (checkAccess()) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            keyModal.classList.add('active');
+            setTimeout(() => keyInput.focus(), 300);
+        }
+
+        function closeKeyModal() {
+            keyModal.classList.remove('active');
+            keyInput.value = '';
+            keyInput.classList.remove('error', 'success');
+            keyError.classList.remove('show');
+        }
+
+        // Format key input (XXXX-XXXX-XXXX)
+        keyInput.addEventListener('input', (e) => {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            let formatted = '';
+            for (let i = 0; i < value.length && i < 12; i++) {
+                if (i > 0 && i % 4 === 0) formatted += '-';
+                formatted += value[i];
+            }
+            e.target.value = formatted;
+            keyInput.classList.remove('error');
+            keyError.classList.remove('show');
+        });
+
+        // Submit key
+        keyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const key = keyInput.value.trim();
+
+            if (getValidKeys().includes(key)) {
+                keyInput.classList.add('success');
+                grantAccess(key);
+
+                // Show success and redirect
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500);
+            } else {
+                keyInput.classList.add('error');
+                keyError.classList.add('show');
+            }
+        });
+
+        // Close modal on overlay click
+        keyModal.addEventListener('click', (e) => {
+            if (e.target === keyModal) closeKeyModal();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeKeyModal();
+        });
+
+        // Button handlers
+        document.getElementById('accessBtn').addEventListener('click', openKeyModal);
+        document.getElementById('startBtn').addEventListener('click', openKeyModal);
+        document.getElementById('ctaBtn').addEventListener('click', openKeyModal);
+        document.getElementById('browseBtn').addEventListener('click', openKeyModal);
+
+        // Subject cards - open modal
+        document.querySelectorAll('.subject-card').forEach(card => {
+            card.addEventListener('click', openKeyModal);
+        });
+
+        // ===== PARTICLES EFFECT =====
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['#3b82f6', '#8b5cf6', '#f472b6', '#22c55e', '#f97316'];
+
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = 15 + Math.random() * 10 + 's';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.width = 2 + Math.random() * 4 + 'px';
+                particle.style.height = particle.style.width;
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // ===== LANGUAGE TOGGLE =====
+        const langToggle = document.querySelector('.lang-toggle');
+        langToggle.addEventListener('click', (e) => {
+            if (e.target.dataset.lang) {
+                document.querySelectorAll('.lang-toggle span').forEach(s => s.classList.remove('active'));
+                e.target.classList.add('active');
+                document.body.classList.toggle('lang-hi', e.target.dataset.lang === 'hi');
+            }
+        });
+
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Check saved theme
+        const savedTheme = localStorage.getItem('genz_theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('genz_theme', isLight ? 'light' : 'dark');
+        });
+    </script>
+</body>
+
+</html>
