@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="UPSC Mock Test - Professional exam interface">
+    <title>Mock Test - UPSC Mock Tests</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        body {
+            background: var(--bg-primary);
+        }
+
+        .exam-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Exam Header */
+        .exam-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-xl);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .exam-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .exam-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .exam-title-hi {
+            display: none;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        body.lang-hi .exam-title-hi {
+            display: block;
+        }
+
+        .exam-progress {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .exam-progress-bar {
+            width: 200px;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .exam-progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease;
+        }
+
+        .exam-header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .exam-timer {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-400);
+            background: var(--bg-tertiary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+        }
+
+        .exam-timer.warning {
+            color: var(--warning-500);
+        }
+
+        .exam-timer.danger {
+            color: var(--error-500);
+            animation: pulse 0.5s infinite;
+        }
+
+        /* Main Exam Area */
+        .exam-main {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            flex: 1;
+        }
+
+        /* Question Panel */
+        .question-panel {
+            padding: var(--spacing-2xl);
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .question-number {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .question-number span {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .question-badges {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .question-badge {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .question-badge.difficulty-easy {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success-500);
+        }
+
+        .question-badge.difficulty-moderate {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--warning-500);
+        }
+
+        .question-badge.difficulty-difficult {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error-500);
+        }
+
+        /* Question Content */
+        .question-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .question-text {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .question-text-hi {
+            display: none;
+            font-family: var(--font-hindi);
+        }
+
+        body.lang-hi .question-text-en {
+            display: none;
+        }
+
+        body.lang-hi .question-text-hi {
+            display: block;
+        }
+
+        /* Table in Question */
+        .question-table-wrapper {
+            overflow-x: auto;
+            margin: var(--spacing-lg) 0;
+        }
+
+        .question-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .question-table th,
+        .question-table td {
+            padding: var(--spacing-md) var(--spacing-lg);
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .question-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .question-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Options */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .option-item:hover {
+            border-color: var(--primary-400);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .option-item.selected {
+            border-color: var(--primary-500);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .option-item.correct {
+            border-color: var(--success-500);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .option-item.wrong {
+            border-color: var(--error-500);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .option-letter {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .option-item.selected .option-letter {
+            background: var(--primary-500);
+            color: white;
+        }
+
+        .option-item.correct .option-letter {
+            background: var(--success-500);
+            color: white;
+        }
+
+        .option-item.wrong .option-letter {
+            background: var(--error-500);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1rem;
+            line-height: 1.6;
+            padding-top: 6px;
+        }
+
+        .option-text-hi {
+            display: none;
+            font-family: var(--font-hindi);
+        }
+
+        body.lang-hi .option-text-en {
+            display: none;
+        }
+
+        body.lang-hi .option-text-hi {
+            display: block;
+        }
+
+        /* Explanation (shown after submission) */
+        .explanation-box {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--primary-500);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            display: none;
+        }
+
+        .explanation-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .explanation-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 600;
+            color: var(--primary-400);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .explanation-text {
+            line-height: 1.9;
+            color: var(--text-secondary);
+        }
+
+        .explanation-text-hi {
+            display: none;
+            font-family: var(--font-hindi);
+        }
+
+        body.lang-hi .explanation-text-en {
+            display: none;
+        }
+
+        body.lang-hi .explanation-text-hi {
+            display: block;
+        }
+
+        .explanation-source {
+            margin-top: var(--spacing-md);
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        /* Navigation */
+        .question-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--spacing-xl);
+            border-top: 1px solid var(--border-color);
+            margin-top: var(--spacing-xl);
+        }
+
+        .nav-left,
+        .nav-right {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .btn-mark {
+            background: var(--warning-500);
+            color: white;
+        }
+
+        .btn-mark.marked {
+            background: var(--warning-600);
+        }
+
+        /* Palette Panel */
+        .palette-panel {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            position: sticky;
+            top: 70px;
+        }
+
+        .palette-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .palette-title {
+            font-weight: 600;
+        }
+
+        .marked-count {
+            color: var(--warning-500);
+            font-size: 0.875rem;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .palette-item {
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+
+        .palette-item:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-400);
+        }
+
+        .palette-item.current {
+            border-color: var(--primary-500);
+            background: var(--primary-600);
+            color: white;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .palette-item.answered {
+            background: var(--success-600);
+            color: white;
+            border-color: var(--success-600);
+        }
+
+        .palette-item.marked {
+            background: var(--warning-500);
+            color: white;
+            border-color: var(--warning-500);
+        }
+
+        .palette-item.answered.marked {
+            background: linear-gradient(135deg, var(--success-600) 50%, var(--warning-500) 50%);
+        }
+
+        .palette-item.not-visited {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+        }
+
+        /* Legend */
+        .palette-legend {
+            margin-top: auto;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .legend-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-md);
+            text-transform: uppercase;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+        }
+
+        .legend-dot.answered {
+            background: var(--success-600);
+        }
+
+        .legend-dot.marked {
+            background: var(--warning-500);
+        }
+
+        .legend-dot.current {
+            background: var(--primary-600);
+        }
+
+        .legend-dot.not-visited {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Submit Section */
+        .submit-section {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .submit-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            font-size: 0.8125rem;
+        }
+
+        .submit-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        .submit-stat .label {
+            color: var(--text-muted);
+        }
+
+        .submit-stat .value {
+            font-weight: 600;
+        }
+
+        .submit-stat .value.answered {
+            color: var(--success-500);
+        }
+
+        .submit-stat .value.not-answered {
+            color: var(--text-muted);
+        }
+
+        .submit-stat .value.marked {
+            color: var(--warning-500);
+        }
+
+        /* Submit Confirmation Modal */
+        .submit-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .submit-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .submit-modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .submit-modal h2 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .submit-modal p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .submit-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .summary-item {
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+        }
+
+        .summary-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .summary-item .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .summary-item.answered .value {
+            color: var(--success-500);
+        }
+
+        .summary-item.not-answered .value {
+            color: var(--error-500);
+        }
+
+        .summary-item.marked .value {
+            color: var(--warning-500);
+        }
+
+        .submit-modal-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .exam-main {
+                grid-template-columns: 1fr;
+            }
+
+            .palette-panel {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: auto;
+                max-height: 60vh;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                transform: translateY(calc(100% - 60px));
+                transition: transform var(--transition-normal);
+                z-index: 200;
+            }
+
+            .palette-panel.open {
+                transform: translateY(0);
+            }
+
+            .palette-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: var(--spacing-sm);
+                padding: var(--spacing-md);
+                background: var(--bg-tertiary);
+                border-radius: var(--radius-md) var(--radius-md) 0 0;
+                cursor: pointer;
+                font-weight: 600;
+            }
+
+            .question-panel {
+                padding-bottom: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .exam-header {
+                flex-wrap: wrap;
+                gap: var(--spacing-md);
+            }
+
+            .exam-progress-bar {
+                display: none;
+            }
+
+            .question-panel {
+                padding: var(--spacing-lg);
+            }
+
+            .option-item {
+                padding: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="exam-wrapper">
+        <!-- Exam Header -->
+        <header class="exam-header">
+            <div class="exam-header-left">
+                <a href="dashboard.html" class="btn btn-ghost btn-sm">← Exit</a>
+                <div>
+                    <div class="exam-title" id="examTitle">Polity Mock Test 1</div>
+                    <div class="exam-title-hi">राजव्यवस्था मॉक टेस्ट 1</div>
+                </div>
+                <div class="exam-progress">
+                    <span id="progressText">15 of 100</span>
+                    <div class="exam-progress-bar">
+                        <div class="exam-progress-fill" id="progressFill" style="width: 15%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="exam-header-right">
+                <div class="lang-toggle">
+                    <span class="active" data-lang="en">EN</span>
+                    <span data-lang="hi">हिं</span>
+                </div>
+                <div class="exam-timer" id="examTimer">
+                    <span>⏱️</span>
+                    <span id="timerDisplay">01:59:45</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Exam Area -->
+        <main class="exam-main">
+            <!-- Question Panel -->
+            <div class="question-panel">
+                <div class="question-header">
+                    <div class="question-number">
+                        Question <span id="currentQ">1</span>
+                    </div>
+                    <div class="question-badges">
+                        <span class="question-badge" id="sourceBadge">Source: Laxmikant</span>
+                        <span class="question-badge difficulty-moderate" id="difficultyBadge">Moderate</span>
+                    </div>
+                </div>
+
+                <!-- Question Content -->
+                <div class="question-content">
+                    <div class="question-text question-text-en" id="questionTextEn">
+                        With reference to the Constituent Assembly of India, consider the following pairs:
+                    </div>
+                    <div class="question-text question-text-hi" id="questionTextHi">
+                        भारत की संविधान सभा के संदर्भ में, निम्नलिखित युग्मों पर विचार कीजिए:
+                    </div>
+
+                    <!-- Table (if present) -->
+                    <div class="question-table-wrapper" id="tableWrapper">
+                        <table class="question-table" id="questionTable">
+                            <thead>
+                                <tr>
+                                    <th>S.No.</th>
+                                    <th>Person</th>
+                                    <th>Position held</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td>1.</td>
+                                    <td>Sir B.N. Rau</td>
+                                    <td>Constitutional advisor</td>
+                                </tr>
+                                <tr>
+                                    <td>2.</td>
+                                    <td>H.V.R. Iyengar</td>
+                                    <td>Chief draftsman of the constitution</td>
+                                </tr>
+                                <tr>
+                                    <td>3.</td>
+                                    <td>Prem Behari Narain Raizada</td>
+                                    <td>Calligrapher of the Indian Constitution</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="question-text question-text-en">
+                        How many of the above pairs are correctly matched?
+                    </div>
+                    <div class="question-text question-text-hi">
+                        उपर्युक्त कितने युग्म सही सुमेलित हैं?
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-container" id="optionsContainer">
+                    <!-- Options will be rendered here -->
+                </div>
+
+                <!-- Explanation (hidden initially) -->
+                <div class="explanation-box" id="explanationBox">
+                    <div class="explanation-header">
+                        💡 Explanation
+                    </div>
+                    <div class="explanation-text explanation-text-en" id="explanationTextEn">
+                        <strong>Pair 1 is correctly matched:</strong> Sir B.N. Rau was appointed as the constitutional
+                        advisor to the Constituent Assembly.<br><br>
+                        <strong>Pair 2 is incorrectly matched:</strong> H.V.R. Iyengar was the Secretary to the
+                        Constituent Assembly, not the chief draftsman. S.N. Mukerjee was the chief draftsman of the
+                        constitution in the Constituent Assembly.<br><br>
+                        <strong>Pair 3 is correctly matched:</strong> Prem Behari Narain Raizada was the calligrapher of
+                        the Indian Constitution. The original constitution was handwritten by him in a flowing italic
+                        style.
+                    </div>
+                    <div class="explanation-text explanation-text-hi" id="explanationTextHi">
+                        <strong>युग्म 1 सही है:</strong> सर बी.एन. राव को संविधान सभा के संवैधानिक सलाहकार के रूप में
+                        नियुक्त किया गया था।<br><br>
+                        <strong>युग्म 2 गलत है:</strong> एच.वी.आर. अयंगर संविधान सभा के सचिव थे, मुख्य प्रारूपकार नहीं।
+                        एस.एन. मुखर्जी संविधान सभा में संविधान के मुख्य प्रारूपकार थे।<br><br>
+                        <strong>युग्म 3 सही है:</strong> प्रेम बिहारी नारायण रायजादा भारतीय संविधान के सुलेखक थे। मूल
+                        संविधान उनके द्वारा एक प्रवाहमान इटैलिक शैली में हस्तलिखित किया गया था।
+                    </div>
+                    <div class="explanation-source" id="explanationSource">
+                        📚 Source: Indian Polity - Laxmikant, Making of the Constitution
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="question-nav">
+                    <div class="nav-left">
+                        <button class="btn btn-outline" id="prevBtn">← Previous</button>
+                        <button class="btn btn-mark" id="markBtn">⭐ Mark for Review</button>
+                    </div>
+                    <div class="nav-right">
+                        <button class="btn btn-ghost" id="clearBtn">Clear Response</button>
+                        <button class="btn btn-primary" id="nextBtn">Save & Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Palette Panel -->
+            <aside class="palette-panel" id="palettePanel">
+                <div class="palette-toggle" onclick="togglePalette()">
+                    <span>📋 Question Palette</span>
+                    <span>▲</span>
+                </div>
+
+                <div class="palette-header">
+                    <span class="palette-title">Question Palette</span>
+                    <span class="marked-count" id="markedCount">⭐ 0 Marked</span>
+                </div>
+
+                <div class="palette-grid" id="paletteGrid">
+                    <!-- Palette items will be rendered here -->
+                </div>
+
+                <div class="palette-legend">
+                    <div class="legend-title">Legend</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-dot answered"></div>
+                            <span>Answered</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot marked"></div>
+                            <span>Marked</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot current"></div>
+                            <span>Current</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot not-visited"></div>
+                            <span>Not Visited</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <div class="submit-stats">
+                        <div class="submit-stat">
+                            <span class="label">Answered</span>
+                            <span class="value answered" id="answeredCount">0</span>
+                        </div>
+                        <div class="submit-stat">
+                            <span class="label">Not Answered</span>
+                            <span class="value not-answered" id="notAnsweredCount">100</span>
+                        </div>
+                        <div class="submit-stat">
+                            <span class="label">Marked</span>
+                            <span class="value marked" id="markedCountStat">0</span>
+                        </div>
+                        <div class="submit-stat">
+                            <span class="label">Not Visited</span>
+                            <span class="value" id="notVisitedCount">99</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-accent btn-lg" style="width: 100%;" id="submitBtn">
+                        Submit Test 📤
+                    </button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div class="submit-modal" id="submitModal">
+        <div class="submit-modal-content">
+            <h2>⚠️ Submit Test?</h2>
+            <p>Are you sure you want to submit? You won't be able to change your answers after submission.</p>
+
+            <div class="submit-summary">
+                <div class="summary-item answered">
+                    <div class="value" id="modalAnswered">45</div>
+                    <div class="label">Answered</div>
+                </div>
+                <div class="summary-item not-answered">
+                    <div class="value" id="modalNotAnswered">50</div>
+                    <div class="label">Not Answered</div>
+                </div>
+                <div class="summary-item marked">
+                    <div class="value" id="modalMarked">5</div>
+                    <div class="label">Marked</div>
+                </div>
+            </div>
+
+            <div class="submit-modal-actions">
+                <button class="btn btn-outline btn-lg" id="cancelSubmit">Go Back</button>
+                <button class="btn btn-accent btn-lg" id="confirmSubmit">Confirm Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Questions Data (will come from Supabase in production)
+        const questions = [
+            {
+                id: 1,
+                questionEn: 'With reference to the Constituent Assembly of India, consider the following pairs:',
+                questionHi: 'भारत की संविधान सभा के संदर्भ में, निम्नलिखित युग्मों पर विचार कीजिए:',
+                hasTable: true,
+                tableHeaders: ['S.No.', 'Person', 'Position held'],
+                tableRows: [
+                    ['1.', 'Sir B.N. Rau', 'Constitutional advisor'],
+                    ['2.', 'H.V.R. Iyengar', 'Chief draftsman of the constitution'],
+                    ['3.', 'Prem Behari Narain Raizada', 'Calligrapher of the Indian Constitution']
+                ],
+                questionEndEn: 'How many of the above pairs are correctly matched?',
+                questionEndHi: 'उपर्युक्त कितने युग्म सही सुमेलित हैं?',
+                options: [
+                    { en: 'Only one', hi: 'केवल एक' },
+                    { en: 'Only two', hi: 'केवल दो' },
+                    { en: 'All three', hi: 'तीनों' },
+                    { en: 'None', hi: 'कोई नहीं' }
+                ],
+                correctAnswer: 1, // Index (0-based), so 'b' is correct
+                explanationEn: '<strong>Pair 1 is correctly matched:</strong> Sir B.N. Rau was appointed as the constitutional advisor to the Constituent Assembly.<br><br><strong>Pair 2 is incorrectly matched:</strong> H.V.R. Iyengar was the Secretary to the Constituent Assembly, not the chief draftsman. S.N. Mukerjee was the chief draftsman of the constitution in the Constituent Assembly.<br><br><strong>Pair 3 is correctly matched:</strong> Prem Behari Narain Raizada was the calligrapher of the Indian Constitution.',
+                explanationHi: '<strong>युग्म 1 सही है:</strong> सर बी.एन. राव को संविधान सभा के संवैधानिक सलाहकार के रूप में नियुक्त किया गया था।<br><br><strong>युग्म 2 गलत है:</strong> एच.वी.आर. अयंगर संविधान सभा के सचिव थे, मुख्य प्रारूपकार नहीं।<br><br><strong>युग्म 3 सही है:</strong> प्रेम बिहारी नारायण रायजादा भारतीय संविधान के सुलेखक थे।',
+                source: 'Indian Polity - Laxmikant, Making of the Constitution',
+                difficulty: 'Moderate'
+            },
+            {
+                id: 2,
+                questionEn: 'Consider the following events:<br>I. The Constituent Assembly ratified India\'s membership of the Commonwealth.<br>II. The national flag of India was adopted by the Constituent Assembly.<br>III. The Constituent Assembly elected Dr. Rajendra Prasad as the first President of India.<br><br>Which of the following is the correct chronological sequence of the above events?',
+                questionHi: 'निम्नलिखित घटनाओं पर विचार कीजिए:<br>I. संविधान सभा ने राष्ट्रमंडल में भारत की सदस्यता की पुष्टि की।<br>II. भारतीय राष्ट्रीय ध्वज को संविधान सभा द्वारा अपनाया गया।<br>III. संविधान सभा ने डॉ. राजेंद्र प्रसाद को भारत के प्रथम राष्ट्रपति के रूप में निर्वाचित किया।<br><br>उपर्युक्त घटनाओं का सही कालानुक्रमिक क्रम कौन-सा है?',
+                hasTable: false,
+                options: [
+                    { en: 'I-II-III', hi: 'I-II-III' },
+                    { en: 'II-I-III', hi: 'II-I-III' },
+                    { en: 'I-III-II', hi: 'I-III-II' },
+                    { en: 'III-I-II', hi: 'III-I-II' }
+                ],
+                correctAnswer: 1,
+                explanationEn: 'The correct chronological sequence is II-I-III. The national flag was adopted on July 22, 1947. India\'s membership of the Commonwealth was ratified in May 1949. Dr. Rajendra Prasad was elected as President on January 24, 1950.',
+                explanationHi: 'सही कालानुक्रमिक क्रम II-I-III है। राष्ट्रीय ध्वज 22 जुलाई 1947 को अपनाया गया था। मई 1949 में राष्ट्रमंडल में भारत की सदस्यता की पुष्टि की गई। डॉ. राजेंद्र प्रसाद 24 जनवरी 1950 को राष्ट्रपति निर्वाचित हुए।',
+                source: 'Indian Polity - Laxmikant',
+                difficulty: 'Moderate'
+            }
+        ];
+
+        // Test State
+        const testState = {
+            currentQuestion: 0,
+            answers: {},           // { questionIndex: selectedOptionIndex }
+            marked: new Set(),     // Set of marked question indices
+            visited: new Set([0]), // Set of visited question indices
+            totalQuestions: questions.length,
+            timeRemaining: 7200,   // 2 hours in seconds
+            submitted: false
+        };
+
+        // DOM Elements
+        const optionsContainer = document.getElementById('optionsContainer');
+        const paletteGrid = document.getElementById('paletteGrid');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const markBtn = document.getElementById('markBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitModal = document.getElementById('submitModal');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const examTimer = document.getElementById('examTimer');
+
+        // Initialize
+        function init() {
+            renderPalette();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        // Render Question
+        function renderQuestion(index) {
+            const q = questions[index];
+            testState.currentQuestion = index;
+            testState.visited.add(index);
+
+            // Update question number
+            document.getElementById('currentQ').textContent = index + 1;
+            document.getElementById('progressText').textContent = `${index + 1} of ${testState.totalQuestions}`;
+            document.getElementById('progressFill').style.width = `${((index + 1) / testState.totalQuestions) * 100}%`;
+
+            // Update badges
+            document.getElementById('sourceBadge').textContent = `Source: ${q.source.split('-')[0].trim()}`;
+            document.getElementById('difficultyBadge').textContent = q.difficulty;
+            document.getElementById('difficultyBadge').className = `question-badge difficulty-${q.difficulty.toLowerCase()}`;
+
+            // Update question text
+            document.getElementById('questionTextEn').innerHTML = q.questionEn;
+            document.getElementById('questionTextHi').innerHTML = q.questionHi;
+
+            // Handle table
+            const tableWrapper = document.getElementById('tableWrapper');
+            if (q.hasTable) {
+                tableWrapper.style.display = 'block';
+                const thead = document.querySelector('#questionTable thead tr');
+                const tbody = document.getElementById('tableBody');
+                thead.innerHTML = q.tableHeaders.map(h => `<th>${h}</th>`).join('');
+                tbody.innerHTML = q.tableRows.map(row =>
+                    `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
+                ).join('');
+            } else {
+                tableWrapper.style.display = 'none';
+            }
+
+            // Render options
+            renderOptions(q, index);
+
+            // Update mark button
+            updateMarkButton(index);
+
+            // Update explanation (hide during test, show if submitted)
+            document.getElementById('explanationBox').classList.remove('show');
+
+            // Update palette
+            updatePalette();
+            updateStats();
+        }
+
+        // Render Options
+        function renderOptions(q, qIndex) {
+            const letters = ['a', 'b', 'c', 'd'];
+            const selectedOption = testState.answers[qIndex];
+
+            optionsContainer.innerHTML = q.options.map((opt, i) => `
+                <div class="option-item ${selectedOption === i ? 'selected' : ''}" 
+                     data-index="${i}" onclick="selectOption(${i})">
+                    <div class="option-letter">${letters[i]}</div>
+                    <div class="option-text">
+                        <span class="option-text-en">${opt.en}</span>
+                        <span class="option-text-hi">${opt.hi}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select Option
+        function selectOption(optionIndex) {
+            if (testState.submitted) return;
+
+            testState.answers[testState.currentQuestion] = optionIndex;
+
+            // Update UI
+            document.querySelectorAll('.option-item').forEach((el, i) => {
+                el.classList.toggle('selected', i === optionIndex);
+            });
+
+            updatePalette();
+            updateStats();
+        }
+
+        // Clear Response
+        clearBtn.addEventListener('click', () => {
+            delete testState.answers[testState.currentQuestion];
+            document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+            updatePalette();
+            updateStats();
+        });
+
+        // Mark for Review
+        function updateMarkButton(index) {
+            const isMarked = testState.marked.has(index);
+            markBtn.classList.toggle('marked', isMarked);
+            markBtn.innerHTML = isMarked ? '⭐ Marked' : '⭐ Mark for Review';
+        }
+
+        markBtn.addEventListener('click', () => {
+            const index = testState.currentQuestion;
+            if (testState.marked.has(index)) {
+                testState.marked.delete(index);
+            } else {
+                testState.marked.add(index);
+            }
+            updateMarkButton(index);
+            updatePalette();
+            updateStats();
+        });
+
+        // Navigation
+        prevBtn.addEventListener('click', () => {
+            if (testState.currentQuestion > 0) {
+                renderQuestion(testState.currentQuestion - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (testState.currentQuestion < testState.totalQuestions - 1) {
+                renderQuestion(testState.currentQuestion + 1);
+            }
+        });
+
+        // Render Palette
+        function renderPalette() {
+            paletteGrid.innerHTML = Array.from({ length: testState.totalQuestions }, (_, i) => `
+                <div class="palette-item not-visited" data-index="${i}" onclick="goToQuestion(${i})">
+                    ${i + 1}
+                </div>
+            `).join('');
+        }
+
+        // Update Palette
+        function updatePalette() {
+            document.querySelectorAll('.palette-item').forEach((el, i) => {
+                el.className = 'palette-item';
+
+                if (i === testState.currentQuestion) {
+                    el.classList.add('current');
+                } else if (testState.answers[i] !== undefined && testState.marked.has(i)) {
+                    el.classList.add('answered', 'marked');
+                } else if (testState.answers[i] !== undefined) {
+                    el.classList.add('answered');
+                } else if (testState.marked.has(i)) {
+                    el.classList.add('marked');
+                } else if (testState.visited.has(i)) {
+                    el.classList.add('not-visited');
+                } else {
+                    el.classList.add('not-visited');
+                }
+            });
+
+            // Update marked count
+            document.getElementById('markedCount').textContent = `⭐ ${testState.marked.size} Marked`;
+        }
+
+        // Update Stats
+        function updateStats() {
+            const answered = Object.keys(testState.answers).length;
+            const marked = testState.marked.size;
+            const visited = testState.visited.size;
+            const notAnswered = testState.totalQuestions - answered;
+            const notVisited = testState.totalQuestions - visited;
+
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('notAnsweredCount').textContent = notAnswered;
+            document.getElementById('markedCountStat').textContent = marked;
+            document.getElementById('notVisitedCount').textContent = notVisited;
+        }
+
+        // Go to Question
+        function goToQuestion(index) {
+            renderQuestion(index);
+        }
+
+        // Timer
+        function startTimer() {
+            const interval = setInterval(() => {
+                if (testState.submitted) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                testState.timeRemaining--;
+
+                const hours = Math.floor(testState.timeRemaining / 3600);
+                const minutes = Math.floor((testState.timeRemaining % 3600) / 60);
+                const seconds = testState.timeRemaining % 60;
+
+                timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                // Warning states
+                if (testState.timeRemaining <= 300) {
+                    examTimer.classList.add('danger');
+                } else if (testState.timeRemaining <= 600) {
+                    examTimer.classList.add('warning');
+                }
+
+                // Auto-submit when time is up
+                if (testState.timeRemaining <= 0) {
+                    clearInterval(interval);
+                    submitTest();
+                }
+            }, 1000);
+        }
+
+        // Submit Modal
+        submitBtn.addEventListener('click', () => {
+            const answered = Object.keys(testState.answers).length;
+            const notAnswered = testState.totalQuestions - answered;
+
+            document.getElementById('modalAnswered').textContent = answered;
+            document.getElementById('modalNotAnswered').textContent = notAnswered;
+            document.getElementById('modalMarked').textContent = testState.marked.size;
+
+            submitModal.classList.add('active');
+        });
+
+        document.getElementById('cancelSubmit').addEventListener('click', () => {
+            submitModal.classList.remove('active');
+        });
+
+        document.getElementById('confirmSubmit').addEventListener('click', () => {
+            submitTest();
+        });
+
+        // Submit Test
+        function submitTest() {
+            testState.submitted = true;
+            submitModal.classList.remove('active');
+
+            // Calculate score
+            let correct = 0;
+            let wrong = 0;
+
+            questions.forEach((q, i) => {
+                if (testState.answers[i] !== undefined) {
+                    if (testState.answers[i] === q.correctAnswer) {
+                        correct++;
+                    } else {
+                        wrong++;
+                    }
+                }
+            });
+
+            // Redirect to results (in production, save to Supabase first)
+            const params = new URLSearchParams({
+                correct,
+                wrong,
+                total: testState.totalQuestions,
+                time: 7200 - testState.timeRemaining
+            });
+
+            window.location.href = `results.html?${params.toString()}`;
+        }
+
+        // Language Toggle
+        document.querySelector('.lang-toggle').addEventListener('click', (e) => {
+            if (e.target.dataset.lang) {
+                document.querySelectorAll('.lang-toggle span').forEach(s => s.classList.remove('active'));
+                e.target.classList.add('active');
+                document.body.classList.toggle('lang-hi', e.target.dataset.lang === 'hi');
+            }
+        });
+
+        // Mobile palette toggle
+        function togglePalette() {
+            document.getElementById('palettePanel').classList.toggle('open');
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Panel - Manage Gen-Z Mocks Tests">
+    <title>Admin - Gen-Z Mocks</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: var(--spacing-xl);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-2xl);
+            color: var(--text-primary);
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+
+        .admin-nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .admin-nav-item.active {
+            background: var(--primary-600);
+            color: white;
+        }
+
+        .admin-nav-item .icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .admin-main {
+            padding: var(--spacing-2xl);
+            background: var(--bg-primary);
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .admin-header h1 {
+            font-size: 1.75rem;
+        }
+
+        /* Stats Cards */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .admin-stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+        }
+
+        .admin-stat-card .icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .admin-stat-card .icon.tests {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        }
+
+        .admin-stat-card .icon.questions {
+            background: linear-gradient(135deg, #22c55e, #4ade80);
+        }
+
+        .admin-stat-card .icon.users {
+            background: linear-gradient(135deg, #f97316, #fb923c);
+        }
+
+        .admin-stat-card .icon.attempts {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+
+        .admin-stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .admin-stat-card .label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Table */
+        .admin-table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .admin-table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-table-header h2 {
+            font-size: 1.125rem;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: var(--spacing-md) var(--spacing-lg);
+            text-align: left;
+        }
+
+        .admin-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+        }
+
+        .admin-table tr {
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .admin-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .admin-table .title-cell {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .admin-table .test-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            font-size: 1.25rem;
+        }
+
+        .admin-table .actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .admin-table .btn-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .admin-table .btn-icon:hover {
+            background: var(--primary-600);
+            color: white;
+        }
+
+        .admin-table .btn-icon.delete:hover {
+            background: var(--error-600);
+        }
+
+        /* Create Test Modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: var(--spacing-xl);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+            padding: var(--spacing-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Form */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-label small {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        /* Import Section */
+        .import-section {
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .import-section:hover {
+            border-color: var(--primary-500);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .import-section.dragover {
+            border-color: var(--primary-500);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .import-section .icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .import-section h3 {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .import-section p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .import-section input {
+            display: none;
+        }
+
+        /* Marking Scheme */
+        .marking-scheme {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            background: var(--bg-tertiary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .marking-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .marking-item label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .marking-item input {
+            width: 80px;
+            padding: var(--spacing-sm);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <span>🚀</span>
+                <span>Gen-Z Admin</span>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="index.html" class="admin-nav-item active">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="admin-nav-item" id="navTests">
+                    <span class="icon">📝</span>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="#" class="admin-nav-item" id="navQuestions">
+                    <span class="icon">❓</span>
+                    <span>Questions</span>
+                </a>
+                <a href="#" class="admin-nav-item" id="navSubjects">
+                    <span class="icon">📚</span>
+                    <span>Subjects</span>
+                </a>
+                <a href="#" class="admin-nav-item" id="navUsers">
+                    <span class="icon">👥</span>
+                    <span>Users</span>
+                </a>
+                <a href="#" class="admin-nav-item" id="navImport">
+                    <span class="icon">📥</span>
+                    <span>Import PDF</span>
+                </a>
+                <a href="#" class="admin-nav-item" id="navKeys">
+                    <span class="icon">🔑</span>
+                    <span>Access Keys</span>
+                </a>
+                <a href="../dashboard.html" class="admin-nav-item">
+                    <span class="icon">🌐</span>
+                    <span>View Site</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>📊 Dashboard</h1>
+                <button class="btn btn-primary" id="createTestBtn">
+                    ➕ Create New Test
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="admin-stats">
+                <div class="admin-stat-card">
+                    <div class="icon tests">📝</div>
+                    <div class="value">24</div>
+                    <div class="label">Total Tests</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="icon questions">❓</div>
+                    <div class="value">1,850</div>
+                    <div class="label">Total Questions</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="icon users">👥</div>
+                    <div class="value">156</div>
+                    <div class="label">Registered Users</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="icon attempts">📈</div>
+                    <div class="value">892</div>
+                    <div class="label">Test Attempts</div>
+                </div>
+            </div>
+
+            <!-- Tests Table -->
+            <div class="admin-table-card">
+                <div class="admin-table-header">
+                    <h2>Recent Mock Tests</h2>
+                    <div class="flex gap-sm">
+                        <button class="btn btn-ghost btn-sm">Export</button>
+                        <button class="btn btn-outline btn-sm" id="importPdfBtn">📥 Import PDF</button>
+                    </div>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Subject</th>
+                            <th>Questions</th>
+                            <th>Time</th>
+                            <th>Attempts</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="testsTableBody">
+                        <tr>
+                            <td>
+                                <div class="title-cell">
+                                    <div class="test-icon">⚖️</div>
+                                    <div>
+                                        <strong>Polity Mock Test 1</strong>
+                                        <div class="text-muted" style="font-size:0.75rem;">राजव्यवस्था मॉक टेस्ट 1</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Indian Polity</td>
+                            <td>100</td>
+                            <td>120 min</td>
+                            <td>45</td>
+                            <td><span class="badge badge-new">Active</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn-icon" title="Edit">✏️</button>
+                                    <button class="btn-icon" title="Preview">👁️</button>
+                                    <button class="btn-icon delete" title="Delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="title-cell">
+                                    <div class="test-icon">📜</div>
+                                    <div>
+                                        <strong>History Mock Test 1</strong>
+                                        <div class="text-muted" style="font-size:0.75rem;">इतिहास मॉक टेस्ट 1</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>History</td>
+                            <td>75</td>
+                            <td>90 min</td>
+                            <td>32</td>
+                            <td><span class="badge badge-new">Active</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn-icon" title="Edit">✏️</button>
+                                    <button class="btn-icon" title="Preview">👁️</button>
+                                    <button class="btn-icon delete" title="Delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="title-cell">
+                                    <div class="test-icon">🌍</div>
+                                    <div>
+                                        <strong>Geography Mock Test 1</strong>
+                                        <div class="text-muted" style="font-size:0.75rem;">भूगोल मॉक टेस्ट 1</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Geography</td>
+                            <td>50</td>
+                            <td>60 min</td>
+                            <td>28</td>
+                            <td><span class="badge badge-attempted">Draft</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn-icon" title="Edit">✏️</button>
+                                    <button class="btn-icon" title="Preview">👁️</button>
+                                    <button class="btn-icon delete" title="Delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create/Edit Test Modal -->
+    <div class="modal" id="testModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create New Mock Test</h2>
+                <span class="modal-close" id="modalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="testForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Test Name (English) *</label>
+                            <input type="text" class="form-input" id="testNameEn" placeholder="e.g., Polity Mock Test 1"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Test Name (Hindi)</label>
+                            <input type="text" class="form-input" id="testNameHi"
+                                placeholder="e.g., राजव्यवस्था मॉक टेस्ट 1">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Subject *</label>
+                            <select class="form-select" id="testSubject" required>
+                                <option value="">Select Subject</option>
+                                <option value="polity">⚖️ Indian Polity</option>
+                                <option value="history">📜 History</option>
+                                <option value="geography">🌍 Geography</option>
+                                <option value="economy">📊 Economy</option>
+                                <option value="environment">🌱 Environment</option>
+                                <option value="science">🔬 Science & Tech</option>
+                                <option value="current">📰 Current Affairs</option>
+                                <option value="culture">🎨 Art & Culture</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Difficulty</label>
+                            <select class="form-select" id="testDifficulty">
+                                <option value="easy">Easy</option>
+                                <option value="moderate" selected>Moderate</option>
+                                <option value="difficult">Difficult</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Number of Questions *</label>
+                            <input type="number" class="form-input" id="testQuestions" placeholder="100" min="1"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time Limit (minutes) *</label>
+                            <input type="number" class="form-input" id="testTime" placeholder="120" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Marking Scheme</label>
+                        <div class="marking-scheme">
+                            <div class="marking-item">
+                                <label>Correct Answer:</label>
+                                <input type="number" id="markCorrect" value="2" step="0.01">
+                                <span>marks</span>
+                            </div>
+                            <div class="marking-item">
+                                <label>Wrong Answer:</label>
+                                <input type="number" id="markWrong" value="-0.66" step="0.01">
+                                <span>marks</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Source <small>(optional)</small></label>
+                        <input type="text" class="form-input" id="testSource" placeholder="e.g., Laxmikant Chapter 5">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description <small>(optional)</small></label>
+                        <textarea class="form-textarea" id="testDescription"
+                            placeholder="Brief description of the test..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveTestBtn">Save Test</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import PDF Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📥 Import Questions from PDF</h2>
+                <span class="modal-close" id="importModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="import-section" id="dropZone">
+                    <div class="icon">📄</div>
+                    <h3>Drop PDF file here</h3>
+                    <p>or click to browse</p>
+                    <input type="file" id="pdfInput" accept=".pdf,.json">
+                </div>
+
+                <div class="form-group mt-xl">
+                    <label class="form-label">Or paste JSON data directly:</label>
+                    <textarea class="form-textarea" id="jsonInput"
+                        placeholder='Paste JSON output from extract_mcq.py tool...'
+                        style="min-height: 150px; font-family: monospace;"></textarea>
+                </div>
+
+                <div class="mt-lg" id="importPreview" style="display: none;">
+                    <h3 class="mb-md">Preview</h3>
+                    <div class="card card-sm">
+                        <p><strong>Test:</strong> <span id="previewTitle">-</span></p>
+                        <p><strong>Subject:</strong> <span id="previewSubject">-</span></p>
+                        <p><strong>Questions:</strong> <span id="previewCount">-</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="cancelImportBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmImportBtn" disabled>Import Questions</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Access Keys Modal -->
+    <div class="modal" id="keysModal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2>🔑 Access Keys Management</h2>
+                <span class="modal-close" id="keysModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                    <div>
+                        <h3 style="margin-bottom: 0.25rem;">Generate Access Keys</h3>
+                        <p style="color: var(--text-muted); font-size: 0.875rem;">Each key grants 3 days of access</p>
+                    </div>
+                    <button class="btn btn-primary" id="generateKeyBtn">
+                        ➕ Generate New Key
+                    </button>
+                </div>
+
+                <div id="keysList">
+                    <!-- Keys will be rendered here -->
+                </div>
+
+                <div
+                    style="margin-top: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 0.75rem; border-left: 4px solid #3b82f6;">
+                    <h4 style="color: #60a5fa; margin-bottom: 0.5rem;">💡 How it works</h4>
+                    <ul style="color: var(--text-secondary); font-size: 0.875rem; margin: 0; padding-left: 1.25rem;">
+                        <li>Generate a key and share it with users</li>
+                        <li>Users enter the key on the login page</li>
+                        <li>Access is granted for 3 days automatically</li>
+                        <li>Same key can be reused after session expires</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Tests Modal (placeholder) -->
+    <div class="modal" id="testsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Mock Tests</h2>
+                <span class="modal-close" id="testsModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    Mock tests management coming soon!<br>
+                    <small>This will connect to Supabase to list and manage all tests.</small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Modal (placeholder) -->
+    <div class="modal" id="questionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>❓ Questions Bank</h2>
+                <span class="modal-close" id="questionsModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    Questions management coming soon!<br>
+                    <small>This will connect to Supabase to list and manage all questions.</small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subjects Modal (placeholder) -->
+    <div class="modal" id="subjectsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📚 Subjects</h2>
+                <span class="modal-close" id="subjectsModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div class="card card-sm" style="text-align: center;">
+                        <span style="font-size: 2rem;">⚖️</span>
+                        <p style="font-weight: 600; margin-top: 0.5rem;">Indian Polity</p>
+                    </div>
+                    <div class="card card-sm" style="text-align: center;">
+                        <span style="font-size: 2rem;">📜</span>
+                        <p style="font-weight: 600; margin-top: 0.5rem;">History</p>
+                    </div>
+                    <div class="card card-sm" style="text-align: center;">
+                        <span style="font-size: 2rem;">🌍</span>
+                        <p style="font-weight: 600; margin-top: 0.5rem;">Geography</p>
+                    </div>
+                    <div class="card card-sm" style="text-align: center;">
+                        <span style="font-size: 2rem;">📊</span>
+                        <p style="font-weight: 600; margin-top: 0.5rem;">Economy</p>
+                    </div>
+                    <div class="card card-sm" style="text-align: center;">
+                        <span style="font-size: 2rem;">🌱</span>
+                        <p style="font-weight: 600; margin-top: 0.5rem;">Environment</p>
+                    </div>
+                    <div class="card card-sm" style="text-align: center;">
+                        <span style="font-size: 2rem;">🔬</span>
+                        <p style="font-weight: 600; margin-top: 0.5rem;">Science & Tech</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Modal (placeholder) -->
+    <div class="modal" id="usersModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👥 Users</h2>
+                <span class="modal-close" id="usersModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    User management coming soon!<br>
+                    <small>This will show all users who have accessed the platform.</small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+
+    <script>
+        // Modal Handlers
+        const testModal = document.getElementById('testModal');
+        const importModal = document.getElementById('importModal');
+        const testsModal = document.getElementById('testsModal');
+        const questionsModal = document.getElementById('questionsModal');
+        const subjectsModal = document.getElementById('subjectsModal');
+        const usersModal = document.getElementById('usersModal');
+
+        // Create Test
+        document.getElementById('createTestBtn').addEventListener('click', () => {
+            testModal.classList.add('active');
+        });
+
+        document.getElementById('modalClose').addEventListener('click', () => {
+            testModal.classList.remove('active');
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            testModal.classList.remove('active');
+        });
+
+        // Import PDF
+        document.getElementById('importPdfBtn').addEventListener('click', () => {
+            importModal.classList.add('active');
+        });
+
+        document.getElementById('navImport').addEventListener('click', (e) => {
+            e.preventDefault();
+            importModal.classList.add('active');
+        });
+
+        document.getElementById('importModalClose').addEventListener('click', () => {
+            importModal.classList.remove('active');
+        });
+
+        document.getElementById('cancelImportBtn').addEventListener('click', () => {
+            importModal.classList.remove('active');
+        });
+
+        // Mock Tests nav
+        document.getElementById('navTests').addEventListener('click', (e) => {
+            e.preventDefault();
+            testsModal.classList.add('active');
+        });
+        document.getElementById('testsModalClose').addEventListener('click', () => {
+            testsModal.classList.remove('active');
+        });
+
+        // Questions nav
+        document.getElementById('navQuestions').addEventListener('click', (e) => {
+            e.preventDefault();
+            questionsModal.classList.add('active');
+        });
+        document.getElementById('questionsModalClose').addEventListener('click', () => {
+            questionsModal.classList.remove('active');
+        });
+
+        // Subjects nav
+        document.getElementById('navSubjects').addEventListener('click', (e) => {
+            e.preventDefault();
+            subjectsModal.classList.add('active');
+        });
+        document.getElementById('subjectsModalClose').addEventListener('click', () => {
+            subjectsModal.classList.remove('active');
+        });
+
+        // Users nav
+        document.getElementById('navUsers').addEventListener('click', (e) => {
+            e.preventDefault();
+            usersModal.classList.add('active');
+        });
+        document.getElementById('usersModalClose').addEventListener('click', () => {
+            usersModal.classList.remove('active');
+        });
+
+        // Drag and Drop
+        const dropZone = document.getElementById('dropZone');
+        const pdfInput = document.getElementById('pdfInput');
+
+        dropZone.addEventListener('click', () => pdfInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        pdfInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
+            if (file.name.endsWith('.json')) {
+                // Read JSON file
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        showImportPreview(data);
+                    } catch (err) {
+                        alert('Invalid JSON file');
+                    }
+                };
+                reader.readAsText(file);
+            } else if (file.name.endsWith('.pdf')) {
+                // For PDF, show instructions
+                alert('PDF processing requires the Python tool.\n\nRun:\npython tools/extract_mcq.py ' + file.name + ' output.json\n\nThen import the JSON file.');
+            }
+        }
+
+        // JSON paste handler
+        document.getElementById('jsonInput').addEventListener('input', (e) => {
+            try {
+                const data = JSON.parse(e.target.value);
+                showImportPreview(data);
+            } catch (err) {
+                document.getElementById('importPreview').style.display = 'none';
+                document.getElementById('confirmImportBtn').disabled = true;
+            }
+        });
+
+        function showImportPreview(data) {
+            document.getElementById('previewTitle').textContent = data.title_en || 'Unknown';
+            document.getElementById('previewSubject').textContent = data.subject || 'Unknown';
+            document.getElementById('previewCount').textContent = data.total_questions || (data.questions ? data.questions.length : 0);
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('confirmImportBtn').disabled = false;
+
+            // Store for import
+            window.importData = data;
+        }
+
+        // Confirm import
+        document.getElementById('confirmImportBtn').addEventListener('click', () => {
+            if (window.importData) {
+                // In production, this would save to Supabase
+                alert('✅ Successfully imported ' + (window.importData.total_questions || window.importData.questions.length) + ' questions!\n\nNote: In the full version, this will be saved to Supabase database.');
+                importModal.classList.remove('active');
+            }
+        });
+
+        // Save Test
+        document.getElementById('saveTestBtn').addEventListener('click', () => {
+            const form = document.getElementById('testForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const testData = {
+                name_en: document.getElementById('testNameEn').value,
+                name_hi: document.getElementById('testNameHi').value,
+                subject: document.getElementById('testSubject').value,
+                difficulty: document.getElementById('testDifficulty').value,
+                questions: parseInt(document.getElementById('testQuestions').value),
+                time: parseInt(document.getElementById('testTime').value),
+                mark_correct: parseFloat(document.getElementById('markCorrect').value),
+                mark_wrong: parseFloat(document.getElementById('markWrong').value),
+                source: document.getElementById('testSource').value,
+                description: document.getElementById('testDescription').value
+            };
+
+            console.log('Test Data:', testData);
+            alert('✅ Test created successfully!\n\nNote: In the full version, this will be saved to Supabase database.');
+            testModal.classList.remove('active');
+            form.reset();
+        });
+
+        // ===== ACCESS KEYS MANAGEMENT =====
+        const keysModal = document.getElementById('keysModal');
+        let generatedKeys = JSON.parse(localStorage.getItem('admin_keys') || '[]');
+
+        // Open keys modal
+        document.getElementById('navKeys').addEventListener('click', (e) => {
+            e.preventDefault();
+            renderKeysList();
+            keysModal.classList.add('active');
+        });
+
+        document.getElementById('keysModalClose').addEventListener('click', () => {
+            keysModal.classList.remove('active');
+        });
+
+        // Generate random key
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 4; i++) {
+                if (i > 0) key += '-';
+                for (let j = 0; j < 4; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+            }
+            return key;
+        }
+
+        // Generate new key
+        document.getElementById('generateKeyBtn').addEventListener('click', () => {
+            const newKey = {
+                key: generateKey(),
+                createdAt: new Date().toISOString(),
+                validDays: 3,
+                used: false,
+                usedAt: null
+            };
+
+            generatedKeys.unshift(newKey);
+            localStorage.setItem('admin_keys', JSON.stringify(generatedKeys));
+
+            // Also add to valid keys list (simulating backend)
+            const validKeys = JSON.parse(localStorage.getItem('valid_keys') || '["UPSC-2024-MOCK","TEST-1234-5678","DEMO-ACCESS-KEY"]');
+            if (!validKeys.includes(newKey.key)) {
+                validKeys.push(newKey.key);
+                localStorage.setItem('valid_keys', JSON.stringify(validKeys));
+            }
+
+            renderKeysList();
+        });
+
+        // Render keys list
+        function renderKeysList() {
+            const container = document.getElementById('keysList');
+
+            if (generatedKeys.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <p>No keys generated yet. Click "Generate New Key" to create one.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = generatedKeys.map((k, i) => `
+                <div class="key-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.75rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.125rem; font-weight: 600; color: ${k.used ? 'var(--text-muted)' : '#60a5fa'};">
+                            ${k.key}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                            Created: ${new Date(k.createdAt).toLocaleDateString()} • 
+                            ${k.used ? '✓ Used' : '🟢 Available'}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-sm btn-outline" onclick="copyKey('${k.key}')" title="Copy">
+                            📋 Copy
+                        </button>
+                        <button class="btn btn-sm btn-ghost" onclick="deleteKey(${i})" title="Delete" style="color: var(--error-500);">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Copy key
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                alert('✅ Key copied to clipboard: ' + key);
+            });
+        }
+
+        // Delete key
+        function deleteKey(index) {
+            if (confirm('Delete this key?')) {
+                generatedKeys.splice(index, 1);
+                localStorage.setItem('admin_keys', JSON.stringify(generatedKeys));
+                renderKeysList();
+            }
+        }
+
+        // Close on overlay click
+        [testModal, importModal, keysModal, testsModal, questionsModal, subjectsModal, usersModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                testModal.classList.remove('active');
+                importModal.classList.remove('active');
+                keysModal.classList.remove('active');
+                testsModal.classList.remove('active');
+                questionsModal.classList.remove('active');
+                subjectsModal.classList.remove('active');
+                usersModal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+
+</html>
