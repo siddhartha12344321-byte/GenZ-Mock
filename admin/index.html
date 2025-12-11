@@ -574,12 +574,12 @@
 
     </div>
 
-    <!-- CREATE TEST MODAL -->
+    <!-- CREATE TEST MODAL - ENHANCED WITH TABS -->
     <div id="createTestModal"
         class="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-        <div class="modal-content bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+        <div class="modal-content bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
             <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="text-xl font-bold text-gray-900">Create New Test</h2>
+                <h2 class="text-xl font-bold text-gray-900">🚀 Create New Mock Test</h2>
                 <button onclick="closeModal('createTestModal')"
                     class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -588,53 +588,109 @@
                     </svg>
                 </button>
             </div>
-            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] custom-scrollbar">
+
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200">
+                <button id="tabJsonUpload" onclick="switchCreateTab('json')"
+                    class="flex-1 py-4 text-center font-bold text-orange-600 border-b-2 border-orange-500 bg-orange-50">
+                    📥 JSON Bulk Upload
+                </button>
+                <button id="tabManual" onclick="switchCreateTab('manual')"
+                    class="flex-1 py-4 text-center font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                    ✏️ Manual Creator
+                </button>
+            </div>
+
+            <!-- JSON Upload Tab -->
+            <div id="jsonUploadTab" class="p-6 overflow-y-auto max-h-[calc(90vh-180px)] custom-scrollbar">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                    <div class="font-bold text-blue-800 mb-2">💡 How to use:</div>
+                    <ol class="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                        <li>Copy your PDF questions to ChatGPT/Gemini</li>
+                        <li>Ask it to convert to JSON format (see format below)</li>
+                        <li>Paste the JSON here and click "Create Mock Test"</li>
+                    </ol>
+                </div>
+
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Paste JSON Here:</label>
+                <textarea id="jsonInput" rows="15" placeholder='{
+  "test_name": "Polity Mock Test 1",
+  "subject": "Polity",
+  "time_limit": 30,
+  "questions": [
+    {
+      "question": "Who is the head of state?",
+      "options": ["PM", "President", "CJI", "Speaker"],
+      "correct": 1,
+      "explanation": "President is the ceremonial head."
+    }
+  ]
+}' class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 font-mono text-sm"></textarea>
+
+                <div id="jsonError" class="text-red-500 text-sm mt-2 hidden"></div>
+                <div id="jsonSuccess" class="text-green-600 text-sm mt-2 hidden"></div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button onclick="closeModal('createTestModal')"
+                        class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">Cancel</button>
+                    <button onclick="createTestFromJson()"
+                        class="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-orange-700 shadow-lg">
+                        🚀 Create Mock Test
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Creator Tab -->
+            <div id="manualTab" class="p-6 overflow-y-auto max-h-[calc(90vh-180px)] custom-scrollbar hidden">
                 <div class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Test Name (English)</label>
-                        <input type="text" id="testNameEn" placeholder="e.g., Polity Mock Test 1"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <!-- Test Info -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Test Name</label>
+                            <input type="text" id="manualTestName" placeholder="e.g., Polity Mock Test 1"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                            <select id="testSubject"
+                            <select id="manualSubject"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100">
-                                <option value="polity">Indian Polity</option>
-                                <option value="history">History</option>
-                                <option value="geography">Geography</option>
-                                <option value="economy">Economy</option>
-                                <option value="science">Science & Tech</option>
-                                <option value="environment">Environment</option>
-                                <option value="current">Current Affairs</option>
+                                <option value="Polity">Indian Polity</option>
+                                <option value="History">History</option>
+                                <option value="Geography">Geography</option>
+                                <option value="Economy">Economy</option>
+                                <option value="Science">Science & Tech</option>
+                                <option value="Environment">Environment</option>
+                                <option value="Current">Current Affairs</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Time Limit (minutes)</label>
-                            <input type="number" id="testTime" value="60"
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Time (minutes)</label>
+                            <input type="number" id="manualTime" value="30"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Correct Mark</label>
-                            <input type="number" id="markCorrect" value="2"
-                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100">
+
+                    <!-- Questions List -->
+                    <div class="border-t border-gray-200 pt-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-800">Questions (<span id="questionCount">0</span>)</h3>
+                            <button onclick="addQuestionForm()"
+                                class="text-sm text-blue-600 font-medium hover:underline">+ Add Question</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Negative Mark</label>
-                            <input type="number" id="markNegative" value="0.66" step="0.01"
-                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <div id="questionsContainer" class="space-y-4">
+                            <!-- Questions will be added here -->
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                <button onclick="closeModal('createTestModal')"
-                    class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
-                <button onclick="createTest()"
-                    class="btn-animate px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700">Create
-                    Test</button>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button onclick="closeModal('createTestModal')"
+                        class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">Cancel</button>
+                    <button onclick="createTestManual()"
+                        class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg">
+                        ✅ Create Test
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -822,6 +878,209 @@
             loadTestsTable();
             alert('Test created successfully!');
         }
+
+        // Tab switching for Create Test modal
+        function switchCreateTab(tab) {
+            const jsonTab = document.getElementById('jsonUploadTab');
+            const manualTab = document.getElementById('manualTab');
+            const tabJson = document.getElementById('tabJsonUpload');
+            const tabManual = document.getElementById('tabManual');
+
+            if (tab === 'json') {
+                jsonTab.classList.remove('hidden');
+                manualTab.classList.add('hidden');
+                tabJson.className = 'flex-1 py-4 text-center font-bold text-orange-600 border-b-2 border-orange-500 bg-orange-50';
+                tabManual.className = 'flex-1 py-4 text-center font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50';
+            } else {
+                jsonTab.classList.add('hidden');
+                manualTab.classList.remove('hidden');
+                tabManual.className = 'flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-500 bg-blue-50';
+                tabJson.className = 'flex-1 py-4 text-center font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50';
+            }
+        }
+
+        // JSON Bulk Upload
+        function createTestFromJson() {
+            const jsonText = document.getElementById('jsonInput').value.trim();
+            const errorEl = document.getElementById('jsonError');
+            const successEl = document.getElementById('jsonSuccess');
+
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+
+            if (!jsonText) {
+                errorEl.textContent = 'Please paste JSON data';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(jsonText);
+
+                // Validate structure
+                if (!data.test_name || !data.questions || !Array.isArray(data.questions)) {
+                    throw new Error('Invalid format. Need test_name and questions array.');
+                }
+
+                if (data.questions.length === 0) {
+                    throw new Error('No questions found in JSON.');
+                }
+
+                // Create test
+                const test = {
+                    name_en: data.test_name,
+                    subject_id: data.subject || 'General',
+                    time_limit: data.time_limit || 30,
+                    mark_correct: 2,
+                    mark_negative: 0.66,
+                    is_active: true,
+                    total_questions: data.questions.length
+                };
+
+                const testId = adminData.createTest(test);
+
+                // Add questions
+                data.questions.forEach((q, idx) => {
+                    const question = {
+                        test_id: testId,
+                        question_text: q.question,
+                        option_a: q.options[0] || '',
+                        option_b: q.options[1] || '',
+                        option_c: q.options[2] || '',
+                        option_d: q.options[3] || '',
+                        correct_option: ['a', 'b', 'c', 'd'][q.correct] || 'a',
+                        explanation: q.explanation || '',
+                        order: idx + 1
+                    };
+                    adminData.createQuestion(question);
+                });
+
+                successEl.textContent = `✅ Mock Test "${data.test_name}" created with ${data.questions.length} questions!`;
+                successEl.classList.remove('hidden');
+
+                setTimeout(() => {
+                    closeModal('createTestModal');
+                    document.getElementById('jsonInput').value = '';
+                    loadDashboardStats();
+                    loadTestsTable();
+                }, 1500);
+
+            } catch (e) {
+                errorEl.textContent = '❌ Error: ' + e.message;
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        // Manual Creator - Add Question Form
+        let manualQuestions = [];
+
+        function addQuestionForm() {
+            const idx = manualQuestions.length;
+            manualQuestions.push({});
+
+            const container = document.getElementById('questionsContainer');
+            const html = `
+                <div id="qForm_${idx}" class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-gray-700">Question ${idx + 1}</span>
+                        <button onclick="removeQuestion(${idx})" class="text-red-500 hover:text-red-700 text-sm">✕ Remove</button>
+                    </div>
+                    <textarea id="q_${idx}_text" placeholder="Enter question text..." rows="2" 
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-3"></textarea>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <input type="text" id="q_${idx}_a" placeholder="Option A" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                        <input type="text" id="q_${idx}_b" placeholder="Option B" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                        <input type="text" id="q_${idx}_c" placeholder="Option C" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                        <input type="text" id="q_${idx}_d" placeholder="Option D" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="q_${idx}_correct" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                            <option value="a">Correct: A</option>
+                            <option value="b">Correct: B</option>
+                            <option value="c">Correct: C</option>
+                            <option value="d">Correct: D</option>
+                        </select>
+                        <input type="text" id="q_${idx}_exp" placeholder="Explanation (optional)" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            document.getElementById('questionCount').textContent = manualQuestions.length;
+        }
+
+        function removeQuestion(idx) {
+            document.getElementById('qForm_' + idx)?.remove();
+            manualQuestions[idx] = null;
+            document.getElementById('questionCount').textContent = manualQuestions.filter(q => q !== null).length;
+        }
+
+        function createTestManual() {
+            const testName = document.getElementById('manualTestName').value;
+            const subject = document.getElementById('manualSubject').value;
+            const time = parseInt(document.getElementById('manualTime').value) || 30;
+
+            if (!testName) {
+                alert('Please enter test name');
+                return;
+            }
+
+            // Collect questions
+            const questions = [];
+            manualQuestions.forEach((_, idx) => {
+                if (!document.getElementById('qForm_' + idx)) return;
+
+                const text = document.getElementById('q_' + idx + '_text').value;
+                if (!text) return;
+
+                questions.push({
+                    question_text: text,
+                    option_a: document.getElementById('q_' + idx + '_a').value,
+                    option_b: document.getElementById('q_' + idx + '_b').value,
+                    option_c: document.getElementById('q_' + idx + '_c').value,
+                    option_d: document.getElementById('q_' + idx + '_d').value,
+                    correct_option: document.getElementById('q_' + idx + '_correct').value,
+                    explanation: document.getElementById('q_' + idx + '_exp').value
+                });
+            });
+
+            if (questions.length === 0) {
+                alert('Please add at least one question');
+                return;
+            }
+
+            // Create test
+            const test = {
+                name_en: testName,
+                subject_id: subject,
+                time_limit: time,
+                mark_correct: 2,
+                mark_negative: 0.66,
+                is_active: true,
+                total_questions: questions.length
+            };
+
+            const testId = adminData.createTest(test);
+
+            // Add questions
+            questions.forEach((q, idx) => {
+                q.test_id = testId;
+                q.order = idx + 1;
+                adminData.createQuestion(q);
+            });
+
+            alert(`✅ Test "${testName}" created with ${questions.length} questions!`);
+            closeModal('createTestModal');
+
+            // Reset
+            manualQuestions = [];
+            document.getElementById('questionsContainer').innerHTML = '';
+            document.getElementById('questionCount').textContent = '0';
+            document.getElementById('manualTestName').value = '';
+
+            loadDashboardStats();
+            loadTestsTable();
+        }
+
 
         function deleteTest(id) {
             if (confirm('Are you sure you want to delete this test?')) {
