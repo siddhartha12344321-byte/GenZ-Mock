@@ -341,11 +341,7 @@
     </div>
 
     <script>
-        // Check if already logged in
-        const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-        if (userData.key || userData.name) {
-            window.location.href = 'student-dashboard.html';
-        }
+        // No auto-redirect - user must login
 
         function openModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');

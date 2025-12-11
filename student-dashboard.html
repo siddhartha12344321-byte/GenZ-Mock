@@ -21,36 +21,45 @@
             border-radius: 4px;
         }
 
-        @keyframes float-1 {
+        .page-view {
+            animation: fadeIn 0.3s ease-out;
+        }
 
-            0%,
-            100% {
-                transform: translateY(0) rotate(-3deg);
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
 
-            50% {
-                transform: translateY(-5px) rotate(-3deg);
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        @keyframes float-2 {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(3deg);
-            }
-
-            50% {
-                transform: translateY(-5px) rotate(3deg);
-            }
+        .nav-item.active {
+            position: relative;
         }
 
-        .animate-float-1 {
-            animation: float-1 3s ease-in-out infinite;
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: #3b82f6;
+            border-radius: 0 3px 3px 0;
         }
 
-        .animate-float-2 {
-            animation: float-2 4s ease-in-out infinite;
+        .test-card {
+            transition: all 0.2s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -58,7 +67,7 @@
 <body class="bg-white text-gray-800 h-screen overflow-hidden">
     <div id="app" class="flex h-screen bg-white font-sans text-gray-900">
 
-        <!-- SIDEBAR - Exact SuperKalam Style -->
+        <!-- SIDEBAR -->
         <div class="w-64 h-full bg-white border-r border-gray-200 flex flex-col shrink-0 z-50">
             <div class="p-6 flex items-center gap-3">
                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center relative">
@@ -70,9 +79,9 @@
             <div class="flex-1 overflow-y-auto px-4 custom-scrollbar space-y-6">
                 <!-- Section 1 -->
                 <div class="space-y-1">
-                    <a href="student-dashboard.html"
-                        class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-600"
-                        data-page="home">
+                    <a href="#"
+                        class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-600"
+                        data-page="home" onclick="showPage('home', this)">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -81,7 +90,7 @@
                     </a>
                     <a href="#"
                         class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
-                        data-page="ask" onclick="showPage('ask')">
+                        data-page="ask" onclick="showPage('ask', this)">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -90,28 +99,22 @@
                     </a>
                 </div>
 
-                <!-- PRELIMS Section -->
+                <!-- TESTS Section -->
                 <div>
-                    <div class="px-3 mb-2 text-[11px] font-bold text-gray-400 tracking-wider">PRELIMS</div>
+                    <div class="px-3 mb-2 text-[11px] font-bold text-gray-400 tracking-wider">TESTS</div>
                     <div class="space-y-1">
-                        <a href="mcq-practice.html"
-                            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2" />
-                            </svg>
-                            MCQ Practice
-                        </a>
-                        <a href="pyq.html"
-                            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                        <a href="#"
+                            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                            data-page="mocktests" onclick="showPage('mocktests', this)">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Prelims PYQs
+                            Mock Tests
                         </a>
-                        <a href="tests.html"
+                        <a href="#"
                             class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
-                            data-page="tests">
+                            data-page="mytests" onclick="showPage('mytests', this)">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -123,16 +126,18 @@
 
                 <!-- Progress Section -->
                 <div class="space-y-1">
-                    <a href="progress.html"
-                        class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                    <a href="#"
+                        class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                        data-page="progress" onclick="showPage('progress', this)">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         My Progress
                     </a>
-                    <a href="leaderboard.html"
-                        class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                    <a href="#"
+                        class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                        data-page="leaderboard" onclick="showPage('leaderboard', this)">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -163,7 +168,7 @@
                     Logout
                 </button>
                 <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-sm font-medium text-gray-600"
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium"
                         id="userAvatar">U</div>
                     <div class="overflow-hidden">
                         <div class="text-sm font-medium text-gray-900 truncate" id="userName">User</div>
@@ -176,7 +181,7 @@
         <main class="flex-1 h-full overflow-hidden relative">
 
             <!-- HOME VIEW -->
-            <div id="homeView" class="h-full flex flex-col bg-gray-50">
+            <div id="homeView" class="page-view h-full flex flex-col bg-gray-50">
                 <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center justify-between shrink-0">
                     <span class="text-gray-900 font-medium">Home</span>
                 </header>
@@ -188,39 +193,49 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div
                                     class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-48 shadow-sm">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        class="mb-3 text-orange-500">
-                                        <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="2" />
-                                    </svg>
+                                    <div
+                                        class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-3">
+                                        <svg width="24" height="24" fill="none" stroke="#f97316" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <rect x="3" y="3" width="7" height="7" />
+                                        </svg>
+                                    </div>
                                     <div class="text-3xl font-bold text-gray-900" id="mcqCount">0</div>
                                     <div class="text-sm text-gray-500 mt-1">MCQ Practiced</div>
                                 </div>
                                 <div
                                     class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-48 shadow-sm">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        class="mb-3 text-blue-500">
-                                        <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" stroke-width="2" />
-                                    </svg>
+                                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
+                                        <svg width="24" height="24" fill="none" stroke="#3b82f6" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
                                     <div class="text-3xl font-bold text-gray-900" id="accuracyVal">-</div>
                                     <div class="text-sm text-gray-500 mt-1">Accuracy</div>
                                 </div>
                                 <div
                                     class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-48 shadow-sm">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        class="mb-3 text-green-500">
-                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor"
-                                            stroke-width="2" />
-                                    </svg>
+                                    <div
+                                        class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-3">
+                                        <svg width="24" height="24" fill="none" stroke="#22c55e" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
                                     <div class="text-3xl font-bold text-gray-900" id="testsCount">0</div>
                                     <div class="text-sm text-gray-500 mt-1">Tests Completed</div>
                                 </div>
                                 <div
                                     class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-48 shadow-sm">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        class="mb-3 text-yellow-500">
-                                        <path d="M3 21v-8a2 2 0 012-2h14a2 2 0 012 2v8M9 10a2 2 0 012-2h2a2 2 0 012 2"
-                                            stroke="currentColor" stroke-width="2" />
-                                    </svg>
+                                    <div
+                                        class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mb-3">
+                                        <svg width="24" height="24" fill="none" stroke="#eab308" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" />
+                                        </svg>
+                                    </div>
                                     <div class="text-3xl font-bold text-gray-900" id="rankVal">-</div>
                                     <div class="text-sm text-gray-500 mt-1">Your Rank</div>
                                 </div>
@@ -229,117 +244,179 @@
 
                         <!-- Right Leaderboard -->
                         <div class="w-80 bg-white border border-gray-200 rounded-xl flex flex-col h-[520px]">
-                            <div class="flex border-b border-gray-100">
-                                <button
-                                    class="flex-1 py-3 text-orange-600 font-semibold border-b-2 border-orange-500 text-sm">Leaderboard</button>
-                                <button class="flex-1 py-3 text-gray-400 font-medium text-sm hover:text-gray-700">PYQ
-                                    Practice</button>
+                            <div class="p-4 border-b border-gray-100">
+                                <h3 class="text-sm font-bold text-gray-800">📊 Today's Leaderboard</h3>
                             </div>
                             <div class="p-4 flex-1 flex flex-col">
-                                <h3 class="text-sm font-bold text-gray-800 mb-3">Today's Leaderboard</h3>
                                 <div class="bg-blue-50 p-3 rounded-lg flex justify-between items-center mb-4">
-                                    <div class="text-[11px] text-blue-800 leading-tight w-2/3">Practice MCQs now & see
-                                        your rank in the leaderboard</div>
-                                    <a href="mcq-practice.html"
-                                        class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-700 whitespace-nowrap">Practice
+                                    <div class="text-[11px] text-blue-800 leading-tight w-2/3">Practice tests & see your
+                                        rank!</div>
+                                    <a href="#" onclick="showPage('mocktests')"
+                                        class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-700">Start
                                         Now</a>
                                 </div>
                                 <div class="flex text-[10px] text-gray-400 font-bold mb-2 px-2 uppercase tracking-wide">
                                     <div class="w-8">Rank</div>
                                     <div class="flex-1">Student</div>
-                                    <div class="w-12 text-right">Marks</div>
-                                    <div class="w-12 text-right">Accuracy</div>
+                                    <div class="w-12 text-right">Score</div>
+                                    <div class="w-12 text-right">Acc.</div>
                                 </div>
-                                <div class="flex-1 overflow-y-auto custom-scrollbar" id="leaderboardList">
-                                    <!-- Leaderboard items -->
-                                </div>
+                                <div class="flex-1 overflow-y-auto custom-scrollbar" id="leaderboardList"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- MOCK TESTS VIEW (All Available Tests) -->
+            <div id="mocktestsView" class="page-view h-full flex-col hidden bg-gray-50">
+                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
+                    <span class="text-gray-900 font-medium">Mock Tests</span>
+                </header>
+                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                    <div class="max-w-5xl mx-auto">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Available Mock Tests</h2>
+                        <div id="mockTestsList" class="grid gap-4">
+                            <div class="text-center py-12 text-gray-500">Loading tests...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MY TESTS VIEW (Attempted Tests) -->
+            <div id="mytestsView" class="page-view h-full flex-col hidden bg-gray-50">
+                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
+                    <span class="text-gray-900 font-medium">My Tests (Attempted)</span>
+                </header>
+                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                    <div class="max-w-5xl mx-auto">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Your Attempted Tests</h2>
+                        <div id="myTestsList" class="grid gap-4">
+                            <div class="text-center py-12 text-gray-500">No tests attempted yet. Start practicing!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MY PROGRESS VIEW -->
+            <div id="progressView" class="page-view h-full flex-col hidden bg-gray-50">
+                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
+                    <span class="text-gray-900 font-medium">My Progress</span>
+                </header>
+                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                    <div class="max-w-5xl mx-auto">
+                        <!-- Stats Overview -->
+                        <div class="grid grid-cols-4 gap-4 mb-8">
+                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                <div class="text-3xl font-bold text-blue-600" id="progressTests">0</div>
+                                <div class="text-sm text-gray-500">Tests Taken</div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                <div class="text-3xl font-bold text-green-600" id="progressCorrect">0</div>
+                                <div class="text-sm text-gray-500">Correct Answers</div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                <div class="text-3xl font-bold text-purple-600" id="progressAccuracy">0%</div>
+                                <div class="text-sm text-gray-500">Avg Accuracy</div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                <div class="text-3xl font-bold text-orange-600" id="progressTime">0m</div>
+                                <div class="text-sm text-gray-500">Time Spent</div>
+                            </div>
+                        </div>
+
+                        <!-- Test History -->
+                        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-100">
+                                <h3 class="font-bold text-gray-900">Test History</h3>
+                            </div>
+                            <div id="testHistory" class="divide-y divide-gray-100">
+                                <div class="px-6 py-8 text-center text-gray-500">No test history yet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEADERBOARD VIEW -->
+            <div id="leaderboardView" class="page-view h-full flex-col hidden bg-gray-50">
+                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
+                    <span class="text-gray-900 font-medium">Leaderboard</span>
+                </header>
+                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                    <div class="max-w-3xl mx-auto">
+                        <!-- Your Rank Card -->
+                        <div
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-8 text-white text-center">
+                            <div class="text-6xl mb-2">🏆</div>
+                            <div class="text-5xl font-bold" id="yourRankBig">#--</div>
+                            <div class="text-blue-100 mt-2">Your Current Rank</div>
+                        </div>
+
+                        <!-- Full Leaderboard -->
+                        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-100">
+                                <h3 class="font-bold text-gray-900">Top Performers</h3>
+                            </div>
+                            <div id="fullLeaderboard" class="divide-y divide-gray-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ASK GENZ AI VIEW -->
-            <div id="askView" class="h-full flex-col bg-white relative hidden">
-                <div class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-3xl mx-auto">
+            <div id="askView" class="page-view h-full flex-col hidden bg-white">
+                <div id="askInitial"
+                    class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-3xl mx-auto">
                     <div
-                        class="absolute top-6 left-1/2 -translate-x-1/2 bg-blue-50 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold border border-blue-100">
+                        class="bg-blue-50 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold border border-blue-100 mb-8">
                         ⚡ Powered by Groq AI
                     </div>
 
                     <div
-                        class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-blue-200 ring-4 ring-blue-50">
+                        class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-blue-200">
                         <span class="text-white text-2xl font-bold">GZ</span>
                     </div>
 
                     <h1 class="text-2xl font-bold text-gray-900 mb-2">Ask GenZ AI</h1>
                     <p class="text-gray-500 mb-8">Your AI-powered study companion</p>
 
-                    <div class="flex gap-3 mb-8">
-                        <button
-                            class="flex items-center gap-2 px-6 py-2 border border-blue-500 text-blue-500 rounded bg-white hover:bg-blue-50 font-bold text-xs tracking-wide">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
-                            </svg> LEARN
-                        </button>
-                        <button
-                            class="flex items-center gap-2 px-6 py-2 border border-blue-500 text-blue-500 rounded bg-white hover:bg-blue-50 font-bold text-xs tracking-wide">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg> PRACTICE
-                        </button>
-                        <button
-                            class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold text-xs tracking-wide shadow-md">
-                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg> UPSC GUIDE
-                        </button>
-                    </div>
-
-                    <!-- Quick Questions -->
                     <div class="w-full space-y-2 mb-6">
-                        <div class="question-btn flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100 group transition-all"
-                            onclick="askQuestion('Explain the concept of Fundamental Rights in India')">
-                            <span>Explain the concept of <b>Fundamental Rights</b> in India</span>
-                            <svg width="16" height="16" stroke="currentColor" fill="none"
-                                class="text-gray-300 group-hover:text-gray-500" viewBox="0 0 24 24">
+                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
+                            onclick="askQuestion('Explain Fundamental Rights in India')">
+                            <span>Explain <b>Fundamental Rights</b> in India</span>
+                            <svg width="16" height="16" stroke="currentColor" fill="none" class="text-gray-300"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5l7 7-7 7" />
                             </svg>
                         </div>
-                        <div class="question-btn flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100 group transition-all"
-                            onclick="askQuestion('What are the Directive Principles of State Policy?')">
-                            <span>What are the <b>Directive Principles</b> of State Policy?</span>
-                            <svg width="16" height="16" stroke="currentColor" fill="none"
-                                class="text-gray-300 group-hover:text-gray-500" viewBox="0 0 24 24">
+                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
+                            onclick="askQuestion('What are Directive Principles of State Policy?')">
+                            <span>What are <b>Directive Principles</b>?</span>
+                            <svg width="16" height="16" stroke="currentColor" fill="none" class="text-gray-300"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5l7 7-7 7" />
                             </svg>
                         </div>
-                        <div class="question-btn flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100 group transition-all"
-                            onclick="askQuestion('Explain the Indian Parliamentary System')">
-                            <span>Explain the <b>Indian Parliamentary System</b></span>
-                            <svg width="16" height="16" stroke="currentColor" fill="none"
-                                class="text-gray-300 group-hover:text-gray-500" viewBox="0 0 24 24">
+                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
+                            onclick="askQuestion('Explain Indian Parliamentary System')">
+                            <span>Explain <b>Parliamentary System</b></span>
+                            <svg width="16" height="16" stroke="currentColor" fill="none" class="text-gray-300"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5l7 7-7 7" />
                             </svg>
                         </div>
                     </div>
 
-                    <!-- Chat Input -->
                     <div class="w-full relative">
-                        <input type="text" id="chatInput"
-                            placeholder="Ask me anything about UPSC, current affairs, polity..."
-                            class="w-full p-4 pr-12 rounded-xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm text-gray-700 placeholder-gray-400"
+                        <input type="text" id="chatInput" placeholder="Ask me anything..."
+                            class="w-full p-4 pr-12 rounded-xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm"
                             onkeypress="if(event.key==='Enter') sendMessage()">
                         <button onclick="sendMessage()"
-                            class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -349,7 +426,7 @@
                     </div>
                 </div>
 
-                <!-- Chat Messages Container (Hidden initially) -->
+                <!-- Chat Container -->
                 <div id="chatContainer" class="hidden h-full flex flex-col">
                     <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center gap-3 shrink-0">
                         <button onclick="resetChat()" class="text-gray-400 hover:text-gray-600">
@@ -364,13 +441,11 @@
                         </div>
                         <span class="font-medium text-gray-900">GenZ AI</span>
                     </header>
-                    <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                        <!-- Messages will appear here -->
-                    </div>
+                    <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar"></div>
                     <div class="p-4 border-t border-gray-200 bg-white">
                         <div class="relative max-w-3xl mx-auto">
                             <input type="text" id="chatInputBottom" placeholder="Type your message..."
-                                class="w-full p-4 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm"
+                                class="w-full p-4 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 text-sm"
                                 onkeypress="if(event.key==='Enter') sendMessage()">
                             <button onclick="sendMessage()"
                                 class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
@@ -390,23 +465,27 @@
 
     <script src="js/admin-data.js"></script>
     <script>
-        // Groq API Configuration
+        // Groq API
         const GROQ_API_KEY = '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';
         const GROQ_MODEL = 'llama-3.3-70b-versatile';
-
         let chatHistory = [];
 
-        // Check login
+        // User data
+        let attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+        let userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
+
         document.addEventListener('DOMContentLoaded', () => {
             const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
             if (!userData.key && !userData.name) {
                 window.location.href = 'index.html';
                 return;
             }
+
             const userName = userData.name || userData.key || 'User';
             document.getElementById('userName').textContent = userName;
             document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
 
+            loadHomeStats();
             loadLeaderboard();
         });
 
@@ -415,71 +494,213 @@
             window.location.href = 'index.html';
         }
 
-        function showPage(page) {
-            document.getElementById('homeView').classList.add('hidden');
-            document.getElementById('askView').classList.add('hidden');
+        function showPage(page, navElement) {
+            // Hide all views
+            document.querySelectorAll('.page-view').forEach(v => {
+                v.classList.add('hidden');
+                v.classList.remove('flex');
+            });
 
-            if (page === 'home') {
-                document.getElementById('homeView').classList.remove('hidden');
-            } else if (page === 'ask') {
-                document.getElementById('askView').classList.remove('hidden');
-                document.getElementById('askView').classList.add('flex');
+            // Show selected view
+            const view = document.getElementById(page + 'View');
+            if (view) {
+                view.classList.remove('hidden');
+                view.classList.add('flex');
             }
 
             // Update nav
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('bg-blue-50', 'text-blue-600');
+                item.classList.remove('active', 'bg-blue-50', 'text-blue-600');
                 item.classList.add('text-gray-600');
             });
-            const activeNav = document.querySelector(`[data-page="${page}"]`);
-            if (activeNav) {
-                activeNav.classList.add('bg-blue-50', 'text-blue-600');
-                activeNav.classList.remove('text-gray-600');
+
+            if (navElement) {
+                navElement.classList.add('active', 'bg-blue-50', 'text-blue-600');
+                navElement.classList.remove('text-gray-600');
             }
+
+            // Load page data
+            if (page === 'mocktests') loadMockTests();
+            if (page === 'mytests') loadMyTests();
+            if (page === 'progress') loadProgress();
+            if (page === 'leaderboard') loadFullLeaderboard();
+        }
+
+        function loadHomeStats() {
+            document.getElementById('mcqCount').textContent = userProgress.total || 0;
+            document.getElementById('testsCount').textContent = userProgress.tests || 0;
+
+            if (userProgress.total > 0) {
+                const acc = Math.round((userProgress.correct / userProgress.total) * 100);
+                document.getElementById('accuracyVal').textContent = acc + '%';
+            }
+
+            document.getElementById('rankVal').textContent = attemptedTests.length > 0 ? '#' + Math.min(attemptedTests.length * 5, 100) : '-';
         }
 
         function loadLeaderboard() {
             const leaders = [
-                { name: 'Mrigendra', questions: 341, score: 618, accuracy: 93 },
-                { name: 'Hanifa', questions: 120, score: 163, accuracy: 76 },
-                { name: 'Rahul V.', questions: 98, score: 142, accuracy: 82 },
-                { name: 'Sneha G.', questions: 75, score: 108, accuracy: 79 }
+                { name: 'Mrigendra S.', score: 618, accuracy: 93 },
+                { name: 'Hanifa K.', score: 163, accuracy: 76 },
+                { name: 'Rahul V.', score: 142, accuracy: 82 },
+                { name: 'Sneha G.', score: 108, accuracy: 79 }
             ];
 
             document.getElementById('leaderboardList').innerHTML = leaders.map((l, i) => `
                 <div class="flex items-center p-2 hover:bg-gray-50 rounded mb-1">
                     <div class="w-8"><div class="w-5 h-5 ${i === 0 ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-500'} rounded-full flex items-center justify-center text-[10px] font-bold">${i + 1}</div></div>
-                    <div class="flex-1 min-w-0"><div class="text-xs font-bold text-gray-900">${l.name}</div><div class="text-[10px] text-gray-500">${l.questions} questions</div></div>
+                    <div class="flex-1 min-w-0"><div class="text-xs font-bold text-gray-900">${l.name}</div></div>
                     <div class="w-12 text-right text-xs font-bold text-gray-900">${l.score}</div>
                     <div class="w-12 text-right text-xs text-green-500 font-bold">${l.accuracy}%</div>
                 </div>
             `).join('');
         }
 
-        function askQuestion(question) {
-            document.getElementById('chatInput').value = question;
+        function loadMockTests() {
+            const tests = adminData?.getAllTests() || [];
+            const container = document.getElementById('mockTestsList');
+
+            if (tests.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-gray-500">No mock tests available yet. Ask admin to create tests.</div>';
+                return;
+            }
+
+            container.innerHTML = tests.map(test => {
+                const isAttempted = attemptedTests.includes(test.id);
+                return `
+                    <div class="test-card bg-white rounded-xl border border-gray-100 p-5 flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-bold text-gray-900">${test.name_en || 'Untitled Test'}</h3>
+                                ${isAttempted ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-bold">✓ ATTEMPTED</span>' : ''}
+                            </div>
+                            <div class="flex gap-4 mt-2 text-sm text-gray-500">
+                                <span>${test.total_questions || 0} Questions</span>
+                                <span>${test.time_limit || 60} mins</span>
+                                <span class="text-blue-600">${test.subject_id || 'General'}</span>
+                            </div>
+                        </div>
+                        <a href="test-oliveboard.html?id=${test.id}" class="px-5 py-2.5 ${isAttempted ? 'bg-gray-100 text-gray-600' : 'bg-blue-600 text-white'} rounded-lg font-medium hover:opacity-90">
+                            ${isAttempted ? 'Retake' : 'Start Test'}
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadMyTests() {
+            const tests = adminData?.getAllTests() || [];
+            const myTests = tests.filter(t => attemptedTests.includes(t.id));
+            const container = document.getElementById('myTestsList');
+
+            if (myTests.length === 0) {
+                container.innerHTML = '<div class="text-center py-12"><div class="text-4xl mb-4">📝</div><div class="text-gray-500">No tests attempted yet</div><button onclick="showPage(\'mocktests\')" class="mt-4 px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium">Start Practicing</button></div>';
+                return;
+            }
+
+            container.innerHTML = myTests.map(test => `
+                <div class="test-card bg-white rounded-xl border border-gray-100 p-5 flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3">
+                            <h3 class="font-bold text-gray-900">${test.name_en || 'Untitled Test'}</h3>
+                            <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-bold">✓ COMPLETED</span>
+                        </div>
+                        <div class="flex gap-4 mt-2 text-sm text-gray-500">
+                            <span>${test.total_questions || 0} Questions</span>
+                            <span>${test.time_limit || 60} mins</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="test-oliveboard.html?id=${test.id}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">Retake</a>
+                        <button class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium">View Result</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadProgress() {
+            document.getElementById('progressTests').textContent = userProgress.tests || 0;
+            document.getElementById('progressCorrect').textContent = userProgress.correct || 0;
+
+            if (userProgress.total > 0) {
+                const acc = Math.round((userProgress.correct / userProgress.total) * 100);
+                document.getElementById('progressAccuracy').textContent = acc + '%';
+            } else {
+                document.getElementById('progressAccuracy').textContent = '0%';
+            }
+
+            document.getElementById('progressTime').textContent = (userProgress.time || 0) + 'm';
+
+            // Test History
+            const historyContainer = document.getElementById('testHistory');
+            if (attemptedTests.length === 0) {
+                historyContainer.innerHTML = '<div class="px-6 py-8 text-center text-gray-500">No test history yet. Take your first test!</div>';
+                return;
+            }
+
+            const tests = adminData?.getAllTests() || [];
+            const myTests = tests.filter(t => attemptedTests.includes(t.id));
+
+            historyContainer.innerHTML = myTests.map(test => `
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <div class="font-medium text-gray-900">${test.name_en || 'Untitled'}</div>
+                        <div class="text-sm text-gray-500">${test.total_questions || 0} questions • ${test.subject_id || 'General'}</div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">Completed</span>
+                </div>
+            `).join('');
+        }
+
+        function loadFullLeaderboard() {
+            const leaders = [
+                { name: 'Mrigendra Singh', score: 618, accuracy: 93, tests: 15 },
+                { name: 'Hanifa Khan', score: 163, accuracy: 76, tests: 8 },
+                { name: 'Rahul Verma', score: 142, accuracy: 82, tests: 6 },
+                { name: 'Sneha Gupta', score: 108, accuracy: 79, tests: 5 },
+                { name: 'Vikram Mehta', score: 95, accuracy: 71, tests: 4 }
+            ];
+
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const userRank = attemptedTests.length > 0 ? Math.min(attemptedTests.length * 3, 50) : '--';
+            document.getElementById('yourRankBig').textContent = '#' + userRank;
+
+            document.getElementById('fullLeaderboard').innerHTML = leaders.map((l, i) => `
+                <div class="px-6 py-4 flex items-center">
+                    <div class="w-10">
+                        <div class="w-8 h-8 ${i === 0 ? 'bg-yellow-100 text-yellow-600' : i === 1 ? 'bg-gray-200 text-gray-600' : i === 2 ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'} rounded-full flex items-center justify-center text-sm font-bold">${i + 1}</div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900">${l.name}</div>
+                        <div class="text-xs text-gray-500">${l.tests} tests completed</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-gray-900">${l.score}</div>
+                        <div class="text-xs text-green-600">${l.accuracy}%</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // AI Chat functions
+        function askQuestion(q) {
+            document.getElementById('chatInput').value = q;
             sendMessage();
         }
 
         async function sendMessage() {
-            const input = document.getElementById('chatInput').value || document.getElementById('chatInputBottom')?.value;
+            const input = document.getElementById('chatInput')?.value || document.getElementById('chatInputBottom')?.value;
             if (!input?.trim()) return;
 
-            // Show chat container
-            document.querySelector('#askView > div:first-child').classList.add('hidden');
+            document.getElementById('askInitial').classList.add('hidden');
             document.getElementById('chatContainer').classList.remove('hidden');
 
-            // Add user message
             addMessage(input, 'user');
             chatHistory.push({ role: 'user', content: input });
 
-            // Clear inputs
             document.getElementById('chatInput').value = '';
-            if (document.getElementById('chatInputBottom')) {
-                document.getElementById('chatInputBottom').value = '';
-            }
+            if (document.getElementById('chatInputBottom')) document.getElementById('chatInputBottom').value = '';
 
-            // Show typing indicator
             const typingId = addMessage('Thinking...', 'ai', true);
 
             try {
@@ -492,7 +713,7 @@
                     body: JSON.stringify({
                         model: GROQ_MODEL,
                         messages: [
-                            { role: 'system', content: 'You are GenZ AI, an intelligent study assistant for UPSC and competitive exam preparation. Provide clear, concise, and accurate answers. Format your responses with proper structure using bullet points and headings where appropriate. Be encouraging and helpful.' },
+                            { role: 'system', content: 'You are GenZ AI, an intelligent study assistant for UPSC and competitive exams. Give clear, accurate answers.' },
                             ...chatHistory
                         ],
                         temperature: 0.7,
@@ -501,18 +722,14 @@
                 });
 
                 const data = await response.json();
-                const aiResponse = data.choices[0]?.message?.content || 'Sorry, I could not process your request.';
+                const aiResponse = data.choices?.[0]?.message?.content || 'Sorry, I could not process your request.';
 
-                // Remove typing indicator
                 document.getElementById(typingId)?.remove();
-
-                // Add AI response
                 addMessage(aiResponse, 'ai');
                 chatHistory.push({ role: 'assistant', content: aiResponse });
-
             } catch (error) {
                 document.getElementById(typingId)?.remove();
-                addMessage('Sorry, there was an error connecting to the AI. Please try again.', 'ai');
+                addMessage('Error connecting to AI. Please try again.', 'ai');
             }
         }
 
@@ -522,7 +739,7 @@
 
             const msgHtml = sender === 'user'
                 ? `<div id="${id}" class="flex justify-end"><div class="bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[70%] text-sm">${text}</div></div>`
-                : `<div id="${id}" class="flex gap-3"><div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shrink-0"><span class="text-white text-xs font-bold">GZ</span></div><div class="bg-gray-100 px-4 py-3 rounded-2xl rounded-tl-sm max-w-[70%] text-sm text-gray-800 ${isTyping ? 'animate-pulse' : ''}">${isTyping ? '<span class="inline-flex gap-1"><span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span><span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span><span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span></span>' : text.replace(/\n/g, '<br>')}</div></div>`;
+                : `<div id="${id}" class="flex gap-3"><div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shrink-0"><span class="text-white text-xs font-bold">GZ</span></div><div class="bg-gray-100 px-4 py-3 rounded-2xl rounded-tl-sm max-w-[70%] text-sm text-gray-800 ${isTyping ? 'animate-pulse' : ''}">${isTyping ? '...' : text.replace(/\n/g, '<br>')}</div></div>`;
 
             container.insertAdjacentHTML('beforeend', msgHtml);
             container.scrollTop = container.scrollHeight;
@@ -533,7 +750,7 @@
             chatHistory = [];
             document.getElementById('chatMessages').innerHTML = '';
             document.getElementById('chatContainer').classList.add('hidden');
-            document.querySelector('#askView > div:first-child').classList.remove('hidden');
+            document.getElementById('askInitial').classList.remove('hidden');
         }
     </script>
 </body>
