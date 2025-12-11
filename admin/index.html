@@ -662,73 +662,11 @@
                         </tr>
                     </thead>
                     <tbody id="testsTableBody">
+                        <!-- Table content loaded dynamically by refreshTestsTable() -->
                         <tr>
-                            <td>
-                                <div class="title-cell">
-                                    <div class="test-icon">⚖️</div>
-                                    <div>
-                                        <strong>Polity Mock Test 1</strong>
-                                        <div class="text-muted" style="font-size:0.75rem;">राजव्यवस्था मॉक टेस्ट 1</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Indian Polity</td>
-                            <td>100</td>
-                            <td>120 min</td>
-                            <td>45</td>
-                            <td><span class="badge badge-new">Active</span></td>
-                            <td>
-                                <div class="actions">
-                                    <button class="btn-icon" title="Edit">✏️</button>
-                                    <button class="btn-icon" title="Preview">👁️</button>
-                                    <button class="btn-icon delete" title="Delete">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="title-cell">
-                                    <div class="test-icon">📜</div>
-                                    <div>
-                                        <strong>History Mock Test 1</strong>
-                                        <div class="text-muted" style="font-size:0.75rem;">इतिहास मॉक टेस्ट 1</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>History</td>
-                            <td>75</td>
-                            <td>90 min</td>
-                            <td>32</td>
-                            <td><span class="badge badge-new">Active</span></td>
-                            <td>
-                                <div class="actions">
-                                    <button class="btn-icon" title="Edit">✏️</button>
-                                    <button class="btn-icon" title="Preview">👁️</button>
-                                    <button class="btn-icon delete" title="Delete">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="title-cell">
-                                    <div class="test-icon">🌍</div>
-                                    <div>
-                                        <strong>Geography Mock Test 1</strong>
-                                        <div class="text-muted" style="font-size:0.75rem;">भूगोल मॉक टेस्ट 1</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Geography</td>
-                            <td>50</td>
-                            <td>60 min</td>
-                            <td>28</td>
-                            <td><span class="badge badge-attempted">Draft</span></td>
-                            <td>
-                                <div class="actions">
-                                    <button class="btn-icon" title="Edit">✏️</button>
-                                    <button class="btn-icon" title="Preview">👁️</button>
-                                    <button class="btn-icon delete" title="Delete">🗑️</button>
-                                </div>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                <div style="font-size: 1.5rem;">⏳</div>
+                                Loading tests...
                             </td>
                         </tr>
                     </tbody>
@@ -1114,6 +1052,122 @@
         const questionsModal = document.getElementById('questionsModal');
         const subjectsModal = document.getElementById('subjectsModal');
         const usersModal = document.getElementById('usersModal');
+
+        // ===== DASHBOARD STATS & TABLE - THESE WERE MISSING! =====
+
+        // Update dashboard stats from localStorage
+        function updateDashboardStats() {
+            const tests = adminData.getAllTests();
+            const questions = adminData.getAllQuestions();
+            const keys = adminData.getAllKeys();
+
+            // Update stat cards
+            const statCards = document.querySelectorAll('.admin-stat-card .value');
+            if (statCards.length >= 4) {
+                statCards[0].textContent = tests.length; // Total Tests
+                statCards[1].textContent = questions.length.toLocaleString(); // Total Questions
+                // Keep Users and Attempts as they may come from elsewhere
+            }
+
+            console.log('📊 Dashboard stats updated:', { tests: tests.length, questions: questions.length });
+        }
+
+        // Refresh the tests table with real data
+        function refreshTestsTable() {
+            const tbody = document.getElementById('testsTableBody');
+            if (!tbody) {
+                console.error('❌ testsTableBody not found!');
+                return;
+            }
+
+            const tests = adminData.getAllTests();
+
+            if (tests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📝</div>
+                            No tests created yet. Click "Create New Test" to get started!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Get subject icons helper
+            const subjectIcons = {
+                'polity': '⚖️',
+                'history': '📜',
+                'geography': '🌍',
+                'economy': '💰',
+                'science': '🔬',
+                'current_affairs': '📰',
+                'default': '📝'
+            };
+
+            tbody.innerHTML = tests.map(test => {
+                const subject = adminData.getSubjectByValue(test.subject_id);
+                const icon = subject?.icon || subjectIcons[test.subject_id] || subjectIcons.default;
+                const subjectName = subject?.name_en || test.subject_id || 'General';
+                const qCount = test.total_questions || adminData.getQuestionsByTestId(test.id).length;
+                const timeMin = test.time_limit || 60;
+                const attempts = test.attempts || 0;
+                const status = test.is_active !== false ? 'Active' : 'Draft';
+                const statusClass = test.is_active !== false ? 'badge-new' : 'badge-draft';
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="title-cell">
+                                <div class="test-icon">${icon}</div>
+                                <div>
+                                    <strong>${test.name_en || 'Untitled Test'}</strong>
+                                    ${test.name_hi ? `<div class="text-muted" style="font-size:0.75rem;">${test.name_hi}</div>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td>${subjectName}</td>
+                        <td>${qCount}</td>
+                        <td>${timeMin} min</td>
+                        <td>${attempts}</td>
+                        <td><span class="badge ${statusClass}">${status}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-icon" title="Edit" onclick="editTest('${test.id}')">✏️</button>
+                                <button class="btn-icon" title="Preview" onclick="previewTest('${test.id}')">👁️</button>
+                                <button class="btn-icon delete" title="Delete" onclick="deleteTest('${test.id}')">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            console.log('📋 Tests table refreshed with', tests.length, 'tests');
+        }
+
+        // Helper functions for test actions
+        function editTest(testId) {
+            alert('Edit test: ' + testId + '\n(Feature coming soon!)');
+        }
+
+        function previewTest(testId) {
+            window.open('test-oliveboard.html?id=' + testId, '_blank');
+        }
+
+        function deleteTest(testId) {
+            if (confirm('Are you sure you want to delete this test and all its questions?')) {
+                adminData.deleteTest(testId);
+                updateDashboardStats();
+                refreshTestsTable();
+                alert('✅ Test deleted successfully!');
+            }
+        }
+
+        // ===== INITIALIZE ON PAGE LOAD =====
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboardStats();
+            refreshTestsTable();
+        });
 
         // Create Test
         document.getElementById('createTestBtn').addEventListener('click', () => {

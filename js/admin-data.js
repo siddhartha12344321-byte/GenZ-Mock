@@ -115,6 +115,10 @@ class AdminDataManager {
 
     // ===== QUESTIONS =====
 
+    getAllQuestions() {
+        return this.questions;
+    }
+
     getQuestionsByTestId(testId) {
         return this.questions.filter(q => q.test_id === testId);
     }
