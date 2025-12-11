@@ -991,17 +991,35 @@
 
                     if (testQuestions.length > 0) {
                         console.log(`📚 Loaded ${testQuestions.length} questions for test ${testId}`);
-                        return testQuestions.map((q, i) => ({
-                            text: q.question_text_en || 'Question ' + (i + 1),
-                            options: [
-                                'a) ' + (q.option_a_en || 'Option A'),
-                                'b) ' + (q.option_b_en || 'Option B'),
-                                'c) ' + (q.option_c_en || 'Option C'),
-                                'd) ' + (q.option_d_en || 'Option D')
-                            ],
-                            correct: ['a', 'b', 'c', 'd'].indexOf((q.correct_option || 'a').toLowerCase()),
-                            explanation: q.explanation_en || ''
-                        }));
+                        return testQuestions.map((q, i) => {
+                            // Support both old format (option_a_en) and new format (options array)
+                            let options;
+                            if (q.options && Array.isArray(q.options)) {
+                                options = q.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`);
+                            } else {
+                                options = [
+                                    'a) ' + (q.option_a_en || 'Option A'),
+                                    'b) ' + (q.option_b_en || 'Option B'),
+                                    'c) ' + (q.option_c_en || 'Option C'),
+                                    'd) ' + (q.option_d_en || 'Option D')
+                                ];
+                            }
+
+                            // Support both correct_option (letter) and correct_option (index)
+                            let correctIdx;
+                            if (typeof q.correct_option === 'number') {
+                                correctIdx = q.correct_option;
+                            } else {
+                                correctIdx = ['a', 'b', 'c', 'd'].indexOf((q.correct_option || 'a').toLowerCase());
+                            }
+
+                            return {
+                                text: q.question_en || q.question_text_en || 'Question ' + (i + 1),
+                                options: options,
+                                correct: correctIdx,
+                                explanation: q.explanation || q.explanation_en || ''
+                            };
+                        });
                     }
                 } catch (e) {
                     console.error('Error loading questions:', e);
