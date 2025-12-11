@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GenZMocks - Login</title>
+    <title>GenZMocks - Your Ultimate Exam Preparation Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -16,25 +16,182 @@
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            background: linear-gradient(135deg, #fef3e2 0%, #fce7f3 50%, #e0e7ff 100%);
+            overflow-x: hidden;
+        }
+
+        /* Developer Credit - HIGHLIGHTED */
+        .developer-credit {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        .developer-credit span {
+            background: linear-gradient(90deg, #f97316, #ec4899, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 10px 40px rgba(249, 115, 22, 0.4);
+            }
+        }
+
+        /* Main Container */
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 100px 20px;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .stars-rating {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .login-container {
+        .stars {
+            color: #fbbf24;
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+        }
+
+        .loved-by {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .main-title .highlight {
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: #6b7280;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Features Grid */
+        .features-section {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .features-title {
+            font-size: 1rem;
+            color: #9333ea;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .features-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feature-tag {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-tag span {
+            font-size: 1.1rem;
+        }
+
+        /* Login Card with Animated Border */
+        .login-wrapper {
+            position: relative;
             width: 100%;
-            max-width: 420px;
-            padding: 20px;
+            max-width: 440px;
+        }
+
+        /* Animated Rainbow Border */
+        .rainbow-border {
+            position: absolute;
+            inset: -3px;
+            border-radius: 28px;
+            background: linear-gradient(90deg,
+                    #f97316, #ec4899, #8b5cf6, #3b82f6, #06b6d4, #10b981, #f97316);
+            background-size: 300% 300%;
+            animation: rainbowFlow 4s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes rainbowFlow {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .login-card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: white;
             border-radius: 24px;
             padding: 48px 40px;
             text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
         }
 
         /* Logo */
@@ -47,80 +204,82 @@
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            border-radius: 12px;
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
         }
 
-        .logo-icon span {
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
             color: white;
-            font-weight: 800;
-            font-size: 1.25rem;
         }
 
         .logo-text {
             font-size: 2rem;
             font-weight: 800;
+            color: #1f2937;
         }
 
-        .logo-text .gen {
-            color: white;
-        }
-
-        .logo-text .z {
-            color: #3b82f6;
+        .logo-text .highlight {
+            color: #f97316;
         }
 
         .tagline {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 40px;
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 36px;
         }
 
         /* Login Options */
         .login-option {
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: rgba(51, 65, 85, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 20px 24px;
+            gap: 18px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 22px 26px;
             margin-bottom: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         .login-option:hover {
-            background: rgba(51, 65, 85, 0.8);
-            border-color: rgba(59, 130, 246, 0.3);
-            transform: translateY(-2px);
+            background: #fff7ed;
+            border-color: #f97316;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.15);
         }
 
         .option-icon {
-            width: 48px;
-            height: 48px;
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .option-icon.student {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
         }
 
         .option-icon.admin {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            box-shadow: 0 6px 15px rgba(249, 115, 22, 0.3);
         }
 
         .option-icon svg {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             color: white;
         }
 
@@ -129,15 +288,15 @@
         }
 
         .option-title {
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 2px;
+            color: #1f2937;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
         .option-subtitle {
-            color: #94a3b8;
-            font-size: 0.85rem;
+            color: #6b7280;
+            font-size: 0.9rem;
         }
 
         /* Modal */
@@ -148,11 +307,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .modal-overlay.active {
@@ -160,20 +319,44 @@
         }
 
         .modal-content {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 32px;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             margin: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+            color: #1f2937;
         }
 
         .modal-title {
-            color: white;
-            font-size: 1.25rem;
+            color: #1f2937;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             text-align: center;
         }
 
@@ -183,125 +366,156 @@
 
         .input-label {
             display: block;
-            color: #94a3b8;
-            font-size: 0.85rem;
+            color: #374151;
+            font-size: 0.9rem;
+            font-weight: 500;
             margin-bottom: 8px;
         }
 
         .input-field {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(51, 65, 85, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
+            padding: 16px 18px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            color: #1f2937;
             font-size: 1rem;
             outline: none;
             transition: all 0.2s;
         }
 
         .input-field:focus {
-            border-color: #3b82f6;
-            background: rgba(51, 65, 85, 0.8);
+            border-color: #f97316;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
         }
 
         .input-field::placeholder {
-            color: #64748b;
+            color: #9ca3af;
         }
 
         .submit-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 16px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            margin-top: 8px;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
         }
 
-        .submit-btn.admin {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-
-        .submit-btn.admin:hover {
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            font-size: 1.5rem;
-        }
-
-        .modal-content {
-            position: relative;
-        }
-
-        .error-msg {
+        .error-message {
             color: #ef4444;
             font-size: 0.85rem;
             margin-top: 8px;
             display: none;
         }
 
-        .error-msg.show {
-            display: block;
+        /* Responsive */
+        @media (max-width: 640px) {
+            .main-title {
+                font-size: 2.25rem;
+            }
+
+            .login-card {
+                padding: 36px 28px;
+            }
+
+            .developer-credit {
+                font-size: 0.85rem;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <!-- Logo -->
-            <div class="logo">
-                <div class="logo-icon">
-                    <span>GZ</span>
-                </div>
-                <div class="logo-text">
-                    <span class="gen">Gen</span><span class="z">Z</span>
-                </div>
-            </div>
-            <p class="tagline">Premium Exam Ecosystem</p>
+    <!-- Developer Credit - HIGHLIGHTED -->
+    <div class="developer-credit">
+        Developed by - <span>सिद्धार्थ वर्धन सिंह</span>
+    </div>
 
-            <!-- Student Login -->
-            <div class="login-option" onclick="openModal('student')">
-                <div class="option-icon student">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-                <div class="option-text">
-                    <div class="option-title">Student Login</div>
-                    <div class="option-subtitle">Access Key</div>
-                </div>
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="stars-rating">
+                <span class="stars">★★★★★</span>
+                <span class="loved-by">Trusted by 10,000+ students</span>
             </div>
+            <h1 class="main-title">
+                Everything you need for<br>
+                <span class="highlight">Exam Preparation</span>
+            </h1>
+            <p class="subtitle">
+                Your AI-powered platform for MCQ practice, mock tests, instant evaluation & comprehensive exam prep
+            </p>
+        </div>
 
-            <!-- Admin Login -->
-            <div class="login-option" onclick="openModal('admin')">
-                <div class="option-icon admin">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+        <!-- Features -->
+        <div class="features-section">
+            <div class="features-title">Why GenZMocks?</div>
+            <div class="features-grid">
+                <div class="feature-tag"><span>📝</span> Unlimited Mock Tests</div>
+                <div class="feature-tag"><span>🤖</span> AI-Powered Doubt Solving</div>
+                <div class="feature-tag"><span>📊</span> Detailed Analytics</div>
+                <div class="feature-tag"><span>🎯</span> All Competitive Exams</div>
+                <div class="feature-tag"><span>📱</span> Practice Anywhere</div>
+            </div>
+        </div>
+
+        <!-- Login Card with Animated Border -->
+        <div class="login-wrapper">
+            <div class="rainbow-border"></div>
+            <div class="login-card">
+                <!-- Logo -->
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                        </svg>
+                    </div>
+                    <span class="logo-text">GenZ<span class="highlight">Mocks</span></span>
                 </div>
-                <div class="option-text">
-                    <div class="option-title">Admin Portal</div>
-                    <div class="option-subtitle">Management</div>
+                <p class="tagline">Select your login type to continue</p>
+
+                <!-- Login Options -->
+                <div class="login-option" onclick="openModal('student')">
+                    <div class="option-icon student">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 14l6.16-3.422A12.083 12.083 0 0112 21a12.083 12.083 0 01-6.16-10.422L12 14z" />
+                        </svg>
+                    </div>
+                    <div class="option-text">
+                        <div class="option-title">👨‍🎓 Student Login</div>
+                        <div class="option-subtitle">Access tests, practice & track progress</div>
+                    </div>
+                </div>
+
+                <div class="login-option" onclick="openModal('admin')">
+                    <div class="option-icon admin">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div class="option-text">
+                        <div class="option-title">⚙️ Admin Panel</div>
+                        <div class="option-subtitle">Manage tests, questions & analytics</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -310,15 +524,20 @@
     <!-- Student Modal -->
     <div class="modal-overlay" id="studentModal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('student')">&times;</button>
-            <h2 class="modal-title">🎓 Student Login</h2>
+            <button class="modal-close" onclick="closeModal('student')">×</button>
+            <h3 class="modal-title">👨‍🎓 Student Login</h3>
             <form onsubmit="studentLogin(event)">
                 <div class="input-group">
-                    <label class="input-label">Access Key</label>
-                    <input type="text" class="input-field" id="accessKey" placeholder="Enter your access key" required>
-                    <p class="error-msg" id="studentError">Invalid access key</p>
+                    <label class="input-label">Your Name</label>
+                    <input type="text" id="studentName" class="input-field" placeholder="Enter your name" required>
                 </div>
-                <button type="submit" class="submit-btn">Login</button>
+                <div class="input-group">
+                    <label class="input-label">Access Key</label>
+                    <input type="text" id="studentKey" class="input-field"
+                        placeholder="Enter access key (or leave blank)">
+                </div>
+                <button type="submit" class="submit-btn">Start Learning →</button>
+                <p class="error-message" id="studentError"></p>
             </form>
         </div>
     </div>
@@ -326,33 +545,30 @@
     <!-- Admin Modal -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('admin')">&times;</button>
-            <h2 class="modal-title">🔐 Admin Portal</h2>
+            <button class="modal-close" onclick="closeModal('admin')">×</button>
+            <h3 class="modal-title">⚙️ Admin Login</h3>
             <form onsubmit="adminLogin(event)">
                 <div class="input-group">
                     <label class="input-label">Admin Password</label>
-                    <input type="password" class="input-field" id="adminPassword" placeholder="Enter admin password"
+                    <input type="password" id="adminPassword" class="input-field" placeholder="Enter admin password"
                         required>
-                    <p class="error-msg" id="adminError">Incorrect password</p>
                 </div>
-                <button type="submit" class="submit-btn admin">Access Admin Panel</button>
+                <button type="submit" class="submit-btn">Access Panel →</button>
+                <p class="error-message" id="adminError"></p>
             </form>
         </div>
     </div>
 
     <script>
-        // No auto-redirect - user must login
-
         function openModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
         }
 
         function closeModal(type) {
             document.getElementById(type + 'Modal').classList.remove('active');
-            document.getElementById(type + 'Error')?.classList.remove('show');
         }
 
-        // Close modal on backdrop click
+        // Close modal on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
@@ -363,34 +579,49 @@
 
         function studentLogin(e) {
             e.preventDefault();
-            const key = document.getElementById('accessKey').value.trim();
+            const name = document.getElementById('studentName').value.trim();
+            const key = document.getElementById('studentKey').value.trim();
 
-            if (key.length > 0) {
-                // Save user data
-                localStorage.setItem('user_data', JSON.stringify({
-                    key: key,
-                    name: key,
-                    loginTime: Date.now()
-                }));
-
-                // Redirect to dashboard
-                window.location.href = 'student-dashboard.html';
-            } else {
-                document.getElementById('studentError').classList.add('show');
+            if (!name) {
+                showError('studentError', 'Please enter your name');
+                return;
             }
+
+            // Save to localStorage
+            localStorage.setItem('user_data', JSON.stringify({
+                name: name,
+                key: key || 'guest',
+                type: 'student',
+                loginTime: Date.now()
+            }));
+
+            // Redirect
+            window.location.href = 'student-dashboard.html';
         }
 
         function adminLogin(e) {
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
 
-            // Check admin password - must match ADMIN_KEY in admin/index.html
-            if (password === 'admin123') {
-                sessionStorage.setItem('admin_authenticated', 'true');
+            // Check admin password (simple check for demo)
+            if (password === 'admin123' || password === 'genz2024') {
+                localStorage.setItem('admin_auth', JSON.stringify({
+                    authenticated: true,
+                    loginTime: Date.now()
+                }));
                 window.location.href = 'admin/index.html';
             } else {
-                document.getElementById('adminError').classList.add('show');
+                showError('adminError', 'Invalid password. Try: admin123');
             }
+        }
+
+        function showError(id, message) {
+            const errorEl = document.getElementById(id);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 3000);
         }
     </script>
 </body>

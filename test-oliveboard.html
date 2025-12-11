@@ -30,9 +30,9 @@
 
         body {
             font-family: 'Open Sans', 'Segoe UI', Arial, sans-serif;
-            font-size: 13px;
-            line-height: 1.4;
-            color: #333;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #1a1a1a;
             background: #e8e8e8;
         }
 
@@ -260,11 +260,12 @@
         }
 
         .question-text {
-            font-size: 15px;
-            line-height: 1.8;
-            color: var(--text-dark);
-            margin-bottom: 28px;
+            font-size: 17px;
+            line-height: 1.9;
+            color: #111111;
+            margin-bottom: 32px;
             white-space: pre-line;
+            font-weight: 500;
         }
 
         /* ===== OPTIONS - SUPERKALAM STYLE ===== */
@@ -305,14 +306,14 @@
         }
 
         .option-letter-box {
-            width: 44px;
-            height: 48px;
+            width: 52px;
+            height: 56px;
             background: var(--option-blue);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             flex-shrink: 0;
         }
@@ -323,10 +324,10 @@
 
         .option-label {
             flex: 1;
-            padding: 12px 16px;
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--text-dark);
+            padding: 14px 18px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1a1a1a;
         }
 
         .option-letter {
@@ -382,14 +383,14 @@
 
         /* ===== SIDEBAR - SUPERKALAM STYLE ===== */
         .sidebar {
-            width: 280px;
+            width: 300px;
             background: var(--bg-white);
             border-left: 1px solid var(--border-light);
-            padding: 16px;
+            padding: 18px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 18px;
         }
 
         .sidebar-card {
@@ -482,7 +483,7 @@
         }
 
         .legend-text {
-            font-size: 11px;
+            font-size: 13px;
             color: var(--text-gray);
         }
 
@@ -509,14 +510,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 8px;
             cursor: pointer;
-            border: 1px solid var(--border-medium);
+            border: 2px solid var(--border-medium);
             background: var(--bg-white);
             color: var(--text-dark);
             transition: all 0.15s ease;
+            min-width: 42px;
+            min-height: 42px;
         }
 
         .palette-btn:hover {
@@ -1090,17 +1093,7 @@
                 state.answers = data.answers || {};
                 state.marked = new Set(data.marked || []);
                 state.visited = new Set(data.visited || [0]);
-
-                // Validate time to prevent NaN
-                let loadedTime = parseInt(data.time);
-                if (!isNaN(loadedTime) && loadedTime >= 0) {
-                    state.time = loadedTime;
-                } else {
-                    // Fallback to default if corrupted
-                    console.warn('⚠️ Saved time was invalid, resetting timer.');
-                    state.time = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
-                }
-
+                state.time = data.time || state.time;
                 console.log('📂 Progress loaded:', data);
                 return true;
             } catch (e) {
@@ -1113,13 +1106,19 @@
             localStorage.removeItem(PROGRESS_KEY);
         }
 
-        // Auto-save on page unload
-        window.addEventListener('beforeunload', (e) => {
+        // Flag to prevent auto-save during submit
+        let isSubmitting = false;
+
+        // Named function for beforeunload (so we can remove it)
+        function handleBeforeUnload(e) {
+            if (isSubmitting) return; // Don't save if submitting
             saveProgress();
-            // Show confirmation dialog
             e.preventDefault();
             e.returnValue = 'You have an ongoing test. Are you sure you want to leave?';
-        });
+        }
+
+        // Auto-save on page unload
+        window.addEventListener('beforeunload', handleBeforeUnload);
 
         // Load saved progress if exists
         const hasResume = loadProgress();
@@ -1229,35 +1228,18 @@
         });
 
         document.getElementById('confirmSubmit').addEventListener('click', () => {
+            // CRITICAL: Set flag and remove listener FIRST to prevent race condition
             isSubmitting = true;
-            window.removeEventListener('beforeunload', handleBeforeUnload); // Vital fix
+            window.removeEventListener('beforeunload', handleBeforeUnload);
 
             let correct = 0;
             questions.forEach((q, i) => {
                 if (state.answers[i] === q.correct) correct++;
             });
+            const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
+            const timeTaken = totalTime - state.time;
 
-            // Safe Time Calculation
-            let totalTime = 15 * 60; // Default
-            if (currentTest && currentTest.time_limit) {
-                totalTime = parseInt(currentTest.time_limit) * 60;
-            }
-
-            let timeTaken = totalTime - state.time;
-            if (isNaN(timeTaken) || timeTaken < 0) timeTaken = 0;
-
-            // Save answers
-            const attemptData = {
-                date: Date.now(),
-                score: correct * 2 - (Object.keys(state.answers).length - correct) * 0.66,
-                correct,
-                wrong: Object.keys(state.answers).length - correct,
-                total: state.total,
-                timeTaken,
-                answers: state.answers,
-                marked: Array.from(state.marked)
-            };
-
+            // Save answers for answers page
             const answersKey = `test_answers_${testId}`;
             localStorage.setItem(answersKey, JSON.stringify({
                 answers: state.answers,
@@ -1265,29 +1247,29 @@
                 submittedAt: Date.now()
             }));
 
-            // Save to Test Attempts History
+            // Save attempt to test_attempts history
             const allAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
             if (!allAttempts[testId]) {
                 allAttempts[testId] = [];
             }
-            allAttempts[testId].push(attemptData);
+            allAttempts[testId].push({
+                date: Date.now(),
+                correct,
+                wrong: Object.keys(state.answers).length - correct,
+                total: state.total,
+                timeTaken
+            });
             localStorage.setItem('test_attempts', JSON.stringify(allAttempts));
 
-            // Update User Aggregate Progress
+            // Update user progress
             const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
             userProgress.tests += 1;
             userProgress.correct += correct;
             userProgress.total += state.total;
-
-            // Safe update for total time
-            const timeToAdd = Math.round(timeTaken / 60);
-            if (!isNaN(timeToAdd) && timeToAdd > 0) {
-                userProgress.time = (userProgress.time || 0) + timeToAdd;
-            }
-
+            userProgress.time += Math.round(timeTaken / 60);
             localStorage.setItem('user_progress', JSON.stringify(userProgress));
 
-            // Update Attempted Tests List
+            // Update attempted tests list
             const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
             if (!attemptedTests.includes(testId)) {
                 attemptedTests.push(testId);
@@ -1303,12 +1285,9 @@
                 attempt: allAttempts[testId].length
             });
 
+            // Clear progress AFTER removing listener
             clearProgress();
-
-            // Small delay to ensure localStorage write completes
-            setTimeout(() => {
-                window.location.href = `results.html?${params}`;
-            }, 100);
+            window.location.href = `results.html?${params}`;
         });
 
         // ===== TIMER =====
