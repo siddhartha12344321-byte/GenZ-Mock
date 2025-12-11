@@ -166,14 +166,10 @@
             <div class="bg-white rounded-2xl border border-gray-100 p-8">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">📊 Performance Analysis</h2>
 
-                <div class="grid grid-cols-3 gap-4 mb-8 pb-6 border-b border-gray-100">
+                <div class="grid grid-cols-2 gap-4 mb-8 pb-6 border-b border-gray-100">
                     <div class="text-center">
                         <div id="timeTaken" class="text-2xl font-bold text-blue-600">00:00</div>
                         <div class="text-sm text-gray-500">Time Taken</div>
-                    </div>
-                    <div class="text-center">
-                        <div id="avgTime" class="text-2xl font-bold text-blue-600">0s</div>
-                        <div class="text-sm text-gray-500">Avg/Question</div>
                     </div>
                     <div class="text-center">
                         <div id="accuracy" class="text-2xl font-bold text-green-600">0%</div>
@@ -348,13 +344,20 @@
             document.getElementById('testInfo').textContent = (test?.name_en || 'Mock Test') + ' • Completed just now';
             document.getElementById('retakeBtn').href = `test-oliveboard.html?id=${testId}`;
 
-            // Stats
-            document.getElementById('correctCount').textContent = correct;
-            document.getElementById('wrongCount').textContent = wrong;
-            document.getElementById('skippedCount').textContent = skipped;
+            // Stats - with safe number conversions
+            const safeCorrect = (typeof correct === 'number' && !isNaN(correct)) ? correct : 0;
+            const safeWrong = (typeof wrong === 'number' && !isNaN(wrong)) ? wrong : 0;
+            const safeSkipped = (typeof skipped === 'number' && !isNaN(skipped)) ? skipped : 0;
+            const safePercentage = (typeof percentage === 'number' && !isNaN(percentage)) ? percentage : 0;
+            const safeAccuracy = (typeof accuracy === 'number' && !isNaN(accuracy)) ? accuracy : 0;
+            const safeUpscScore = (typeof upscScore === 'number' && !isNaN(upscScore)) ? upscScore : 0;
 
-            document.getElementById('upscScore').textContent = upscScore.toFixed(1);
-            document.getElementById('upscBreakdown').textContent = `(+2 × ${correct}) - (0.66 × ${wrong}) = ${upscScore.toFixed(1)} marks`;
+            document.getElementById('correctCount').textContent = safeCorrect;
+            document.getElementById('wrongCount').textContent = safeWrong;
+            document.getElementById('skippedCount').textContent = safeSkipped;
+
+            document.getElementById('upscScore').textContent = safeUpscScore.toFixed(1);
+            document.getElementById('upscBreakdown').textContent = `(+2 × ${safeCorrect}) - (0.66 × ${safeWrong}) = ${safeUpscScore.toFixed(1)} marks`;
 
             // Time - with safe number conversion
             const safeTime = (typeof timeTaken === 'number' && !isNaN(timeTaken)) ? timeTaken : 0;
@@ -362,10 +365,8 @@
             const secs = Math.floor(safeTime % 60);
             document.getElementById('timeTaken').textContent = `${mins}:${String(secs).padStart(2, '0')}`;
 
-            const answeredCount = (correct || 0) + (wrong || 0);
-            const avgTime = answeredCount > 0 ? Math.round(safeTime / answeredCount) : 0;
-            document.getElementById('avgTime').textContent = avgTime + 's';
-            document.getElementById('accuracy').textContent = (accuracy || 0) + '%';
+            // Accuracy
+            document.getElementById('accuracy').textContent = safeAccuracy + '%';
 
             // Score message
             const msgEl = document.getElementById('scoreMessage');

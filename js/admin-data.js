@@ -13,10 +13,31 @@ class AdminDataManager {
         this.accessKeys = this.load('access_keys') || [];
         this.subjects = this.getDefaultSubjects();
 
+        // Add default testing keys if not already present
+        this.initDefaultKeys();
+
         console.log('📦 AdminDataManager initialized');
         console.log(`   - ${this.mockTests.length} tests`);
         console.log(`   - ${this.questions.length} questions`);
         console.log(`   - ${this.accessKeys.length} access keys`);
+    }
+
+    initDefaultKeys() {
+        const defaultKeys = ['GenZTesting1', 'GenZTesting2', 'GenZTesting3'];
+        let validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
+
+        let added = false;
+        defaultKeys.forEach(key => {
+            if (!validKeys.includes(key)) {
+                validKeys.push(key);
+                added = true;
+            }
+        });
+
+        if (added) {
+            localStorage.setItem('valid_keys', JSON.stringify(validKeys));
+            console.log('🔑 Default testing keys added:', defaultKeys);
+        }
     }
 
     // ===== STORAGE HELPERS =====
