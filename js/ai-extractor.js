@@ -88,8 +88,7 @@ RESPOND ONLY WITH VALID JSON. No markdown, no explanations.`;
                         { role: 'user', content: userPrompt }
                     ],
                     temperature: 0.1,
-                    max_tokens: 8000,
-                    response_format: { type: 'json_object' }
+                    max_tokens: 8000
                 })
             });
 
@@ -99,11 +98,24 @@ RESPOND ONLY WITH VALID JSON. No markdown, no explanations.`;
             }
 
             const data = await response.json();
-            const content = data.choices[0]?.message?.content;
+            let content = data.choices[0]?.message?.content;
 
             if (!content) {
                 throw new Error('Empty response from AI');
             }
+
+            // Clean up response - extract JSON from markdown if present
+            content = content.trim();
+            if (content.startsWith('```json')) {
+                content = content.slice(7);
+            }
+            if (content.startsWith('```')) {
+                content = content.slice(3);
+            }
+            if (content.endsWith('```')) {
+                content = content.slice(0, -3);
+            }
+            content = content.trim();
 
             const result = JSON.parse(content);
             console.log(`✅ AI extracted ${result.questions?.length || 0} questions`);
@@ -200,8 +212,7 @@ RESPOND ONLY WITH VALID JSON.`;
                         { role: 'user', content: userPrompt }
                     ],
                     temperature: 0.7,
-                    max_tokens: 8000,
-                    response_format: { type: 'json_object' }
+                    max_tokens: 8000
                 })
             });
 
@@ -211,11 +222,24 @@ RESPOND ONLY WITH VALID JSON.`;
             }
 
             const data = await response.json();
-            const content = data.choices[0]?.message?.content;
+            let content = data.choices[0]?.message?.content;
 
             if (!content) {
                 throw new Error('Empty response from AI');
             }
+
+            // Clean up response - extract JSON from markdown if present
+            content = content.trim();
+            if (content.startsWith('```json')) {
+                content = content.slice(7);
+            }
+            if (content.startsWith('```')) {
+                content = content.slice(3);
+            }
+            if (content.endsWith('```')) {
+                content = content.slice(0, -3);
+            }
+            content = content.trim();
 
             const result = JSON.parse(content);
             console.log(`✅ AI generated ${result.questions?.length || 0} questions`);
