@@ -235,441 +235,420 @@
                                             <path
                                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" />
                                         </svg>
-                                    </div>
-                                    <div class="text-3xl font-bold text-gray-900" id="rankVal">-</div>
-                                    <div class="text-sm text-gray-500 mt-1">Your Rank</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Current Affairs / Updates Section -->
-                        <div class="mt-6 w-full mb-6"> <!-- Added margin-bottom to separate from footer/bottom -->
-                            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <span class="w-1 h-6 bg-orange-500 rounded-full"></span>
-                                Current Affairs Updates
-                            </h2>
-                            <div
-                                class="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-between shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
-                                <div class="flex items-start gap-5">
-                                    <div
-                                        class="w-14 h-14 bg-orange-50 rounded-xl flex items-center justify-center shrink-0 border border-orange-100 group-hover:scale-105 transition-transform">
-                                        <svg width="28" height="28" fill="none" stroke="#f97316" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <span
-                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 uppercase tracking-wider">Daily
-                                                Updates</span>
-                                            <span class="text-xs text-gray-400 font-medium">• 12 Dec 2024</span>
+                                        <div
+                                            class="w-80 bg-white border border-gray-200 rounded-xl flex flex-col h-[520px]">
+                                            <div class="p-4 border-b border-gray-100">
+                                                <h3 class="text-sm font-bold text-gray-800">📊 Today's Leaderboard</h3>
+                                            </div>
+                                            <div class="p-4 flex-1 flex flex-col">
+                                                <div
+                                                    class="bg-blue-50 p-3 rounded-lg flex justify-between items-center mb-4">
+                                                    <div class="text-[11px] text-blue-800 leading-tight w-2/3">Practice
+                                                        tests & see your
+                                                        rank!</div>
+                                                    <a href="#" onclick="showPage('mocktests')"
+                                                        class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-700">Start
+                                                        Now</a>
+                                                </div>
+                                                <div
+                                                    class="flex text-[10px] text-gray-400 font-bold mb-2 px-2 uppercase tracking-wide">
+                                                    <div class="w-8">Rank</div>
+                                                    <div class="flex-1">Student</div>
+                                                    <div class="w-12 text-right">Score</div>
+                                                    <div class="w-12 text-right">Acc.</div>
+                                                </div>
+                                                <div class="flex-1 overflow-y-auto custom-scrollbar"
+                                                    id="leaderboardList"></div>
+                                            </div>
                                         </div>
-                                        <h3
-                                            class="font-bold text-gray-900 mb-1.5 text-lg group-hover:text-orange-600 transition-colors">
-                                            Important News Analysis</h3>
-                                        <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed">Key updates on
-                                            International Relations, Economy, and Science & Tech. Essential reading for
-                                            your preparation.</p>
                                     </div>
                                 </div>
-                                <div
-                                    class="h-10 w-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-all">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                    </svg>
+                            </div>
+
+                            <!-- MOCK TESTS VIEW (All Available Tests) -->
+                            <div id="mocktestsView" class="page-view h-full flex-col hidden bg-white">
+                                <header
+                                    class="bg-white h-14 border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
+                                    <span class="text-gray-500 font-medium text-sm" id="mockTestsHeader">Mock
+                                        Tests</span>
+                                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                                        id="headerAvatar">U</div>
+                                </header>
+                                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                                    <div class="max-w-6xl mx-auto">
+                                        <!-- Tabs -->
+                                        <div class="flex gap-8 border-b border-gray-200 mb-6">
+                                            <button
+                                                class="pb-3 border-b-2 border-orange-500 text-orange-500 font-bold text-sm">All
+                                                Tests</button>
+                                            <button
+                                                class="pb-3 text-gray-500 font-medium hover:text-gray-800 text-sm">Completed</button>
+                                        </div>
+
+                                        <!-- Filters -->
+                                        <div class="flex justify-between items-center mb-6">
+                                            <div class="flex gap-3">
+                                                <select
+                                                    class="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white text-gray-600 outline-none focus:border-blue-400">
+                                                    <option>All Subjects</option>
+                                                </select>
+                                                <select
+                                                    class="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white text-gray-600 outline-none focus:border-blue-400">
+                                                    <option>All attempts</option>
+                                                </select>
+                                            </div>
+                                            <div class="text-sm text-gray-500">Sort by: <span
+                                                    class="text-gray-900 font-medium">Newest
+                                                    first</span></div>
+                                        </div>
+
+                                        <!-- Professional Table -->
+                                        <div id="mockTestsList"
+                                            class="w-full border border-gray-200 rounded-lg overflow-hidden">
+                                            <div
+                                                class="bg-orange-50 px-6 py-3 flex text-xs font-bold text-gray-700 uppercase tracking-wide border-b border-orange-100">
+                                                <div class="w-[35%]">Test name</div>
+                                                <div class="w-24 text-center"># Questions</div>
+                                                <div class="w-24 text-center">Max marks</div>
+                                                <div class="w-24 text-center">Time</div>
+                                                <div class="flex-1">Subject</div>
+                                                <div class="w-32"></div>
+                                            </div>
+                                            <div id="mockTestsBody" class="divide-y divide-gray-100">
+                                                <div class="px-6 py-8 text-center text-gray-500">Loading tests...</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Right Leaderboard -->
-                        <div class="w-80 bg-white border border-gray-200 rounded-xl flex flex-col h-[520px]">
-                            <div class="p-4 border-b border-gray-100">
-                                <h3 class="text-sm font-bold text-gray-800">📊 Today's Leaderboard</h3>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col">
-                                <div class="bg-blue-50 p-3 rounded-lg flex justify-between items-center mb-4">
-                                    <div class="text-[11px] text-blue-800 leading-tight w-2/3">Practice tests & see your
-                                        rank!</div>
-                                    <a href="#" onclick="showPage('mocktests')"
-                                        class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-700">Start
-                                        Now</a>
-                                </div>
-                                <div class="flex text-[10px] text-gray-400 font-bold mb-2 px-2 uppercase tracking-wide">
-                                    <div class="w-8">Rank</div>
-                                    <div class="flex-1">Student</div>
-                                    <div class="w-12 text-right">Score</div>
-                                    <div class="w-12 text-right">Acc.</div>
-                                </div>
-                                <div class="flex-1 overflow-y-auto custom-scrollbar" id="leaderboardList"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            <!-- MY TESTS VIEW (Attempted Tests) -->
+                            <div id="mytestsView" class="page-view h-full flex-col hidden bg-white">
+                                <header
+                                    class="bg-white h-14 border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
+                                    <span class="text-gray-500 font-medium text-sm">My Tests</span>
+                                    <div
+                                        class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                        U</div>
+                                </header>
+                                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                                    <div class="max-w-6xl mx-auto">
+                                        <!-- Tabs -->
+                                        <div class="flex gap-8 border-b border-gray-200 mb-6">
+                                            <button
+                                                class="pb-3 border-b-2 border-orange-500 text-orange-500 font-bold text-sm">Attempted
+                                                Tests</button>
+                                            <button class="pb-3 text-gray-500 font-medium hover:text-gray-800 text-sm"
+                                                onclick="showPage('mocktests')">All Tests</button>
+                                        </div>
 
-            <!-- MOCK TESTS VIEW (All Available Tests) -->
-            <div id="mocktestsView" class="page-view h-full flex-col hidden bg-white">
-                <header class="bg-white h-14 border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
-                    <span class="text-gray-500 font-medium text-sm" id="mockTestsHeader">Mock Tests</span>
-                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                        id="headerAvatar">U</div>
-                </header>
-                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
-                    <div class="max-w-6xl mx-auto">
-                        <!-- Tabs -->
-                        <div class="flex gap-8 border-b border-gray-200 mb-6">
-                            <button class="pb-3 border-b-2 border-orange-500 text-orange-500 font-bold text-sm">All
-                                Tests</button>
-                            <button
-                                class="pb-3 text-gray-500 font-medium hover:text-gray-800 text-sm">Completed</button>
-                        </div>
-
-                        <!-- Filters -->
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex gap-3">
-                                <select
-                                    class="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white text-gray-600 outline-none focus:border-blue-400">
-                                    <option>All Subjects</option>
-                                </select>
-                                <select
-                                    class="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white text-gray-600 outline-none focus:border-blue-400">
-                                    <option>All attempts</option>
-                                </select>
-                            </div>
-                            <div class="text-sm text-gray-500">Sort by: <span class="text-gray-900 font-medium">Newest
-                                    first</span></div>
-                        </div>
-
-                        <!-- Professional Table -->
-                        <div id="mockTestsList" class="w-full border border-gray-200 rounded-lg overflow-hidden">
-                            <div
-                                class="bg-orange-50 px-6 py-3 flex text-xs font-bold text-gray-700 uppercase tracking-wide border-b border-orange-100">
-                                <div class="w-[35%]">Test name</div>
-                                <div class="w-24 text-center"># Questions</div>
-                                <div class="w-24 text-center">Max marks</div>
-                                <div class="w-24 text-center">Time</div>
-                                <div class="flex-1">Subject</div>
-                                <div class="w-32"></div>
-                            </div>
-                            <div id="mockTestsBody" class="divide-y divide-gray-100">
-                                <div class="px-6 py-8 text-center text-gray-500">Loading tests...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MY TESTS VIEW (Attempted Tests) -->
-            <div id="mytestsView" class="page-view h-full flex-col hidden bg-white">
-                <header class="bg-white h-14 border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
-                    <span class="text-gray-500 font-medium text-sm">My Tests</span>
-                    <div
-                        class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        U</div>
-                </header>
-                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
-                    <div class="max-w-6xl mx-auto">
-                        <!-- Tabs -->
-                        <div class="flex gap-8 border-b border-gray-200 mb-6">
-                            <button
-                                class="pb-3 border-b-2 border-orange-500 text-orange-500 font-bold text-sm">Attempted
-                                Tests</button>
-                            <button class="pb-3 text-gray-500 font-medium hover:text-gray-800 text-sm"
-                                onclick="showPage('mocktests')">All Tests</button>
-                        </div>
-
-                        <!-- Professional Table -->
-                        <div class="w-full border border-gray-200 rounded-lg overflow-hidden">
-                            <div
-                                class="bg-orange-50 px-6 py-3 flex text-xs font-bold text-gray-700 uppercase tracking-wide border-b border-orange-100">
-                                <div class="w-[30%]">Test name</div>
-                                <div class="w-20 text-center"># Questions</div>
-                                <div class="w-20 text-center">Max marks</div>
-                                <div class="w-20 text-center">Time</div>
-                                <div class="w-24">Status</div>
-                                <div class="w-28 text-center">Attempts</div>
-                                <div class="w-24"></div>
-                            </div>
-                            <div id="myTestsBody" class="divide-y divide-gray-100">
-                                <div class="px-6 py-8 text-center text-gray-500">No tests attempted yet. Start
-                                    practicing!</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TEST INSTRUCTIONS MODAL - EXACT SUPERKALAM REPLICA -->
-            <div id="testModal" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center">
-                <div class="bg-white rounded-xl shadow-2xl w-[720px] max-w-[95vw] overflow-hidden flex"
-                    style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-
-                    <!-- Left Panel - Gray Background -->
-                    <div class="w-[280px] bg-gray-50 p-8 flex flex-col">
-                        <!-- Logo -->
-                        <div class="flex items-center gap-2.5 mb-8">
-                            <div class="w-9 h-9 rounded-full flex items-center justify-center"
-                                style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
-                                    stroke-width="2.5">
-                                    <circle cx="12" cy="12" r="3" />
-                                    <path
-                                        d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                                </svg>
-                            </div>
-                            <span class="font-bold text-xl text-gray-900">GenZMocks</span>
-                        </div>
-
-                        <!-- PRELIMS Badge -->
-                        <div
-                            class="inline-flex w-fit px-2.5 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold uppercase tracking-wider rounded mb-3">
-                            PRELIMS</div>
-
-                        <!-- Test Name -->
-                        <h2 id="modalTestName" class="text-xl font-bold text-gray-900 leading-tight mb-6">Laxmikanth
-                            Revision Series: Test 9</h2>
-
-                        <!-- Topics -->
-                        <div class="text-xs text-gray-400 font-medium mb-1.5">Topics</div>
-                        <div id="modalTestTopic" class="text-sm text-gray-800 font-medium">Centre-State Relations</div>
-                    </div>
-
-                    <!-- Right Panel - White Background -->
-                    <div class="flex-1 p-8 flex flex-col">
-                        <!-- Header -->
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold text-gray-900">Test Instructions</h3>
-                            <button onclick="closeTestModal()"
-                                class="text-blue-600 text-sm font-medium hover:underline">Back</button>
-                        </div>
-
-                        <!-- Stats Grid -->
-                        <div class="grid grid-cols-3 border border-gray-200 rounded-lg overflow-hidden mb-6">
-                            <div class="p-5 text-center border-r border-gray-200">
-                                <div id="modalQuestions" class="text-2xl font-bold text-gray-900 mb-0.5">10</div>
-                                <div class="text-xs text-gray-500">Questions</div>
-                            </div>
-                            <div class="p-5 text-center border-r border-gray-200">
-                                <div id="modalMarks" class="text-2xl font-bold text-gray-900 mb-0.5">20</div>
-                                <div class="text-xs text-gray-500">Max marks</div>
-                            </div>
-                            <div class="p-5 text-center">
-                                <div id="modalTime" class="text-2xl font-bold text-gray-900 mb-0.5">10 min</div>
-                                <div class="text-xs text-gray-500">Duration</div>
-                            </div>
-                        </div>
-
-                        <!-- Marking Scheme -->
-                        <h4 class="font-bold text-gray-900 mb-3 text-sm">Marking Scheme</h4>
-                        <div class="grid grid-cols-3 border border-gray-200 rounded-lg overflow-hidden mb-6">
-                            <div class="p-4 text-center border-r border-gray-200">
-                                <div class="text-xl font-bold text-gray-900 mb-1">+2</div>
-                                <div class="flex items-center justify-center gap-1.5 text-xs">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span class="text-green-600 font-medium">Correct</span>
+                                        <!-- Professional Table -->
+                                        <div class="w-full border border-gray-200 rounded-lg overflow-hidden">
+                                            <div
+                                                class="bg-orange-50 px-6 py-3 flex text-xs font-bold text-gray-700 uppercase tracking-wide border-b border-orange-100">
+                                                <div class="w-[30%]">Test name</div>
+                                                <div class="w-20 text-center"># Questions</div>
+                                                <div class="w-20 text-center">Max marks</div>
+                                                <div class="w-20 text-center">Time</div>
+                                                <div class="w-24">Status</div>
+                                                <div class="w-28 text-center">Attempts</div>
+                                                <div class="w-24"></div>
+                                            </div>
+                                            <div id="myTestsBody" class="divide-y divide-gray-100">
+                                                <div class="px-6 py-8 text-center text-gray-500">No tests attempted yet.
+                                                    Start
+                                                    practicing!</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-4 text-center border-r border-gray-200">
-                                <div class="text-xl font-bold text-gray-900 mb-1">-0.67</div>
-                                <div class="flex items-center justify-center gap-1.5 text-xs">
-                                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                                    <span class="text-red-600 font-medium">Incorrect</span>
+
+                            <!-- TEST INSTRUCTIONS MODAL - EXACT SUPERKALAM REPLICA -->
+                            <div id="testModal"
+                                class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center">
+                                <div class="bg-white rounded-xl shadow-2xl w-[720px] max-w-[95vw] overflow-hidden flex"
+                                    style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+
+                                    <!-- Left Panel - Gray Background -->
+                                    <div class="w-[280px] bg-gray-50 p-8 flex flex-col">
+                                        <!-- Logo -->
+                                        <div class="flex items-center gap-2.5 mb-8">
+                                            <div class="w-9 h-9 rounded-full flex items-center justify-center"
+                                                style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                    stroke="white" stroke-width="2.5">
+                                                    <circle cx="12" cy="12" r="3" />
+                                                    <path
+                                                        d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                                                </svg>
+                                            </div>
+                                            <span class="font-bold text-xl text-gray-900">GenZMocks</span>
+                                        </div>
+
+                                        <!-- PRELIMS Badge -->
+                                        <div
+                                            class="inline-flex w-fit px-2.5 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold uppercase tracking-wider rounded mb-3">
+                                            PRELIMS</div>
+
+                                        <!-- Test Name -->
+                                        <h2 id="modalTestName"
+                                            class="text-xl font-bold text-gray-900 leading-tight mb-6">Laxmikanth
+                                            Revision Series: Test 9</h2>
+
+                                        <!-- Topics -->
+                                        <div class="text-xs text-gray-400 font-medium mb-1.5">Topics</div>
+                                        <div id="modalTestTopic" class="text-sm text-gray-800 font-medium">Centre-State
+                                            Relations</div>
+                                    </div>
+
+                                    <!-- Right Panel - White Background -->
+                                    <div class="flex-1 p-8 flex flex-col">
+                                        <!-- Header -->
+                                        <div class="flex justify-between items-center mb-6">
+                                            <h3 class="text-xl font-bold text-gray-900">Test Instructions</h3>
+                                            <button onclick="closeTestModal()"
+                                                class="text-blue-600 text-sm font-medium hover:underline">Back</button>
+                                        </div>
+
+                                        <!-- Stats Grid -->
+                                        <div
+                                            class="grid grid-cols-3 border border-gray-200 rounded-lg overflow-hidden mb-6">
+                                            <div class="p-5 text-center border-r border-gray-200">
+                                                <div id="modalQuestions"
+                                                    class="text-2xl font-bold text-gray-900 mb-0.5">10</div>
+                                                <div class="text-xs text-gray-500">Questions</div>
+                                            </div>
+                                            <div class="p-5 text-center border-r border-gray-200">
+                                                <div id="modalMarks" class="text-2xl font-bold text-gray-900 mb-0.5">20
+                                                </div>
+                                                <div class="text-xs text-gray-500">Max marks</div>
+                                            </div>
+                                            <div class="p-5 text-center">
+                                                <div id="modalTime" class="text-2xl font-bold text-gray-900 mb-0.5">10
+                                                    min</div>
+                                                <div class="text-xs text-gray-500">Duration</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Marking Scheme -->
+                                        <h4 class="font-bold text-gray-900 mb-3 text-sm">Marking Scheme</h4>
+                                        <div
+                                            class="grid grid-cols-3 border border-gray-200 rounded-lg overflow-hidden mb-6">
+                                            <div class="p-4 text-center border-r border-gray-200">
+                                                <div class="text-xl font-bold text-gray-900 mb-1">+2</div>
+                                                <div class="flex items-center justify-center gap-1.5 text-xs">
+                                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                                    <span class="text-green-600 font-medium">Correct</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-4 text-center border-r border-gray-200">
+                                                <div class="text-xl font-bold text-gray-900 mb-1">-0.67</div>
+                                                <div class="flex items-center justify-center gap-1.5 text-xs">
+                                                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                                    <span class="text-red-600 font-medium">Incorrect</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-4 text-center">
+                                                <div class="text-xl font-bold text-gray-900 mb-1">0</div>
+                                                <div class="flex items-center justify-center gap-1.5 text-xs">
+                                                    <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                                                    <span class="text-gray-500 font-medium">Unattempted</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tip Box -->
+                                        <div
+                                            class="flex items-center gap-3 bg-blue-50 text-blue-800 px-4 py-3 rounded-lg mb-6 text-sm border border-blue-100">
+                                            <span class="text-lg">✏️</span>
+                                            <span class="font-medium">Keep a water bottle by your side during the
+                                                test</span>
+                                        </div>
+
+                                        <!-- Action Button -->
+                                        <button id="modalActionBtn" onclick="startTest()"
+                                            class="w-full py-4 rounded-lg font-bold text-base text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.99]">
+                                            Start Test
+                                        </button>
+
+                                        <!-- Resume Info -->
+                                        <div id="modalResumeInfo" class="hidden text-center mt-4 text-xs text-gray-400">
+                                            Test in progress saved <span class="italic font-medium">Today, 01:57
+                                                pm</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-4 text-center">
-                                <div class="text-xl font-bold text-gray-900 mb-1">0</div>
-                                <div class="flex items-center justify-center gap-1.5 text-xs">
-                                    <span class="w-2 h-2 rounded-full bg-gray-400"></span>
-                                    <span class="text-gray-500 font-medium">Unattempted</span>
+
+                            <!-- MY PROGRESS VIEW -->
+                            <div id="progressView" class="page-view h-full flex-col hidden bg-gray-50">
+                                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
+                                    <span class="text-gray-900 font-medium">My Progress</span>
+                                </header>
+                                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                                    <div class="max-w-5xl mx-auto">
+                                        <!-- Stats Overview -->
+                                        <div class="grid grid-cols-4 gap-4 mb-8">
+                                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                                <div class="text-3xl font-bold text-blue-600" id="progressTests">0</div>
+                                                <div class="text-sm text-gray-500">Tests Taken</div>
+                                            </div>
+                                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                                <div class="text-3xl font-bold text-green-600" id="progressCorrect">0
+                                                </div>
+                                                <div class="text-sm text-gray-500">Correct Answers</div>
+                                            </div>
+                                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                                <div class="text-3xl font-bold text-purple-600" id="progressAccuracy">0%
+                                                </div>
+                                                <div class="text-sm text-gray-500">Avg Accuracy</div>
+                                            </div>
+                                            <div class="bg-white rounded-xl border border-gray-100 p-5">
+                                                <div class="text-3xl font-bold text-orange-600" id="progressTime">0m
+                                                </div>
+                                                <div class="text-sm text-gray-500">Time Spent</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Test History -->
+                                        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                                            <div class="px-6 py-4 border-b border-gray-100">
+                                                <h3 class="font-bold text-gray-900">Test History</h3>
+                                            </div>
+                                            <div id="testHistory" class="divide-y divide-gray-100">
+                                                <div class="px-6 py-8 text-center text-gray-500">No test history yet
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Tip Box -->
-                        <div
-                            class="flex items-center gap-3 bg-blue-50 text-blue-800 px-4 py-3 rounded-lg mb-6 text-sm border border-blue-100">
-                            <span class="text-lg">✏️</span>
-                            <span class="font-medium">Keep a water bottle by your side during the test</span>
-                        </div>
+                            <!-- LEADERBOARD VIEW -->
+                            <div id="leaderboardView" class="page-view h-full flex-col hidden bg-gray-50">
+                                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
+                                    <span class="text-gray-900 font-medium">Leaderboard</span>
+                                </header>
+                                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                                    <div class="max-w-3xl mx-auto">
+                                        <!-- Your Rank Card -->
+                                        <div
+                                            class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-8 text-white text-center">
+                                            <div class="text-6xl mb-2">🏆</div>
+                                            <div class="text-5xl font-bold" id="yourRankBig">#--</div>
+                                            <div class="text-blue-100 mt-2">Your Current Rank</div>
+                                        </div>
 
-                        <!-- Action Button -->
-                        <button id="modalActionBtn" onclick="startTest()"
-                            class="w-full py-4 rounded-lg font-bold text-base text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.99]">
-                            Start Test
-                        </button>
-
-                        <!-- Resume Info -->
-                        <div id="modalResumeInfo" class="hidden text-center mt-4 text-xs text-gray-400">
-                            Test in progress saved <span class="italic font-medium">Today, 01:57 pm</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MY PROGRESS VIEW -->
-            <div id="progressView" class="page-view h-full flex-col hidden bg-gray-50">
-                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
-                    <span class="text-gray-900 font-medium">My Progress</span>
-                </header>
-                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
-                    <div class="max-w-5xl mx-auto">
-                        <!-- Stats Overview -->
-                        <div class="grid grid-cols-4 gap-4 mb-8">
-                            <div class="bg-white rounded-xl border border-gray-100 p-5">
-                                <div class="text-3xl font-bold text-blue-600" id="progressTests">0</div>
-                                <div class="text-sm text-gray-500">Tests Taken</div>
+                                        <!-- Full Leaderboard -->
+                                        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                                            <div class="px-6 py-4 border-b border-gray-100">
+                                                <h3 class="font-bold text-gray-900">Top Performers</h3>
+                                            </div>
+                                            <div id="fullLeaderboard" class="divide-y divide-gray-100"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white rounded-xl border border-gray-100 p-5">
-                                <div class="text-3xl font-bold text-green-600" id="progressCorrect">0</div>
-                                <div class="text-sm text-gray-500">Correct Answers</div>
+
+                            <!-- ASK GENZ AI VIEW -->
+                            <div id="askView" class="page-view h-full flex-col hidden bg-white">
+                                <div id="askInitial"
+                                    class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-3xl mx-auto">
+                                    <div
+                                        class="bg-blue-50 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold border border-blue-100 mb-8">
+                                        ⚡ Powered by Groq AI
+                                    </div>
+
+                                    <div
+                                        class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-blue-200">
+                                        <span class="text-white text-2xl font-bold">GZ</span>
+                                    </div>
+
+                                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Ask GenZ AI</h1>
+                                    <p class="text-gray-500 mb-8">Your AI-powered study companion</p>
+
+                                    <div class="w-full space-y-2 mb-6">
+                                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
+                                            onclick="askQuestion('Explain Fundamental Rights in India')">
+                                            <span>Explain <b>Fundamental Rights</b> in India</span>
+                                            <svg width="16" height="16" stroke="currentColor" fill="none"
+                                                class="text-gray-300" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
+                                            onclick="askQuestion('What are Directive Principles of State Policy?')">
+                                            <span>What are <b>Directive Principles</b>?</span>
+                                            <svg width="16" height="16" stroke="currentColor" fill="none"
+                                                class="text-gray-300" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
+                                            onclick="askQuestion('Explain Indian Parliamentary System')">
+                                            <span>Explain <b>Parliamentary System</b></span>
+                                            <svg width="16" height="16" stroke="currentColor" fill="none"
+                                                class="text-gray-300" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full relative">
+                                        <input type="text" id="chatInput" placeholder="Ask me anything..."
+                                            class="w-full p-4 pr-12 rounded-xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm"
+                                            onkeypress="if(event.key==='Enter') sendMessage()">
+                                        <button onclick="sendMessage()"
+                                            class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Chat Container -->
+                                <div id="chatContainer" class="hidden h-full flex flex-col">
+                                    <header
+                                        class="bg-white h-14 border-b border-gray-200 px-6 flex items-center gap-3 shrink-0">
+                                        <button onclick="resetChat()" class="text-gray-400 hover:text-gray-600">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <div
+                                            class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                            <span class="text-white text-xs font-bold">GZ</span>
+                                        </div>
+                                        <span class="font-medium text-gray-900">GenZ AI</span>
+                                    </header>
+                                    <div id="chatMessages"
+                                        class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar"></div>
+                                    <div class="p-4 border-t border-gray-200 bg-white">
+                                        <div class="relative max-w-3xl mx-auto">
+                                            <input type="text" id="chatInputBottom" placeholder="Type your message..."
+                                                class="w-full p-4 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 text-sm"
+                                                onkeypress="if(event.key==='Enter') sendMessage()">
+                                            <button onclick="sendMessage()"
+                                                class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                                <svg width="20" height="20" fill="none" stroke="currentColor"
+                                                    stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white rounded-xl border border-gray-100 p-5">
-                                <div class="text-3xl font-bold text-purple-600" id="progressAccuracy">0%</div>
-                                <div class="text-sm text-gray-500">Avg Accuracy</div>
-                            </div>
-                            <div class="bg-white rounded-xl border border-gray-100 p-5">
-                                <div class="text-3xl font-bold text-orange-600" id="progressTime">0m</div>
-                                <div class="text-sm text-gray-500">Time Spent</div>
-                            </div>
-                        </div>
-
-                        <!-- Test History -->
-                        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-100">
-                                <h3 class="font-bold text-gray-900">Test History</h3>
-                            </div>
-                            <div id="testHistory" class="divide-y divide-gray-100">
-                                <div class="px-6 py-8 text-center text-gray-500">No test history yet</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LEADERBOARD VIEW -->
-            <div id="leaderboardView" class="page-view h-full flex-col hidden bg-gray-50">
-                <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center shrink-0">
-                    <span class="text-gray-900 font-medium">Leaderboard</span>
-                </header>
-                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
-                    <div class="max-w-3xl mx-auto">
-                        <!-- Your Rank Card -->
-                        <div
-                            class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-8 text-white text-center">
-                            <div class="text-6xl mb-2">🏆</div>
-                            <div class="text-5xl font-bold" id="yourRankBig">#--</div>
-                            <div class="text-blue-100 mt-2">Your Current Rank</div>
-                        </div>
-
-                        <!-- Full Leaderboard -->
-                        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-100">
-                                <h3 class="font-bold text-gray-900">Top Performers</h3>
-                            </div>
-                            <div id="fullLeaderboard" class="divide-y divide-gray-100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ASK GENZ AI VIEW -->
-            <div id="askView" class="page-view h-full flex-col hidden bg-white">
-                <div id="askInitial"
-                    class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-3xl mx-auto">
-                    <div
-                        class="bg-blue-50 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold border border-blue-100 mb-8">
-                        ⚡ Powered by Groq AI
-                    </div>
-
-                    <div
-                        class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-blue-200">
-                        <span class="text-white text-2xl font-bold">GZ</span>
-                    </div>
-
-                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Ask GenZ AI</h1>
-                    <p class="text-gray-500 mb-8">Your AI-powered study companion</p>
-
-                    <div class="w-full space-y-2 mb-6">
-                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
-                            onclick="askQuestion('Explain Fundamental Rights in India')">
-                            <span>Explain <b>Fundamental Rights</b> in India</span>
-                            <svg width="16" height="16" stroke="currentColor" fill="none" class="text-gray-300"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
-                            onclick="askQuestion('What are Directive Principles of State Policy?')">
-                            <span>What are <b>Directive Principles</b>?</span>
-                            <svg width="16" height="16" stroke="currentColor" fill="none" class="text-gray-300"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                        <div class="flex justify-between items-center p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border border-gray-100"
-                            onclick="askQuestion('Explain Indian Parliamentary System')">
-                            <span>Explain <b>Parliamentary System</b></span>
-                            <svg width="16" height="16" stroke="currentColor" fill="none" class="text-gray-300"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <div class="w-full relative">
-                        <input type="text" id="chatInput" placeholder="Ask me anything..."
-                            class="w-full p-4 pr-12 rounded-xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-sm"
-                            onkeypress="if(event.key==='Enter') sendMessage()">
-                        <button onclick="sendMessage()"
-                            class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Chat Container -->
-                <div id="chatContainer" class="hidden h-full flex flex-col">
-                    <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center gap-3 shrink-0">
-                        <button onclick="resetChat()" class="text-gray-400 hover:text-gray-600">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <div
-                            class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <span class="text-white text-xs font-bold">GZ</span>
-                        </div>
-                        <span class="font-medium text-gray-900">GenZ AI</span>
-                    </header>
-                    <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar"></div>
-                    <div class="p-4 border-t border-gray-200 bg-white">
-                        <div class="relative max-w-3xl mx-auto">
-                            <input type="text" id="chatInputBottom" placeholder="Type your message..."
-                                class="w-full p-4 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 text-sm"
-                                onkeypress="if(event.key==='Enter') sendMessage()">
-                            <button onclick="sendMessage()"
-                                class="absolute right-3 top-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         </main>
     </div>

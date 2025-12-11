@@ -1090,7 +1090,17 @@
                 state.answers = data.answers || {};
                 state.marked = new Set(data.marked || []);
                 state.visited = new Set(data.visited || [0]);
-                state.time = data.time || state.time;
+
+                // Validate time to prevent NaN
+                let loadedTime = parseInt(data.time);
+                if (!isNaN(loadedTime) && loadedTime >= 0) {
+                    state.time = loadedTime;
+                } else {
+                    // Fallback to default if corrupted
+                    console.warn('⚠️ Saved time was invalid, resetting timer.');
+                    state.time = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
+                }
+
                 console.log('📂 Progress loaded:', data);
                 return true;
             } catch (e) {
@@ -1219,21 +1229,27 @@
         });
 
         document.getElementById('confirmSubmit').addEventListener('click', () => {
+            isSubmitting = true;
+            window.removeEventListener('beforeunload', handleBeforeUnload); // Vital fix
+
             let correct = 0;
             questions.forEach((q, i) => {
                 if (state.answers[i] === q.correct) correct++;
             });
-            const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
-            const timeTaken = totalTime - state.time;
 
-            // Save answers for answers page (separate from progress)
-            // We use a unique key for each attempt to avoid overwriting or valid simple retrieval
-            // For now, let's keep the latest answers in 'test_answers_[id]' for immediate view
-            // BUT we also need to store attempt history.
+            // Safe Time Calculation
+            let totalTime = 15 * 60; // Default
+            if (currentTest && currentTest.time_limit) {
+                totalTime = parseInt(currentTest.time_limit) * 60;
+            }
 
+            let timeTaken = totalTime - state.time;
+            if (isNaN(timeTaken) || timeTaken < 0) timeTaken = 0;
+
+            // Save answers
             const attemptData = {
                 date: Date.now(),
-                score: correct * 2 - (Object.keys(state.answers).length - correct) * 0.66, // Approx scoring
+                score: correct * 2 - (Object.keys(state.answers).length - correct) * 0.66,
                 correct,
                 wrong: Object.keys(state.answers).length - correct,
                 total: state.total,
@@ -1242,7 +1258,6 @@
                 marked: Array.from(state.marked)
             };
 
-            // 1. Save Latest Answers for immediate "View Answers"
             const answersKey = `test_answers_${testId}`;
             localStorage.setItem(answersKey, JSON.stringify({
                 answers: state.answers,
@@ -1250,7 +1265,7 @@
                 submittedAt: Date.now()
             }));
 
-            // 2. Save to Test Attempts History
+            // Save to Test Attempts History
             const allAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
             if (!allAttempts[testId]) {
                 allAttempts[testId] = [];
@@ -1258,15 +1273,21 @@
             allAttempts[testId].push(attemptData);
             localStorage.setItem('test_attempts', JSON.stringify(allAttempts));
 
-            // 3. Update User Aggregate Progress
+            // Update User Aggregate Progress
             const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
             userProgress.tests += 1;
             userProgress.correct += correct;
             userProgress.total += state.total;
-            userProgress.time += Math.round(timeTaken / 60);
+
+            // Safe update for total time
+            const timeToAdd = Math.round(timeTaken / 60);
+            if (!isNaN(timeToAdd) && timeToAdd > 0) {
+                userProgress.time = (userProgress.time || 0) + timeToAdd;
+            }
+
             localStorage.setItem('user_progress', JSON.stringify(userProgress));
 
-            // 4. Update Attempted Tests List (if not already there)
+            // Update Attempted Tests List
             const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
             if (!attemptedTests.includes(testId)) {
                 attemptedTests.push(testId);
@@ -1279,12 +1300,15 @@
                 wrong: Object.keys(state.answers).length - correct,
                 total: state.total,
                 time: timeTaken,
-                attempt: allAttempts[testId].length // Pass attempt number
+                attempt: allAttempts[testId].length
             });
 
-            // Clear progress on successful submit
             clearProgress();
-            window.location.href = `results.html?${params}`;
+
+            // Small delay to ensure localStorage write completes
+            setTimeout(() => {
+                window.location.href = `results.html?${params}`;
+            }, 100);
         });
 
         // ===== TIMER =====
