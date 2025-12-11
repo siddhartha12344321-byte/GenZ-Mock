@@ -950,17 +950,17 @@
                 }
 
                 // Create test with user-specified timing/marking
+                // NOTE: createTest expects 'subject', 'time', 'questions' as property names
                 const test = {
                     name_en: data.test_name,
-                    subject_id: data.subject || 'General',
-                    time_limit: timeLimit,
+                    subject: data.subject || 'General',
+                    time: timeLimit,
                     mark_correct: markCorrect,
-                    mark_negative: markNegative,
-                    is_active: true,
-                    total_questions: data.questions.length
+                    mark_wrong: markNegative,
+                    questions: data.questions.length
                 };
 
-                const testId = adminData.createTest(test);
+                const testId = adminData.createTest(test).id;
 
                 // Prepare questions array for addQuestionsToTest
                 const questionsData = data.questions.map((q, idx) => ({
@@ -1070,18 +1070,17 @@
                 return;
             }
 
-            // Create test
+            // Create test - using property names expected by createTest
             const test = {
                 name_en: testName,
-                subject_id: subject,
-                time_limit: time,
+                subject: subject,
+                time: time,
                 mark_correct: 2,
-                mark_negative: 0.66,
-                is_active: true,
-                total_questions: questions.length
+                mark_wrong: 0.66,
+                questions: questions.length
             };
 
-            const testId = adminData.createTest(test);
+            const testId = adminData.createTest(test).id;
 
             // Add all questions at once
             adminData.addQuestionsToTest(testId, questions);
