@@ -1,540 +1,402 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen-Z Mocks | SuperKalam UI</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <script src="js/supabase-config.js"></script>
-    <script src="js/admin-data.js"></script>
-    <script src="js/pdf-extractor.js"></script>
-    <script src="js/ai-extractor.js"></script>
-
+    <title>GenZMocks - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* SUPERKALAM BASE THEME */
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; overflow: hidden; }
-        
-        /* SIDEBAR STYLES */
-        .sk-sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; height: 100vh; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; z-index: 50; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 4px; border-radius: 8px; color: #64748b; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-        .nav-item:hover { background: #f1f5f9; color: #0f172a; }
-        .nav-item.active { background: #eff6ff; color: #2563eb; }
-        .nav-section { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin: 20px 16px 8px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        /* CONTENT AREA */
-        .main-content { margin-left: 260px; height: 100vh; overflow-y: auto; padding: 0; }
-        .view-section { display: none; padding: 32px; }
-        .view-section.active { display: block; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
 
-        /* ADMIN TOGGLES & INPUTS (Restored from your file) */
-        .toggle-group { display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; display: inline-flex; }
-        .toggle-btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
-        .toggle-btn.active { background: white; color: #2563eb; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .form-input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; transition: border 0.2s; }
-        .form-input:focus { border-color: #3b82f6; ring: 2px solid #eff6ff; }
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
 
-        /* OLIVEBOARD EXAM THEME (Full Screen Overlay) */
-        #exam-view { position: fixed; inset: 0; background: #e8e8e8; z-index: 100; font-family: 'Roboto', sans-serif; display: none; flex-direction: column; }
-        .ob-header { background: linear-gradient(to bottom, #4a9fd4 0%, #2d7bb8 100%); height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 10px; }
-        .pal-item { height: 34px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .pal-item.answered { background: #5cb85c; color: white; border-color: #4cae4c; }
-        .pal-item.marked { background: #f0ad4e; color: white; border-color: #eea236; }
-        .pal-item.not-visited { background: #e8e8e8; }
-        .pal-item.current { border: 2px solid #337ab7; }
+        .login-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+        }
 
-        /* LANDING PAGE */
-        #landing-view { position: fixed; inset: 0; z-index: 200; background: #0f172a; display: flex; align-items: center; justify-content: center; }
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon span {
+            color: white;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .logo-text .gen {
+            color: white;
+        }
+
+        .logo-text .z {
+            color: #3b82f6;
+        }
+
+        .tagline {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+        }
+
+        /* Login Options */
+        .login-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .login-option:hover {
+            background: rgba(51, 65, 85, 0.8);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-icon.student {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .option-icon.admin {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .option-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .option-text {
+            text-align: left;
+        }
+
+        .option-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .option-subtitle {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #3b82f6;
+            background: rgba(51, 65, 85, 0.8);
+        }
+
+        .input-field::placeholder {
+            color: #64748b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .submit-btn.admin {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .submit-btn.admin:hover {
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .modal-content {
+            position: relative;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
     </style>
 </head>
+
 <body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo">
+                <div class="logo-icon">
+                    <span>GZ</span>
+                </div>
+                <div class="logo-text">
+                    <span class="gen">Gen</span><span class="z">Z</span>
+                </div>
+            </div>
+            <p class="tagline">Premium Exam Ecosystem</p>
 
-    <div id="landing-view">
-        <div class="w-full max-w-md bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl text-center">
-            <h1 class="text-4xl font-bold text-white mb-2 flex justify-center items-center gap-2">🚀 Gen<span class="text-blue-500">Z</span></h1>
-            <p class="text-slate-400 mb-8">Premium Exam Ecosystem</p>
-            
-            <div id="login-options" class="space-y-4">
-                <button onclick="showLogin('user')" class="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-xl flex items-center gap-4 transition text-white border border-slate-600">
-                    <div class="p-3 bg-blue-500/20 rounded-full text-blue-400">👤</div>
-                    <div class="text-left"><h3 class="font-bold">Student Login</h3><p class="text-xs text-slate-400">Access Key</p></div>
-                </button>
-                <button onclick="showLogin('admin')" class="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-xl flex items-center gap-4 transition text-white border border-slate-600">
-                    <div class="p-3 bg-purple-500/20 rounded-full text-purple-400">🔒</div>
-                    <div class="text-left"><h3 class="font-bold">Admin Portal</h3><p class="text-xs text-slate-400">Management</p></div>
-                </button>
+            <!-- Student Login -->
+            <div class="login-option" onclick="openModal('student')">
+                <div class="option-icon student">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <div class="option-text">
+                    <div class="option-title">Student Login</div>
+                    <div class="option-subtitle">Access Key</div>
+                </div>
             </div>
 
-            <form id="user-form" class="hidden space-y-4" onsubmit="handleUserLogin(event)">
-                <input id="user-key" type="text" placeholder="ENTER KEY (e.g. DEMO-1234)" class="w-full p-3 bg-slate-900 border border-slate-600 rounded text-center text-white tracking-widest outline-none focus:border-blue-500">
-                <button class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded font-bold">Start Learning</button>
-                <button type="button" onclick="resetLogin()" class="text-slate-400 text-sm">Back</button>
-            </form>
+            <!-- Admin Login -->
+            <div class="login-option" onclick="openModal('admin')">
+                <div class="option-icon admin">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <div class="option-text">
+                    <div class="option-title">Admin Portal</div>
+                    <div class="option-subtitle">Management</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <form id="admin-form" class="hidden space-y-4" onsubmit="handleAdminLogin(event)">
-                <input id="admin-pass" type="password" placeholder="Password" class="w-full p-3 bg-slate-900 border border-slate-600 rounded text-center text-white outline-none focus:border-purple-500">
-                <button class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded font-bold">Access Panel</button>
-                <button type="button" onclick="resetLogin()" class="text-slate-400 text-sm">Back</button>
+    <!-- Student Modal -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('student')">&times;</button>
+            <h2 class="modal-title">🎓 Student Login</h2>
+            <form onsubmit="studentLogin(event)">
+                <div class="input-group">
+                    <label class="input-label">Access Key</label>
+                    <input type="text" class="input-field" id="accessKey" placeholder="Enter your access key" required>
+                    <p class="error-msg" id="studentError">Invalid access key</p>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
             </form>
         </div>
     </div>
 
-    <div id="app-layout" class="hidden">
-        <aside class="sk-sidebar">
-            <div class="p-6 flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">SK</div>
-                <span class="font-bold text-xl text-gray-800">SuperKalam</span>
-            </div>
-            
-            <div class="flex-1 px-4 py-2 overflow-y-auto custom-scrollbar">
-                <div class="nav-item active" onclick="switchView('dashboard')" id="nav-dashboard">
-                    <span>🏠</span> Home
+    <!-- Admin Modal -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('admin')">&times;</button>
+            <h2 class="modal-title">🔐 Admin Portal</h2>
+            <form onsubmit="adminLogin(event)">
+                <div class="input-group">
+                    <label class="input-label">Admin Password</label>
+                    <input type="password" class="input-field" id="adminPassword" placeholder="Enter admin password"
+                        required>
+                    <p class="error-msg" id="adminError">Incorrect password</p>
                 </div>
-                
-                <div class="nav-section">PRACTICE</div>
-                <div class="nav-item" onclick="switchView('tests')" id="nav-tests">
-                    <span>📝</span> Mock Tests
-                </div>
-                <div class="nav-item" onclick="switchView('ask')">
-                    <span>🤖</span> Ask SuperKalam
-                </div>
-
-                <div class="nav-section">ADMINISTRATION</div>
-                <div class="nav-item" onclick="switchView('admin')" id="nav-admin">
-                    <span>🛠️</span> Admin Panel
-                </div>
-            </div>
-
-            <div class="p-4 border-t">
-                <button onclick="logout()" class="w-full flex items-center gap-2 text-red-500 hover:bg-red-50 p-2 rounded text-sm font-bold">
-                    🚪 Logout
-                </button>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            
-            <div id="view-dashboard" class="view-section active">
-                <h1 class="text-2xl font-bold text-gray-800 mb-6">Student Dashboard</h1>
-                <div class="grid grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border shadow-sm">
-                        <div class="text-gray-500 text-xs uppercase font-bold">Tests Taken</div>
-                        <div class="text-3xl font-bold text-blue-600 mt-1" id="stat-tests">0</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border shadow-sm">
-                        <div class="text-gray-500 text-xs uppercase font-bold">Accuracy</div>
-                        <div class="text-3xl font-bold text-green-600 mt-1" id="stat-accuracy">0%</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b font-bold bg-gray-50">Recent Activity</div>
-                    <div id="history-list" class="divide-y">
-                        </div>
-                </div>
-            </div>
-
-            <div id="view-tests" class="view-section">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold text-gray-800">Available Tests</h1>
-                    <div class="flex gap-2">
-                        <button class="px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">All</button>
-                        <button class="px-4 py-1.5 rounded-full hover:bg-gray-100 text-gray-600 text-sm font-bold">Attempted</button>
-                    </div>
-                </div>
-                <div id="tests-grid" class="grid gap-4">
-                    </div>
-            </div>
-
-            <div id="view-admin" class="view-section">
-                <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Control</h1>
-                
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl border shadow-sm">
-                        <h3 class="font-bold text-lg mb-4">Create New Test</h3>
-                        <div class="space-y-4">
-                            <input id="admin-test-name" class="form-input" placeholder="Test Name">
-                            <div class="flex gap-2">
-                                <select id="admin-subject" class="form-input">
-                                    <option>Polity</option><option>History</option><option>Geography</option>
-                                </select>
-                                <input id="admin-qs" type="number" class="form-input w-24" value="10">
-                            </div>
-                            <button onclick="createManualTest()" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">Create Test</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl border shadow-sm">
-                        <h3 class="font-bold text-lg mb-4">Import PDF (Gemini)</h3>
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 relative cursor-pointer">
-                            <input type="file" accept=".pdf" onchange="handlePDFUpload(event)" class="absolute inset-0 w-full h-full opacity-0">
-                            <div class="text-3xl mb-2">📄</div>
-                            <p class="text-gray-500">Click to upload PDF</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 bg-white p-6 rounded-xl border shadow-sm">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg">Access Keys</h3>
-                        <button onclick="generateKey()" class="text-green-600 font-bold text-sm">+ Generate Key</button>
-                    </div>
-                    <div id="keys-list" class="space-y-2 max-h-60 overflow-y-auto">
-                        </div>
-                </div>
-            </div>
-
-            <div id="view-ask" class="view-section h-full flex flex-col">
-                <div class="flex-1 flex items-center justify-center text-gray-400">
-                    GenZ AI Chat Integration Ready
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="exam-view">
-        <div class="ob-header shrink-0">
-            <div class="font-bold text-lg" id="exam-title">Test Name</div>
-            <div class="flex items-center gap-4">
-                <div class="bg-white/20 px-3 py-1 rounded text-sm font-mono font-bold" id="exam-timer">00:00</div>
-                <button onclick="exitExam()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold">EXIT</button>
-            </div>
-        </div>
-
-        <div class="flex flex-1 overflow-hidden p-2 gap-2">
-            <div class="flex-1 flex flex-col bg-white border border-gray-300">
-                <div class="bg-gray-100 p-2 px-4 border-b flex justify-between font-bold text-gray-700">
-                    <span id="q-number">Question 1</span>
-                    <span class="text-xs text-gray-500">+2.0 / -0.66</span>
-                </div>
-                <div class="flex-1 p-6 overflow-y-auto" id="q-content">
-                    </div>
-                <div class="p-3 bg-gray-50 border-t flex justify-between">
-                    <button onclick="clearResponse()" class="px-4 py-2 border bg-white rounded text-sm">Clear</button>
-                    <button onclick="saveNext()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save & Next</button>
-                </div>
-            </div>
-
-            <div class="w-72 bg-white border border-gray-300 flex flex-col shrink-0">
-                <div class="p-2 bg-gray-100 border-b font-bold text-gray-700 text-xs">Question Palette</div>
-                <div class="flex-1 overflow-y-auto p-2">
-                    <div id="palette-container" class="palette-grid"></div>
-                </div>
-                <div class="p-3 border-t">
-                    <button onclick="submitTest()" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700">SUBMIT TEST</button>
-                </div>
-            </div>
+                <button type="submit" class="submit-btn admin">Access Admin Panel</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // --- GLOBAL STATE ---
-        let currentTest = null;
-        let currentQuestions = [];
-        let currentQIndex = 0;
-        let answers = {};
-        let marked = {};
-        let visited = {};
-        let timerInterval = null;
-        let timeLeft = 0;
-
-        // --- AUTH LOGIC ---
-        function showLogin(type) {
-            document.getElementById('login-options').classList.add('hidden');
-            document.getElementById(type + '-form').classList.remove('hidden');
+        // Check if already logged in
+        const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+        if (userData.key || userData.name) {
+            window.location.href = 'student-dashboard.html';
         }
 
-        function resetLogin() {
-            document.getElementById('login-options').classList.remove('hidden');
-            document.getElementById('user-form').classList.add('hidden');
-            document.getElementById('admin-form').classList.add('hidden');
+        function openModal(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
         }
 
-        function handleUserLogin(e) {
-            e.preventDefault();
-            const key = document.getElementById('user-key').value.trim().toUpperCase();
-            const keys = window.adminData.getAllKeys();
-            
-            if (key === "DEMO-1234" || keys.some(k => k.key === key && k.is_active)) {
-                localStorage.setItem('user_session', key);
-                initApp();
-            } else {
-                alert("Invalid Key!");
-            }
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+            document.getElementById(type + 'Error')?.classList.remove('show');
         }
 
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const pass = document.getElementById('admin-pass').value;
-            if (pass === "genz2024admin") {
-                localStorage.setItem('user_session', 'ADMIN');
-                initApp();
-            } else {
-                alert("Wrong Password");
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('user_session');
-            location.reload();
-        }
-
-        function initApp() {
-            document.getElementById('landing-view').classList.add('hidden');
-            document.getElementById('app-layout').classList.remove('hidden');
-            
-            const session = localStorage.getItem('user_session');
-            // Hide Admin Nav if student
-            if(session !== 'ADMIN') {
-                document.getElementById('nav-admin').style.display = 'none';
-            }
-
-            renderTests();
-            renderStats();
-            renderKeys();
-        }
-
-        // --- VIEW NAVIGATION ---
-        function switchView(viewName) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewName).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const navBtn = document.getElementById('nav-' + viewName);
-            if(navBtn) navBtn.classList.add('active');
-
-            if(viewName === 'tests') renderTests();
-            if(viewName === 'admin') renderKeys();
-        }
-
-        // --- ADMIN FUNCTIONS ---
-        function createManualTest() {
-            const name = document.getElementById('admin-test-name').value;
-            const subject = document.getElementById('admin-subject').value;
-            const qs = document.getElementById('admin-qs').value;
-            
-            if(!name) return alert("Name Required");
-            
-            window.adminData.createTest({
-                name_en: name, subject: subject, questions: parseInt(qs), time: 20
-            });
-            alert("Test Created!");
-            document.getElementById('admin-test-name').value = '';
-        }
-
-        async function handlePDFUpload(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            alert("Reading PDF... (Gemini AI)");
-            
-            // Set Key (Hardcoded for demo, move to secure storage in prod)
-            window.aiExtractor.setApiKey("AIzaSyAje3aDrFfZsOEMw8mtTQSlpNlXXkO8Yi4");
-            
-            const res = await window.aiExtractor.extractFromPDF(file);
-            if(res.success) {
-                const importData = window.aiExtractor.toImportFormat(res.questions, file.name, "Imported");
-                window.adminData.importTestWithQuestions(importData);
-                alert("Success! Imported " + res.questions.length + " questions.");
-            } else {
-                alert("Error: " + res.error);
-            }
-        }
-
-        function generateKey() {
-            const k = window.adminData.createKey();
-            renderKeys();
-            alert("Key Generated: " + k.key);
-        }
-
-        function renderKeys() {
-            const keys = window.adminData.getAllKeys();
-            const list = document.getElementById('keys-list');
-            list.innerHTML = keys.map(k => `
-                <div class="flex justify-between p-3 bg-gray-50 rounded border text-sm font-mono">
-                    <span class="text-blue-600 font-bold">${k.key}</span>
-                    <span class="${k.used ? 'text-red-500':'text-green-500'}">${k.used ? 'Used' : 'Active'}</span>
-                </div>
-            `).join('');
-        }
-
-        // --- EXAM ENGINE (Core Logic Restored) ---
-        function renderTests() {
-            const tests = window.adminData.getAllTests();
-            const grid = document.getElementById('tests-grid');
-            
-            if(tests.length === 0) {
-                grid.innerHTML = '<div class="text-gray-400 p-8 text-center">No tests available.</div>';
-                return;
-            }
-
-            grid.innerHTML = tests.map(t => `
-                <div class="bg-white p-4 rounded-lg border shadow-sm flex justify-between items-center hover:shadow-md transition">
-                    <div>
-                        <div class="font-bold text-gray-800 text-lg">${t.name_en}</div>
-                        <div class="text-sm text-gray-500">${t.subject} • ${t.total_questions || t.questions} Qs • ${t.time_limit} Mins</div>
-                    </div>
-                    <button onclick="startExam('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold">Attempt</button>
-                </div>
-            `).join('');
-        }
-
-        function startExam(testId) {
-            currentTest = window.adminData.getTestById(testId);
-            currentQuestions = window.adminData.getQuestionsByTestId(testId);
-            
-            if(currentQuestions.length === 0) return alert("This test has no questions yet!");
-
-            // Reset State
-            currentQIndex = 0;
-            answers = {};
-            marked = {};
-            visited = {0: true};
-            timeLeft = (currentTest.time_limit || 60) * 60;
-
-            // Show Exam View
-            document.getElementById('app-layout').classList.add('hidden');
-            document.getElementById('exam-view').style.display = 'flex';
-            document.getElementById('exam-title').innerText = currentTest.name_en;
-
-            startTimer();
-            renderQuestion();
-            renderPalette();
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if(timeLeft <= 0) {
-                    submitTest();
-                } else {
-                    timeLeft--;
-                    const m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
-                    const s = (timeLeft % 60).toString().padStart(2,'0');
-                    document.getElementById('exam-timer').innerText = `${m}:${s}`;
-                }
-            }, 1000);
-        }
-
-        function renderQuestion() {
-            const q = currentQuestions[currentQIndex];
-            document.getElementById('q-number').innerText = `Question ${currentQIndex + 1}`;
-            
-            let html = `<div class="text-lg font-medium mb-6 text-gray-800">${q.question_text_en}</div><div class="space-y-3">`;
-            
-            ['a','b','c','d'].forEach(opt => {
-                if(q[`option_${opt}_en`]) {
-                    const isChecked = answers[currentQIndex] === opt ? 'checked' : '';
-                    const bgClass = answers[currentQIndex] === opt ? 'bg-blue-50 border-blue-500' : 'bg-white border-gray-300';
-                    
-                    html += `
-                    <label class="flex items-start gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50 ${bgClass}" onclick="selectOption('${opt}')">
-                        <input type="radio" name="opt" ${isChecked} class="mt-1">
-                        <span class="text-gray-700 text-sm">${q[`option_${opt}_en`]}</span>
-                    </label>`;
+        // Close modal on backdrop click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
                 }
             });
-            html += '</div>';
-            
-            document.getElementById('q-content').innerHTML = html;
-            renderPalette();
-        }
+        });
 
-        function selectOption(opt) {
-            answers[currentQIndex] = opt;
-            renderQuestion(); // Re-render to show selection
-        }
+        function studentLogin(e) {
+            e.preventDefault();
+            const key = document.getElementById('accessKey').value.trim();
 
-        function clearResponse() {
-            delete answers[currentQIndex];
-            renderQuestion();
-        }
+            if (key.length > 0) {
+                // Save user data
+                localStorage.setItem('user_data', JSON.stringify({
+                    key: key,
+                    name: key,
+                    loginTime: Date.now()
+                }));
 
-        function saveNext() {
-            if(currentQIndex < currentQuestions.length - 1) {
-                currentQIndex++;
-                visited[currentQIndex] = true;
-                renderQuestion();
+                // Redirect to dashboard
+                window.location.href = 'student-dashboard.html';
+            } else {
+                document.getElementById('studentError').classList.add('show');
             }
         }
 
-        function renderPalette() {
-            const container = document.getElementById('palette-container');
-            container.innerHTML = currentQuestions.map((_, i) => {
-                let cls = 'pal-not-visited';
-                if(answers[i]) cls = 'pal-answered';
-                else if(marked[i]) cls = 'pal-marked';
-                else if(visited[i]) cls = 'pal-not-visited'; // simplified
-                
-                if(i === currentQIndex) cls += ' pal-current';
-                
-                return `<div class="pal-item ${cls}" onclick="jumpToQuestion(${i})">${i+1}</div>`;
-            }).join('');
-        }
+        function adminLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
 
-        function jumpToQuestion(i) {
-            currentQIndex = i;
-            visited[i] = true;
-            renderQuestion();
-        }
-
-        function submitTest() {
-            clearInterval(timerInterval);
-            let score = 0;
-            let correct = 0;
-            
-            currentQuestions.forEach((q, i) => {
-                if(answers[i] === q.correct_option) { score += 2; correct++; }
-                else if(answers[i]) { score -= 0.66; }
-            });
-
-            // Save History
-            const history = JSON.parse(localStorage.getItem('user_history') || '[]');
-            history.unshift({
-                testName: currentTest.name_en,
-                score: score.toFixed(2),
-                date: new Date().toISOString()
-            });
-            localStorage.setItem('user_history', JSON.stringify(history));
-
-            alert(`Test Finished!\nScore: ${score.toFixed(2)}\nCorrect: ${correct}`);
-            exitExam();
-        }
-
-        function exitExam() {
-            clearInterval(timerInterval);
-            document.getElementById('exam-view').style.display = 'none';
-            document.getElementById('app-layout').classList.remove('hidden');
-            renderStats(); // Update stats
-        }
-
-        function renderStats() {
-            const history = JSON.parse(localStorage.getItem('user_history') || '[]');
-            document.getElementById('stat-tests').innerText = history.length;
-            
-            const list = document.getElementById('history-list');
-            list.innerHTML = history.length === 0 ? '<div class="p-4 text-gray-500">No history yet.</div>' : 
-            history.map(h => `
-                <div class="px-6 py-4 flex justify-between hover:bg-gray-50">
-                    <div>
-                        <div class="font-bold text-gray-800">${h.testName}</div>
-                        <div class="text-xs text-gray-500">${new Date(h.date).toLocaleDateString()}</div>
-                    </div>
-                    <div class="font-bold text-blue-600">${h.score}</div>
-                </div>
-            `).join('');
-        }
-
-        // Check Session on Load
-        if(localStorage.getItem('user_session')) {
-            initApp();
+            // Check admin password
+            if (password === 'genz2024admin') {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                window.location.href = 'admin/index.html';
+            } else {
+                document.getElementById('adminError').classList.add('show');
+            }
         }
     </script>
 </body>
+
 </html>

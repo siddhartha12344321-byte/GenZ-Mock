@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZMocks - Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e5e7eb;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-800 h-screen overflow-hidden">
+    <div class="flex h-screen">
+        <!-- SIDEBAR -->
+        <aside class="w-64 h-full bg-white border-r border-gray-200 flex flex-col shrink-0">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">GZ</span>
+                </div>
+                <span class="font-bold text-lg text-gray-800">GenZMocks</span>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto px-4 custom-scrollbar space-y-6">
+                <!-- Section 1 -->
+                <div class="space-y-1">
+                    <a href="student-dashboard.html"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-600">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Home
+                    </a>
+                </div>
+
+                <!-- PRELIMS Section -->
+                <div>
+                    <div class="px-3 mb-2 text-[11px] font-bold text-gray-400 tracking-wider">PRACTICE</div>
+                    <div class="space-y-1">
+                        <a href="tests.html"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Mock Tests
+                        </a>
+                        <a href="mcq-practice.html"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2" />
+                            </svg>
+                            MCQ Practice
+                        </a>
+                        <a href="pyq.html"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Previous Year Qs
+                        </a>
+                    </div>
+                </div>
+
+                <!-- PROGRESS Section -->
+                <div>
+                    <div class="px-3 mb-2 text-[11px] font-bold text-gray-400 tracking-wider">PROGRESS</div>
+                    <div class="space-y-1">
+                        <a href="progress.html"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            My Progress
+                        </a>
+                        <a href="leaderboard.html"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Leaderboard
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-gray-100">
+                <a href="admin/index.html"
+                    class="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 mb-3">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Admin Panel
+                </a>
+                <a href="help.html"
+                    class="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium mb-2">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke-width="2" />
+                        <path stroke-width="2" d="M12 16v-4M12 8h.01" />
+                    </svg>
+                    Help & Support
+                </a>
+                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm"
+                        id="userAvatar">U</div>
+                    <div class="overflow-hidden">
+                        <div class="text-sm font-medium text-gray-900 truncate" id="userName">User</div>
+                        <div class="text-xs text-gray-500">Premium Member</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 h-full overflow-hidden bg-gray-50">
+            <!-- Header -->
+            <header class="bg-white h-14 border-b border-gray-200 px-6 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2 text-gray-400">
+                    <span class="text-gray-900 font-medium">Home</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search tests..."
+                            class="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400">
+                        <svg class="absolute left-3 top-2.5 text-gray-400" width="16" height="16" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" stroke-width="2" />
+                            <path stroke-width="2" d="m21 21-4.35-4.35" />
+                        </svg>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="flex-1 p-8 overflow-y-auto custom-scrollbar" style="height: calc(100% - 56px);">
+                <div class="flex gap-6 max-w-7xl mx-auto">
+                    <!-- Left Stats -->
+                    <div class="flex-1">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Today's Activity</h2>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div
+                                class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-40 shadow-sm">
+                                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg width="20" height="20" fill="none" stroke="#f97316" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <rect x="3" y="3" width="7" height="7" />
+                                        <rect x="14" y="3" width="7" height="7" />
+                                        <rect x="3" y="14" width="7" height="7" />
+                                        <rect x="14" y="14" width="7" height="7" />
+                                    </svg>
+                                </div>
+                                <div class="text-3xl font-bold text-gray-900" id="mcqPracticed">0</div>
+                                <div class="text-sm text-gray-500 mt-1">MCQ Practiced</div>
+                            </div>
+                            <div
+                                class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-40 shadow-sm">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg width="20" height="20" fill="none" stroke="#3b82f6" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <div class="text-3xl font-bold text-gray-900" id="accuracy">-</div>
+                                <div class="text-sm text-gray-500 mt-1">Accuracy</div>
+                            </div>
+                            <div
+                                class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-40 shadow-sm">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div class="text-3xl font-bold text-gray-900" id="testsCompleted">0</div>
+                                <div class="text-sm text-gray-500 mt-1">Tests Completed</div>
+                            </div>
+                            <div
+                                class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center h-40 shadow-sm">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg width="20" height="20" fill="none" stroke="#eab308" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                                <div class="text-3xl font-bold text-gray-900" id="yourRank">-</div>
+                                <div class="text-sm text-gray-500 mt-1">Your Rank</div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Tests -->
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Available Tests</h2>
+                        <div class="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+                            <div
+                                class="bg-blue-50 px-6 py-3 flex text-[11px] font-bold text-gray-700 uppercase tracking-wide">
+                                <div class="w-[40%]">Test name</div>
+                                <div class="w-20"># Questions</div>
+                                <div class="w-20">Time</div>
+                                <div class="flex-1">Subject</div>
+                                <div class="w-28"></div>
+                            </div>
+                            <div id="testsTable">
+                                <div class="px-6 py-8 text-center text-gray-500 text-sm">Loading tests...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Leaderboard -->
+                    <div class="w-80 shrink-0">
+                        <div class="bg-white border border-gray-200 rounded-xl h-[520px] flex flex-col">
+                            <div class="flex border-b border-gray-100">
+                                <button
+                                    class="flex-1 py-3 text-orange-600 font-semibold border-b-2 border-orange-500 text-sm">Leaderboard</button>
+                                <button class="flex-1 py-3 text-gray-400 font-medium text-sm hover:text-gray-700">Quick
+                                    Stats</button>
+                            </div>
+                            <div class="p-4 flex-1 flex flex-col">
+                                <h3 class="text-sm font-bold text-gray-800 mb-3">Today's Leaderboard</h3>
+                                <div class="bg-blue-50 p-3 rounded-lg flex justify-between items-center mb-4">
+                                    <div class="text-[11px] text-blue-800 leading-tight w-2/3">Practice MCQs now & see
+                                        your rank in the leaderboard</div>
+                                    <a href="mcq-practice.html"
+                                        class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded hover:bg-blue-700 whitespace-nowrap">Practice
+                                        Now</a>
+                                </div>
+                                <div class="flex text-[10px] text-gray-400 font-bold mb-2 px-2 uppercase tracking-wide">
+                                    <div class="w-8">Rank</div>
+                                    <div class="flex-1">Student</div>
+                                    <div class="w-12 text-right">Score</div>
+                                    <div class="w-14 text-right">Accuracy</div>
+                                </div>
+                                <div class="flex-1 overflow-y-auto custom-scrollbar" id="leaderboardList">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/admin-data.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+            if (!userData.key && !userData.name) {
+                // Not logged in, redirect to login
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Set user info
+            const userName = userData.name || userData.key || 'User';
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+
+            // Load stats
+            const stats = JSON.parse(localStorage.getItem('user_stats') || '{}');
+            if (stats.mcqPracticed) document.getElementById('mcqPracticed').textContent = stats.mcqPracticed;
+            if (stats.testsCompleted) document.getElementById('testsCompleted').textContent = stats.testsCompleted;
+            if (stats.accuracy) document.getElementById('accuracy').textContent = stats.accuracy + '%';
+            if (stats.rank) document.getElementById('yourRank').textContent = '#' + stats.rank;
+
+            // Load tests
+            loadTests();
+
+            // Load leaderboard
+            loadLeaderboard();
+        });
+
+        function loadTests() {
+            const container = document.getElementById('testsTable');
+            const tests = adminData ? adminData.getAllTests() : [];
+
+            if (tests.length === 0) {
+                container.innerHTML = `
+                    <div class="px-6 py-8 text-center">
+                        <div class="text-3xl mb-2">📝</div>
+                        <div class="text-gray-700 font-medium">No tests available yet</div>
+                        <div class="text-gray-500 text-sm">Tests will appear here when admin creates them</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = tests.slice(0, 6).map(test => {
+                const subject = adminData.getSubjectByValue(test.subject_id) || { name_en: 'General' };
+                return `
+                    <div class="px-6 py-4 flex items-center border-b border-gray-50 last:border-0 hover:bg-gray-50">
+                        <div class="w-[40%] pr-4">
+                            <div class="text-sm font-semibold text-gray-900">${test.name_en || 'Untitled Test'}</div>
+                        </div>
+                        <div class="w-20 text-xs text-gray-500 font-medium">${test.total_questions || 0}</div>
+                        <div class="w-20 text-xs text-gray-500 font-medium">${test.time_limit || 60} min</div>
+                        <div class="flex-1 text-xs text-gray-500">${subject.name_en}</div>
+                        <div class="w-28 text-right">
+                            <a href="test-oliveboard.html?id=${test.id}" class="text-blue-600 border border-blue-600 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50">Attempt Now</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadLeaderboard() {
+            const container = document.getElementById('leaderboardList');
+
+            // Demo leaderboard data
+            const leaders = [
+                { name: 'Arjun S.', questions: 341, score: 618, accuracy: 93 },
+                { name: 'Priya P.', questions: 120, score: 163, accuracy: 76 },
+                { name: 'Rahul V.', questions: 98, score: 142, accuracy: 82 },
+                { name: 'Sneha G.', questions: 75, score: 108, accuracy: 79 },
+                { name: 'Vikram M.', questions: 62, score: 89, accuracy: 71 }
+            ];
+
+            container.innerHTML = leaders.map((l, i) => `
+                <div class="flex items-center p-2 hover:bg-gray-50 rounded mb-1">
+                    <div class="w-8">
+                        <div class="w-5 h-5 ${i === 0 ? 'bg-yellow-100 text-yellow-600' : i === 1 ? 'bg-gray-100 text-gray-500' : i === 2 ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-gray-400'} rounded-full flex items-center justify-center text-[10px] font-bold">${i + 1}</div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-bold text-gray-900">${l.name}</div>
+                        <div class="text-[10px] text-gray-500">${l.questions} questions</div>
+                    </div>
+                    <div class="w-12 text-right text-xs font-bold text-gray-900">${l.score}</div>
+                    <div class="w-14 text-right text-xs text-green-500 font-bold">${l.accuracy}%</div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+
+</html>
