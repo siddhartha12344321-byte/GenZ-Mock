@@ -313,23 +313,31 @@
 
         // Animate score circle
         function animateScore() {
+            // Safe percentage value - prevent NaN
+            const safePercent = (typeof percentage === 'number' && !isNaN(percentage)) ? percentage : 0;
+
             const circle = document.getElementById('scoreCircle');
             const circumference = 2 * Math.PI * 54;
-            const offset = circumference - (percentage / 100) * circumference;
+            const offset = circumference - (safePercent / 100) * circumference;
 
             setTimeout(() => {
                 circle.style.transition = 'stroke-dashoffset 1.5s ease-out';
                 circle.style.strokeDashoffset = offset;
             }, 300);
 
-            // Animate percentage
+            // Animate percentage counter
+            if (safePercent === 0) {
+                document.getElementById('scorePercent').textContent = '0%';
+                return;
+            }
+
             let current = 0;
             const duration = 1500;
-            const increment = percentage / (duration / 16);
+            const increment = safePercent / (duration / 16);
             const counter = setInterval(() => {
                 current += increment;
-                if (current >= percentage) {
-                    current = percentage;
+                if (current >= safePercent) {
+                    current = safePercent;
                     clearInterval(counter);
                 }
                 document.getElementById('scorePercent').textContent = Math.round(current) + '%';
