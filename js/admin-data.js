@@ -44,8 +44,7 @@ class AdminDataManager {
     }
 
     initDemoTest() {
-        // Only add if no tests exist
-        if (this.mockTests.length > 0) return;
+        // Always set the default test (overwrite old data)
 
         const demoTest = {
             id: 'polity_test_1',
