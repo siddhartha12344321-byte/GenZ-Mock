@@ -9,7 +9,7 @@ class AIQuestionExtractor {
     constructor() {
         this.apiKey = this.getApiKey();
         this.baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
-        this.model = 'llama-3.1-70b-versatile'; // Fast and capable
+        this.model = 'llama-3.3-70b-versatile'; // Updated: Current supported model
         this.isProcessing = false;
     }
 
