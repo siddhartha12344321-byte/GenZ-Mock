@@ -748,87 +748,89 @@
         }
 
         // ===== MOCK TEST DATA =====
-        const mockTests = [
-            {
-                id: 1,
-                titleEn: 'Polity Mock Test 1',
-                titleHi: 'राजव्यवस्था मॉक टेस्ट 1',
-                subject: 'polity',
-                icon: '⚖️',
-                questions: 100,
-                time: 120,
-                difficulty: 'Moderate',
-                status: 'new',
-                score: null
-            },
-            {
-                id: 2,
-                titleEn: 'Polity Mock Test 2',
-                titleHi: 'राजव्यवस्था मॉक टेस्ट 2',
-                subject: 'polity',
-                icon: '⚖️',
-                questions: 50,
-                time: 60,
-                difficulty: 'Easy',
-                status: 'completed',
-                score: 76
-            },
-            {
-                id: 3,
-                titleEn: 'History Mock Test 1',
-                titleHi: 'इतिहास मॉक टेस्ट 1',
-                subject: 'history',
-                icon: '📜',
-                questions: 100,
-                time: 120,
-                difficulty: 'Moderate',
-                status: 'new',
-                score: null
-            },
-            {
-                id: 4,
-                titleEn: 'Geography Mock Test 1',
-                titleHi: 'भूगोल मॉक टेस्ट 1',
-                subject: 'geography',
-                icon: '🌍',
-                questions: 75,
-                time: 90,
-                difficulty: 'Moderate',
-                status: 'completed',
-                score: 68
-            },
-            {
-                id: 5,
-                titleEn: 'Economy Mock Test 1',
-                titleHi: 'अर्थव्यवस्था मॉक टेस्ट 1',
-                subject: 'economy',
-                icon: '📊',
-                questions: 50,
-                time: 60,
-                difficulty: 'Difficult',
-                status: 'attempted',
-                score: 45
-            },
-            {
-                id: 6,
-                titleEn: 'Environment Mock Test 1',
-                titleHi: 'पर्यावरण मॉक टेस्ट 1',
-                subject: 'environment',
-                icon: '🌱',
-                questions: 50,
-                time: 60,
-                difficulty: 'Easy',
-                status: 'new',
-                score: null
-            }
-        ];
+        // Load tests from localStorage (admin-created) and merge with demo data
+        function getTestsFromStorage() {
+            // Get admin-created tests from localStorage
+            const storedTests = localStorage.getItem('genz_mock_tests');
+            let adminTests = [];
 
+            if (storedTests) {
+                try {
+                    const parsed = JSON.parse(storedTests);
+                    adminTests = parsed.map(test => ({
+                        id: test.id,
+                        titleEn: test.name_en || test.titleEn || 'Untitled Test',
+                        titleHi: test.name_hi || test.titleHi || '',
+                        subject: test.subject_id || test.subject || 'polity',
+                        icon: getSubjectIcon(test.subject_id || test.subject),
+                        questions: test.total_questions || 0,
+                        time: test.time_limit || 60,
+                        difficulty: test.difficulty || 'Moderate',
+                        status: 'new',
+                        score: null
+                    }));
+                    console.log(`📚 Loaded ${adminTests.length} tests from admin panel`);
+                } catch (e) {
+                    console.error('Error parsing stored tests:', e);
+                }
+            }
+
+            // Demo fallback tests (shown only if no admin tests exist)
+            const demoTests = [
+                {
+                    id: 'demo_1',
+                    titleEn: 'Polity Demo Test',
+                    titleHi: 'राजव्यवस्था डेमो टेस्ट',
+                    subject: 'polity',
+                    icon: '⚖️',
+                    questions: 10,
+                    time: 15,
+                    difficulty: 'Easy',
+                    status: 'new',
+                    score: null,
+                    isDemo: true
+                }
+            ];
+
+            // Return admin tests if available, otherwise show demo
+            return adminTests.length > 0 ? adminTests : demoTests;
+        }
+
+        function getSubjectIcon(subject) {
+            const icons = {
+                'polity': '⚖️',
+                'history': '📜',
+                'geography': '🌍',
+                'economy': '📊',
+                'environment': '🌱',
+                'science': '🔬',
+                'current': '📰',
+                'culture': '🎨'
+            };
+            return icons[subject?.toLowerCase()] || '📝';
+        }
+
+        const mockTests = getTestsFromStorage();
         const testList = document.getElementById('testList');
 
         function renderTests(filter = 'all') {
+            const tests = getTestsFromStorage(); // Refresh from storage each time
             const filtered = filter === 'all'
-                ? mockTests
-                : mockTests.filter(t => t.subject === filter);
+                ? tests
+                : tests.filter(t => t.subject === filter);
+
+            if (filtered.length === 0) {
+                testList.innerHTML = `
+                    <div class="test-card" style="justify-content: center; padding: 3rem;">
+                        <div style="text-align: center; color: var(--text-muted);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                            <p style="margin-bottom: 0.5rem;">No tests available${filter !== 'all' ? ' for this subject' : ''}.</p>
+                            <p style="font-size: 0.875rem;">Ask your admin to create tests via the <a href="admin/index.html" style="color: var(--primary-400);">Admin Panel</a>.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
 
             testList.innerHTML = filtered.map(test => `
                 <div class="test-card" data-subject="${test.subject}">
@@ -843,6 +845,7 @@
                                 <span>📝 ${test.questions} Questions</span>
                                 <span>⏱️ ${test.time} min</span>
                                 <span>📊 ${test.difficulty}</span>
+                                ${test.isDemo ? '<span style="color: var(--warning-400);">Demo</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -856,7 +859,7 @@
                         <span class="badge badge-${test.status}">${test.status === 'new' ? 'New' :
                     test.status === 'completed' ? 'Completed' : 'Attempted'
                 }</span>
-                        <a href="test.html?id=${test.id}" class="btn btn-primary btn-sm">
+                        <a href="test-oliveboard.html?id=${test.id}" class="btn btn-primary btn-sm">
                             ${test.status === 'new' ? 'Start Test' :
                     test.status === 'completed' ? 'Retake' : 'Continue'}
                         </a>
@@ -867,6 +870,7 @@
 
         // Initial render
         renderTests();
+
 
         // Filter buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {

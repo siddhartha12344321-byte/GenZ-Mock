@@ -945,8 +945,61 @@
     </div>
 
     <script>
-        // Sample Questions Data (will come from Supabase in production)
-        const questions = [
+        // ===== LOAD TEST AND QUESTIONS FROM LOCALSTORAGE =====
+        // Get test ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const testId = urlParams.get('id');
+
+        // Load test info
+        function getTestFromStorage(testId) {
+            const storedTests = localStorage.getItem('genz_mock_tests');
+            if (storedTests) {
+                try {
+                    const tests = JSON.parse(storedTests);
+                    return tests.find(t => t.id === testId);
+                } catch (e) {
+                    console.error('Error loading test:', e);
+                }
+            }
+            return null;
+        }
+
+        // Load questions from localStorage
+        function getQuestionsFromStorage(testId) {
+            const storedQuestions = localStorage.getItem('genz_questions');
+            if (storedQuestions) {
+                try {
+                    const allQuestions = JSON.parse(storedQuestions);
+                    // Filter questions for this test
+                    const testQuestions = allQuestions.filter(q => q.test_id === testId);
+
+                    // Convert to the format expected by the test UI
+                    return testQuestions.map((q, i) => ({
+                        id: q.id || i + 1,
+                        questionEn: q.question_text_en || '',
+                        questionHi: q.question_text_hi || '',
+                        hasTable: false,
+                        options: [
+                            { en: q.option_a_en || 'Option A', hi: q.option_a_hi || '' },
+                            { en: q.option_b_en || 'Option B', hi: q.option_b_hi || '' },
+                            { en: q.option_c_en || 'Option C', hi: q.option_c_hi || '' },
+                            { en: q.option_d_en || 'Option D', hi: q.option_d_hi || '' }
+                        ],
+                        correctAnswer: ['a', 'b', 'c', 'd'].indexOf((q.correct_option || 'a').toLowerCase()),
+                        explanationEn: q.explanation_en || '',
+                        explanationHi: q.explanation_hi || '',
+                        source: 'Admin Import',
+                        difficulty: q.difficulty || 'Moderate'
+                    }));
+                } catch (e) {
+                    console.error('Error loading questions:', e);
+                }
+            }
+            return [];
+        }
+
+        // Demo questions (fallback when no questions are available)
+        const demoQuestions = [
             {
                 id: 1,
                 questionEn: 'With reference to the Constituent Assembly of India, consider the following pairs:',
@@ -966,30 +1019,33 @@
                     { en: 'All three', hi: 'तीनों' },
                     { en: 'None', hi: 'कोई नहीं' }
                 ],
-                correctAnswer: 1, // Index (0-based), so 'b' is correct
+                correctAnswer: 1,
                 explanationEn: '<strong>Pair 1 is correctly matched:</strong> Sir B.N. Rau was appointed as the constitutional advisor to the Constituent Assembly.<br><br><strong>Pair 2 is incorrectly matched:</strong> H.V.R. Iyengar was the Secretary to the Constituent Assembly, not the chief draftsman. S.N. Mukerjee was the chief draftsman of the constitution in the Constituent Assembly.<br><br><strong>Pair 3 is correctly matched:</strong> Prem Behari Narain Raizada was the calligrapher of the Indian Constitution.',
                 explanationHi: '<strong>युग्म 1 सही है:</strong> सर बी.एन. राव को संविधान सभा के संवैधानिक सलाहकार के रूप में नियुक्त किया गया था।<br><br><strong>युग्म 2 गलत है:</strong> एच.वी.आर. अयंगर संविधान सभा के सचिव थे, मुख्य प्रारूपकार नहीं।<br><br><strong>युग्म 3 सही है:</strong> प्रेम बिहारी नारायण रायजादा भारतीय संविधान के सुलेखक थे।',
                 source: 'Indian Polity - Laxmikant, Making of the Constitution',
                 difficulty: 'Moderate'
-            },
-            {
-                id: 2,
-                questionEn: 'Consider the following events:<br>I. The Constituent Assembly ratified India\'s membership of the Commonwealth.<br>II. The national flag of India was adopted by the Constituent Assembly.<br>III. The Constituent Assembly elected Dr. Rajendra Prasad as the first President of India.<br><br>Which of the following is the correct chronological sequence of the above events?',
-                questionHi: 'निम्नलिखित घटनाओं पर विचार कीजिए:<br>I. संविधान सभा ने राष्ट्रमंडल में भारत की सदस्यता की पुष्टि की।<br>II. भारतीय राष्ट्रीय ध्वज को संविधान सभा द्वारा अपनाया गया।<br>III. संविधान सभा ने डॉ. राजेंद्र प्रसाद को भारत के प्रथम राष्ट्रपति के रूप में निर्वाचित किया।<br><br>उपर्युक्त घटनाओं का सही कालानुक्रमिक क्रम कौन-सा है?',
-                hasTable: false,
-                options: [
-                    { en: 'I-II-III', hi: 'I-II-III' },
-                    { en: 'II-I-III', hi: 'II-I-III' },
-                    { en: 'I-III-II', hi: 'I-III-II' },
-                    { en: 'III-I-II', hi: 'III-I-II' }
-                ],
-                correctAnswer: 1,
-                explanationEn: 'The correct chronological sequence is II-I-III. The national flag was adopted on July 22, 1947. India\'s membership of the Commonwealth was ratified in May 1949. Dr. Rajendra Prasad was elected as President on January 24, 1950.',
-                explanationHi: 'सही कालानुक्रमिक क्रम II-I-III है। राष्ट्रीय ध्वज 22 जुलाई 1947 को अपनाया गया था। मई 1949 में राष्ट्रमंडल में भारत की सदस्यता की पुष्टि की गई। डॉ. राजेंद्र प्रसाद 24 जनवरी 1950 को राष्ट्रपति निर्वाचित हुए।',
-                source: 'Indian Polity - Laxmikant',
-                difficulty: 'Moderate'
             }
         ];
+
+        // Load test and questions
+        const currentTest = testId ? getTestFromStorage(testId) : null;
+        let questions = testId ? getQuestionsFromStorage(testId) : [];
+
+        // Use demo if no questions found
+        if (questions.length === 0) {
+            console.log('⚠️ No questions found for test, using demo questions');
+            questions = demoQuestions;
+        } else {
+            console.log(`📚 Loaded ${questions.length} questions for test ${testId}`);
+        }
+
+        // Update exam title if test found
+        if (currentTest) {
+            document.getElementById('examTitle').textContent = currentTest.name_en || 'Mock Test';
+            if (currentTest.name_hi) {
+                document.querySelector('.exam-title-hi').textContent = currentTest.name_hi;
+            }
+        }
 
         // Test State
         const testState = {
@@ -998,9 +1054,10 @@
             marked: new Set(),     // Set of marked question indices
             visited: new Set([0]), // Set of visited question indices
             totalQuestions: questions.length,
-            timeRemaining: 7200,   // 2 hours in seconds
+            timeRemaining: currentTest?.time_limit ? currentTest.time_limit * 60 : 7200,   // Time in seconds
             submitted: false
         };
+
 
         // DOM Elements
         const optionsContainer = document.getElementById('optionsContainer');

@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mock Test Interface - Professional exam simulator">
+    <title>Mock Test - Gen-Z Mocks</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #333;
+            background: #e8e8e8;
+        }
+
+        /* ===== EXACT OLIVEBOARD COLORS ===== */
+        :root {
+            --header-bg: linear-gradient(to bottom, #4a9fd4 0%, #2d7bb8 100%);
+            --header-blue: #3a8bc5;
+            --answered-green: #5cb85c;
+            --not-answered-red: #d9534f;
+            --marked-orange: #f0ad4e;
+            --not-visited-gray: #999;
+            --button-blue: #337ab7;
+            --button-blue-hover: #286090;
+            --save-green: #5cb85c;
+            --save-green-hover: #449d44;
+            --border-light: #ddd;
+            --border-medium: #ccc;
+            --bg-light: #f5f5f5;
+            --bg-white: #fff;
+            --text-dark: #333;
+            --text-gray: #666;
+        }
+
+        /* ===== HEADER - EXACT OLIVEBOARD STYLE ===== */
+        .exam-header {
+            background: var(--header-bg);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .exam-title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .brand-logo {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'Roboto', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-logo .highlight {
+            color: #90d5ff;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer-section {
+            text-align: right;
+            color: #fff;
+        }
+
+        .timer-label {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .timer-value {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Roboto', monospace;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #ccc;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-placeholder {
+            font-size: 20px;
+            color: #666;
+        }
+
+        .pause-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pause-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+
+        /* ===== TOOLBAR - EXACT OLIVEBOARD STYLE ===== */
+        .toolbar {
+            background: #fff;
+            border-bottom: 1px solid var(--border-light);
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+
+        .sections-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sections-label {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .section-btn {
+            background: var(--button-blue);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .section-btn:hover {
+            background: var(--button-blue-hover);
+        }
+
+        .language-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-label {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .language-select {
+            border: 1px solid var(--border-medium);
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrapper {
+            display: flex;
+            height: calc(100vh - 90px);
+        }
+
+        /* ===== QUESTION PANEL - EXACT OLIVEBOARD STYLE ===== */
+        .question-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid var(--border-light);
+            margin: 10px;
+            margin-right: 0;
+        }
+
+        .question-header {
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-light);
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .question-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .question-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+        }
+
+        /* ===== OPTIONS - EXACT OLIVEBOARD RADIO STYLE ===== */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .option-row:hover {
+            background: #f9f9f9;
+        }
+
+        .option-radio {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #999;
+            border-radius: 50%;
+            margin-top: 2px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .option-row.selected .option-radio {
+            border-color: var(--button-blue);
+        }
+
+        .option-row.selected .option-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--button-blue);
+            border-radius: 50%;
+        }
+
+        .option-label {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-dark);
+        }
+
+        .option-letter {
+            font-weight: 600;
+            margin-right: 3px;
+        }
+
+        /* ===== BOTTOM NAV - EXACT OLIVEBOARD STYLE ===== */
+        .bottom-nav {
+            background: var(--bg-light);
+            border-top: 1px solid var(--border-light);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.15s;
+        }
+
+        .btn-outline {
+            background: #fff;
+            border-color: var(--border-medium);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-light);
+            border-color: #bbb;
+        }
+
+        .btn-primary {
+            background: var(--save-green);
+            border-color: var(--save-green);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--save-green-hover);
+            border-color: var(--save-green-hover);
+        }
+
+        /* ===== SIDEBAR - EXACT OLIVEBOARD STYLE ===== */
+        .sidebar {
+            width: 250px;
+            background: var(--bg-light);
+            border-left: 1px solid var(--border-light);
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-card {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: 3px;
+        }
+
+        .card-header {
+            background: #f0f0f0;
+            border-bottom: 1px solid var(--border-light);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        /* ===== LEGEND - EXACT OLIVEBOARD STYLE ===== */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .legend-badge.answered {
+            background: var(--answered-green);
+        }
+
+        .legend-badge.not-answered {
+            background: var(--not-answered-red);
+        }
+
+        .legend-badge.marked {
+            background: var(--marked-orange);
+        }
+
+        .legend-badge.not-visited {
+            background: #e0e0e0;
+            color: #666;
+            border: 1px solid #ccc;
+        }
+
+        .legend-text {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        /* ===== SECTION INFO ===== */
+        .section-info {
+            font-size: 11px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        .section-info strong {
+            color: var(--text-dark);
+        }
+
+        /* ===== PALETTE - EXACT OLIVEBOARD STYLE ===== */
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .palette-btn {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid var(--border-medium);
+            background: #fff;
+            color: var(--text-dark);
+            transition: all 0.1s;
+        }
+
+        .palette-btn:hover {
+            border-color: var(--button-blue);
+            transform: scale(1.02);
+        }
+
+        .palette-btn.current {
+            background: var(--button-blue);
+            border-color: var(--button-blue);
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(51, 122, 183, 0.3);
+        }
+
+        .palette-btn.answered {
+            background: var(--answered-green);
+            border-color: var(--answered-green);
+            color: #fff;
+        }
+
+        .palette-btn.not-answered {
+            background: var(--not-answered-red);
+            border-color: var(--not-answered-red);
+            color: #fff;
+        }
+
+        .palette-btn.marked {
+            background: var(--marked-orange);
+            border-color: var(--marked-orange);
+            color: #fff;
+        }
+
+        .palette-btn.not-visited {
+            background: #f0f0f0;
+            color: #888;
+        }
+
+        /* ===== SIDEBAR BUTTONS - EXACT STYLE ===== */
+        .sidebar-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 8px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid var(--border-medium);
+            background: #fff;
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-light);
+        }
+
+        .action-btn.blue {
+            background: var(--button-blue);
+            border-color: var(--button-blue);
+            color: #fff;
+        }
+
+        .action-btn.blue:hover {
+            background: var(--button-blue-hover);
+        }
+
+        .action-btn.green {
+            background: var(--save-green);
+            border-color: var(--save-green);
+            color: #fff;
+        }
+
+        .action-btn.green:hover {
+            background: var(--save-green-hover);
+        }
+
+        /* ===== SUBMIT MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 5px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: var(--button-blue);
+            color: #fff;
+            padding: 12px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body p {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 15px;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .summary-box {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-light);
+            border-radius: 4px;
+        }
+
+        .summary-box .num {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .summary-box .txt {
+            font-size: 10px;
+            color: var(--text-gray);
+            margin-top: 2px;
+        }
+
+        .summary-box.green .num {
+            color: var(--answered-green);
+        }
+
+        .summary-box.red .num {
+            color: var(--not-answered-red);
+        }
+
+        .summary-box.orange .num {
+            color: var(--marked-orange);
+        }
+
+        .modal-footer {
+            padding: 12px 15px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                right: -260px;
+                top: 90px;
+                height: calc(100vh - 90px);
+                z-index: 100;
+                transition: right 0.3s;
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.15);
+            }
+
+            .sidebar.open {
+                right: 0;
+            }
+
+            .question-panel {
+                margin-right: 10px;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-toggle {
+                display: none;
+            }
+        }
+
+        .mobile-toggle {
+            position: fixed;
+            right: 15px;
+            bottom: 70px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--button-blue);
+            color: #fff;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="exam-header">
+        <div class="exam-title" id="examTitle">General Knowledge: Biology</div>
+        <div class="brand-logo">🎓 Gen<span class="highlight">Z</span> Mocks</div>
+        <div class="header-right">
+            <div class="timer-section">
+                <div class="timer-label">Time Left:</div>
+                <div class="timer-value" id="timerDisplay">14:59</div>
+            </div>
+            <div class="user-profile">
+                <div class="profile-pic">
+                    <span class="profile-placeholder">👤</span>
+                </div>
+                <button class="pause-btn" id="pauseBtn">
+                    ⏸ Pause Test
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="sections-wrapper">
+            <span class="sections-label">Sections</span>
+            <button class="section-btn">Topic Test ▾</button>
+        </div>
+        <div class="language-wrapper">
+            <span class="language-label">Choose Language:</span>
+            <select class="language-select" id="langSelect">
+                <option value="en">English</option>
+                <option value="hi">हिंदी</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        <!-- QUESTION PANEL -->
+        <div class="question-panel">
+            <div class="question-header">
+                Question No <span id="qNum">1</span>
+            </div>
+            <div class="question-body">
+                <div class="question-text" id="qText">
+                    The yellow and orange colour of fruits and flowers is mainly due to ____________.
+                </div>
+                <div class="options-list" id="optionsList">
+                    <!-- Options rendered by JS -->
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <div class="nav-buttons-left">
+                    <button class="btn btn-outline" id="markBtn">Mark for Review & Next</button>
+                    <button class="btn btn-outline" id="clearBtn">Clear Response</button>
+                </div>
+                <button class="btn btn-primary" id="saveNextBtn">Save & Next</button>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Legend Card -->
+            <div class="sidebar-card">
+                <div class="card-header">Legend</div>
+                <div class="card-body">
+                    <div class="legend-grid">
+                        <div class="legend-item">
+                            <div class="legend-badge answered" id="legAnswered">0</div>
+                            <span class="legend-text">Answered</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-badge not-answered" id="legNotAns">1</div>
+                            <span class="legend-text">Not Answered</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-badge marked" id="legMarked">0</div>
+                            <span class="legend-text">Marked</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-badge not-visited" id="legNotVis">24</div>
+                            <span class="legend-text">Not Visited</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Palette Card -->
+            <div class="sidebar-card">
+                <div class="card-header">
+                    <div class="section-info">You are viewing <strong>S1</strong> section</div>
+                    Question Palette:
+                </div>
+                <div class="card-body">
+                    <div class="palette-grid" id="paletteGrid">
+                        <!-- Palette buttons rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="sidebar-card">
+                <div class="card-body">
+                    <div class="sidebar-actions">
+                        <button class="action-btn">Question Paper</button>
+                        <button class="action-btn">Instructions</button>
+                        <button class="action-btn blue">Profile</button>
+                        <button class="action-btn green" id="submitBtn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" id="mobileToggle">☰</button>
+
+    <!-- Submit Modal -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal-box">
+            <div class="modal-header">⚠️ Submit Test?</div>
+            <div class="modal-body">
+                <p>Are you sure you want to submit? You won't be able to change your answers after submission.</p>
+                <div class="summary-row">
+                    <div class="summary-box green">
+                        <div class="num" id="modAnswered">0</div>
+                        <div class="txt">Answered</div>
+                    </div>
+                    <div class="summary-box red">
+                        <div class="num" id="modNotAns">25</div>
+                        <div class="txt">Not Answered</div>
+                    </div>
+                    <div class="summary-box orange">
+                        <div class="num" id="modMarked">0</div>
+                        <div class="txt">Marked</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelSubmit">Go Back</button>
+                <button class="btn btn-primary" id="confirmSubmit">Confirm Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== LOAD TEST AND QUESTIONS FROM LOCALSTORAGE =====
+        const urlParams = new URLSearchParams(window.location.search);
+        const testId = urlParams.get('id');
+
+        // Load test info
+        function getTestFromStorage(testId) {
+            const storedTests = localStorage.getItem('genz_mock_tests');
+            if (storedTests) {
+                try {
+                    const tests = JSON.parse(storedTests);
+                    return tests.find(t => t.id === testId);
+                } catch (e) {
+                    console.error('Error loading test:', e);
+                }
+            }
+            return null;
+        }
+
+        // Load questions from localStorage
+        function getQuestionsFromStorage(testId) {
+            const storedQuestions = localStorage.getItem('genz_questions');
+            if (storedQuestions) {
+                try {
+                    const allQuestions = JSON.parse(storedQuestions);
+                    const testQuestions = allQuestions.filter(q => q.test_id === testId);
+
+                    if (testQuestions.length > 0) {
+                        console.log(`📚 Loaded ${testQuestions.length} questions for test ${testId}`);
+                        return testQuestions.map((q, i) => ({
+                            text: q.question_text_en || 'Question ' + (i + 1),
+                            options: [
+                                'a) ' + (q.option_a_en || 'Option A'),
+                                'b) ' + (q.option_b_en || 'Option B'),
+                                'c) ' + (q.option_c_en || 'Option C'),
+                                'd) ' + (q.option_d_en || 'Option D')
+                            ],
+                            correct: ['a', 'b', 'c', 'd'].indexOf((q.correct_option || 'a').toLowerCase()),
+                            explanation: q.explanation_en || ''
+                        }));
+                    }
+                } catch (e) {
+                    console.error('Error loading questions:', e);
+                }
+            }
+            return null;
+        }
+
+        // Demo questions fallback
+        const demoQuestions = [
+            {
+                text: 'The yellow and orange colour of fruits and flowers is mainly due to ____________.',
+                options: ['a) Leucoplasts', 'b) Chloroplasts', 'c) Gerontoplasts', 'd) Chromoplast'],
+                correct: 3
+            },
+            {
+                text: 'Which organelle is known as the "powerhouse of the cell"?',
+                options: ['a) Nucleus', 'b) Mitochondria', 'c) Ribosome', 'd) Golgi body'],
+                correct: 1
+            },
+            {
+                text: 'DNA replication occurs during which phase of cell cycle?',
+                options: ['a) G1 phase', 'b) S phase', 'c) G2 phase', 'd) M phase'],
+                correct: 1
+            },
+            ...Array.from({ length: 21 }, (_, i) => ({
+                text: `Sample question ${i + 4}: Which of the following is correct?`,
+                options: ['a) Option A', 'b) Option B', 'c) Option C', 'd) Option D'],
+                correct: Math.floor(Math.random() * 4)
+            }))
+        ];
+
+        // Load test and questions
+        const currentTest = testId ? getTestFromStorage(testId) : null;
+        let questions = testId ? getQuestionsFromStorage(testId) : null;
+
+        // Use demo if no questions found
+        if (!questions || questions.length === 0) {
+            console.log('⚠️ No questions found for test, using demo questions');
+            questions = demoQuestions;
+        }
+
+        // Update exam title if test found
+        if (currentTest) {
+            document.getElementById('examTitle').textContent = currentTest.name_en || 'Mock Test';
+        }
+
+        // ===== STATE =====
+        const state = {
+            current: 0,
+            answers: {},
+            marked: new Set(),
+            visited: new Set([0]),
+            total: questions.length,
+            time: currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60
+        };
+
+        // ===== RENDER =====
+        function renderQuestion(idx) {
+            state.current = idx;
+            state.visited.add(idx);
+
+            document.getElementById('qNum').textContent = idx + 1;
+            document.getElementById('qText').textContent = questions[idx].text;
+
+            document.getElementById('optionsList').innerHTML = questions[idx].options.map((opt, i) => `
+                <div class="option-row ${state.answers[idx] === i ? 'selected' : ''}" onclick="selectOption(${i})">
+                    <div class="option-radio"></div>
+                    <div class="option-label">${opt}</div>
+                </div>
+            `).join('');
+
+            updatePalette();
+            updateLegend();
+        }
+
+        function renderPalette() {
+            document.getElementById('paletteGrid').innerHTML =
+                Array.from({ length: state.total }, (_, i) =>
+                    `<button class="palette-btn not-visited" onclick="goTo(${i})">${i + 1}</button>`
+                ).join('');
+        }
+
+        function updatePalette() {
+            document.querySelectorAll('.palette-btn').forEach((btn, i) => {
+                btn.className = 'palette-btn';
+                if (i === state.current) {
+                    btn.classList.add('current');
+                } else if (state.answers[i] !== undefined && state.marked.has(i)) {
+                    btn.classList.add('answered');
+                } else if (state.answers[i] !== undefined) {
+                    btn.classList.add('answered');
+                } else if (state.marked.has(i)) {
+                    btn.classList.add('marked');
+                } else if (state.visited.has(i)) {
+                    btn.classList.add('not-answered');
+                } else {
+                    btn.classList.add('not-visited');
+                }
+            });
+        }
+
+        function updateLegend() {
+            const answered = Object.keys(state.answers).length;
+            const notVisited = state.total - state.visited.size;
+            const notAnswered = state.total - answered;
+
+            document.getElementById('legAnswered').textContent = answered;
+            document.getElementById('legNotAns').textContent = notAnswered;
+            document.getElementById('legMarked').textContent = state.marked.size;
+            document.getElementById('legNotVis').textContent = notVisited;
+        }
+
+        // ===== ACTIONS =====
+        function selectOption(i) {
+            state.answers[state.current] = i;
+            document.querySelectorAll('.option-row').forEach((row, idx) => {
+                row.classList.toggle('selected', idx === i);
+            });
+            updatePalette();
+            updateLegend();
+        }
+
+        function goTo(idx) {
+            renderQuestion(idx);
+        }
+
+        document.getElementById('saveNextBtn').addEventListener('click', () => {
+            if (state.current < state.total - 1) renderQuestion(state.current + 1);
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            delete state.answers[state.current];
+            document.querySelectorAll('.option-row').forEach(r => r.classList.remove('selected'));
+            updatePalette();
+            updateLegend();
+        });
+
+        document.getElementById('markBtn').addEventListener('click', () => {
+            state.marked.has(state.current) ? state.marked.delete(state.current) : state.marked.add(state.current);
+            if (state.current < state.total - 1) renderQuestion(state.current + 1);
+            else { updatePalette(); updateLegend(); }
+        });
+
+        // ===== SUBMIT =====
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const answered = Object.keys(state.answers).length;
+            document.getElementById('modAnswered').textContent = answered;
+            document.getElementById('modNotAns').textContent = state.total - answered;
+            document.getElementById('modMarked').textContent = state.marked.size;
+            document.getElementById('submitModal').classList.add('active');
+        });
+
+        document.getElementById('cancelSubmit').addEventListener('click', () => {
+            document.getElementById('submitModal').classList.remove('active');
+        });
+
+        document.getElementById('confirmSubmit').addEventListener('click', () => {
+            let correct = 0;
+            questions.forEach((q, i) => {
+                if (state.answers[i] === q.correct) correct++;
+            });
+            const params = new URLSearchParams({
+                correct, wrong: Object.keys(state.answers).length - correct,
+                total: state.total, time: (15 * 60) - state.time
+            });
+            window.location.href = `results.html?${params}`;
+        });
+
+        // ===== TIMER =====
+        setInterval(() => {
+            if (state.time <= 0) return;
+            state.time--;
+            const m = Math.floor(state.time / 60);
+            const s = state.time % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }, 1000);
+
+        // ===== MOBILE =====
+        document.getElementById('mobileToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // ===== INIT =====
+        renderPalette();
+        renderQuestion(0);
+    </script>
+</body>
+
+</html>
