@@ -412,8 +412,64 @@ class AdminDataManager {
             totalTests: this.mockTests.length,
             totalQuestions: this.questions.length,
             totalKeys: this.accessKeys.length,
-            activeKeys: this.accessKeys.filter(k => k.is_active).length
+            activeKeys: this.accessKeys.filter(k => k.is_active).length,
+            totalNotifications: this.getNotifications().length
         };
+    }
+
+    // ===== NOTIFICATIONS =====
+
+    getNotifications() {
+        return JSON.parse(localStorage.getItem('genz_notifications') || '[]');
+    }
+
+    createNotification(data) {
+        const notification = {
+            id: this.generateId(),
+            title: data.title || 'New Notification',
+            message: data.message || '',
+            type: data.type || 'info', // info, warning, success, urgent
+            created_at: new Date().toISOString(),
+            is_active: true
+        };
+
+        const notifications = this.getNotifications();
+        notifications.unshift(notification);
+        localStorage.setItem('genz_notifications', JSON.stringify(notifications));
+
+        console.log('📢 Notification created:', notification.title);
+        return notification;
+    }
+
+    updateNotification(id, updates) {
+        const notifications = this.getNotifications();
+        const index = notifications.findIndex(n => n.id === id);
+
+        if (index !== -1) {
+            notifications[index] = { ...notifications[index], ...updates };
+            localStorage.setItem('genz_notifications', JSON.stringify(notifications));
+            console.log('✅ Notification updated:', id);
+            return notifications[index];
+        }
+        return null;
+    }
+
+    deleteNotification(id) {
+        const notifications = this.getNotifications();
+        const index = notifications.findIndex(n => n.id === id);
+
+        if (index !== -1) {
+            notifications.splice(index, 1);
+            localStorage.setItem('genz_notifications', JSON.stringify(notifications));
+            console.log('🗑️ Notification deleted:', id);
+            return true;
+        }
+        return false;
+    }
+
+    clearAllNotifications() {
+        localStorage.setItem('genz_notifications', '[]');
+        console.log('🗑️ All notifications cleared');
     }
 }
 

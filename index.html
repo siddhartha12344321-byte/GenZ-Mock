@@ -607,18 +607,33 @@
         function validateAccessKey(key) {
             if (!key || key === '') return false;
 
-            // Get valid keys from localStorage (set by admin panel)
+            // Source 1: valid_keys (direct array of key strings)
             const validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
+            console.log('valid_keys:', validKeys);
 
-            // Check genz_access_keys (admin panel stores with prefix genz_)
+            // Source 2: genz_access_keys (array of key objects from admin-data.js)
             const accessKeysData = JSON.parse(localStorage.getItem('genz_access_keys') || '[]');
             const activeKeys = accessKeysData.filter(k => k.is_active).map(k => k.key);
+            console.log('genz_access_keys:', activeKeys);
+
+            // Source 3: Check if adminData is available (loaded from admin-data.js)
+            let adminDataKeys = [];
+            if (typeof adminData !== 'undefined' && adminData.accessKeys) {
+                adminDataKeys = adminData.accessKeys.filter(k => k.is_active).map(k => k.key);
+                console.log('adminData.accessKeys:', adminDataKeys);
+            }
 
             // Merge all sources
-            const allValidKeys = [...new Set([...validKeys, ...activeKeys])];
+            const allValidKeys = [...new Set([...validKeys, ...activeKeys, ...adminDataKeys])];
 
-            console.log('Valid keys found:', allValidKeys);
+            console.log('All valid keys found:', allValidKeys);
             console.log('Checking key:', key);
+
+            // If no keys exist yet, allow login with any key (for initial setup)
+            if (allValidKeys.length === 0) {
+                console.log('No keys configured - allowing any key for initial setup');
+                return true;
+            }
 
             return allValidKeys.includes(key);
         }

@@ -254,48 +254,18 @@
 
                         <!-- Right Sidebar -->
                         <div class="w-80 space-y-5">
-                            <!-- Today's Activity Card -->
+                            <!-- Notification Panel -->
                             <div class="bg-white border border-gray-200 rounded-xl p-5">
-                                <h3 class="text-base font-bold text-gray-900 mb-4">Today's Activity</h3>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="text-center p-3 bg-orange-50 rounded-xl">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <span class="text-orange-500">📝</span>
-                                            <span class="text-2xl font-bold text-gray-900" id="mcqCount">0</span>
-                                        </div>
-                                        <div class="text-xs text-gray-500">MCQs Practiced</div>
-                                    </div>
-                                    <div class="text-center p-3 bg-blue-50 rounded-xl">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <span class="text-blue-500">⚡</span>
-                                            <span class="text-2xl font-bold text-gray-900" id="accuracyVal">—</span>
-                                        </div>
-                                        <div class="text-xs text-gray-500">Accuracy</div>
-                                    </div>
-                                    <div class="text-center p-3 bg-green-50 rounded-xl">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <span class="text-green-500">📊</span>
-                                            <span class="text-2xl font-bold text-gray-900" id="testsCount">0</span>
-                                        </div>
-                                        <div class="text-xs text-gray-500">Mains Answers</div>
-                                    </div>
-                                    <div class="text-center p-3 bg-purple-50 rounded-xl">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <span class="text-purple-500">🏆</span>
-                                            <span class="text-2xl font-bold text-gray-900" id="rankVal">—</span>
-                                        </div>
-                                        <div class="text-xs text-gray-500">Your Rank</div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-base font-bold text-gray-900">📢 Notifications</h3>
+                                    <span class="text-xs text-gray-400" id="notifCount">0 new</span>
+                                </div>
+                                <div id="notificationsList" class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
+                                    <!-- Notifications will be loaded here -->
+                                    <div class="text-center py-6 text-gray-400 text-sm">
+                                        No notifications yet
                                     </div>
                                 </div>
-                                <a href="#" onclick="showPage('leaderboard')"
-                                    class="mt-4 text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700">
-                                    View Leaderboard
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </a>
                             </div>
 
                             <!-- Streak Card -->
@@ -798,25 +768,70 @@
 
         function loadHomeStats() {
             // Get FRESH data from localStorage
-            const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
-            const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
             const streakData = JSON.parse(localStorage.getItem('streak_data') || '{"currentStreak":0,"lastActivityDate":null,"weeklyDays":[]}');
-
-            // Update Today's Activity stats
-            document.getElementById('mcqCount').textContent = userProgress.total || 0;
-            document.getElementById('testsCount').textContent = userProgress.tests || 0;
-
-            if (userProgress.total > 0) {
-                const acc = Math.round((userProgress.correct / userProgress.total) * 100);
-                document.getElementById('accuracyVal').textContent = acc + '%';
-            } else {
-                document.getElementById('accuracyVal').textContent = '—';
-            }
-
-            document.getElementById('rankVal').textContent = attemptedTests.length > 0 ? '#' + Math.min(attemptedTests.length * 5, 100) : '—';
 
             // Update streak
             updateStreakDisplay(streakData);
+
+            // Load notifications
+            loadNotifications();
+        }
+
+        function loadNotifications() {
+            const notifications = JSON.parse(localStorage.getItem('genz_notifications') || '[]');
+            const container = document.getElementById('notificationsList');
+            const countEl = document.getElementById('notifCount');
+
+            if (!container) return;
+
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-gray-400 text-sm">
+                        No notifications yet
+                    </div>
+                `;
+                countEl.textContent = '0 new';
+                return;
+            }
+
+            // Sort by date (newest first)
+            const sorted = [...notifications].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            container.innerHTML = sorted.map(notif => {
+                const typeColors = {
+                    'info': 'bg-blue-50 border-blue-200 text-blue-700',
+                    'warning': 'bg-yellow-50 border-yellow-200 text-yellow-700',
+                    'success': 'bg-green-50 border-green-200 text-green-700',
+                    'urgent': 'bg-red-50 border-red-200 text-red-700'
+                };
+                const color = typeColors[notif.type] || typeColors.info;
+                const timeAgo = getTimeAgo(notif.created_at);
+
+                return `
+                    <div class="p-3 rounded-lg border ${color}">
+                        <div class="font-medium text-sm">${notif.title}</div>
+                        <div class="text-xs mt-1 opacity-80">${notif.message}</div>
+                        <div class="text-[10px] mt-2 opacity-60">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+
+            countEl.textContent = sorted.length + ' new';
+        }
+
+        function getTimeAgo(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+
+            const mins = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return mins + ' min ago';
+            if (hours < 24) return hours + ' hour(s) ago';
+            return days + ' day(s) ago';
         }
 
         // Streak calculation and display
