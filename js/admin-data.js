@@ -178,6 +178,170 @@ class AdminDataManager {
         return test;
     }
 
+    // ===== SINGLE QUESTION MANAGEMENT =====
+
+    addSingleQuestion(testId, questionData) {
+        const existingQuestions = this.getQuestionsByTestId(testId);
+        const nextNumber = existingQuestions.length + 1;
+
+        const question = {
+            id: this.generateId(),
+            test_id: testId,
+            question_number: questionData.question_number || nextNumber,
+            question_text_en: questionData.question_text_en || '',
+            question_text_hi: questionData.question_text_hi || '',
+            option_a_en: questionData.option_a_en || '',
+            option_b_en: questionData.option_b_en || '',
+            option_c_en: questionData.option_c_en || '',
+            option_d_en: questionData.option_d_en || '',
+            option_a_hi: questionData.option_a_hi || '',
+            option_b_hi: questionData.option_b_hi || '',
+            option_c_hi: questionData.option_c_hi || '',
+            option_d_hi: questionData.option_d_hi || '',
+            correct_option: questionData.correct_option || 'a',
+            explanation_en: questionData.explanation_en || '',
+            explanation_hi: questionData.explanation_hi || '',
+            difficulty: questionData.difficulty || 'moderate',
+            created_at: new Date().toISOString()
+        };
+
+        this.questions.push(question);
+        this.save('questions', this.questions);
+
+        // Update test question count
+        this.updateTest(testId, {
+            total_questions: this.getQuestionsByTestId(testId).length
+        });
+
+        console.log(`✅ Added question #${question.question_number} to test ${testId}`);
+        return question;
+    }
+
+    updateQuestion(questionId, updates) {
+        const index = this.questions.findIndex(q => q.id === questionId);
+        if (index !== -1) {
+            this.questions[index] = {
+                ...this.questions[index],
+                ...updates,
+                updated_at: new Date().toISOString()
+            };
+            this.save('questions', this.questions);
+            console.log(`✅ Updated question ${questionId}`);
+            return this.questions[index];
+        }
+        return null;
+    }
+
+    deleteQuestion(questionId) {
+        const question = this.questions.find(q => q.id === questionId);
+        if (!question) return false;
+
+        const testId = question.test_id;
+        const index = this.questions.findIndex(q => q.id === questionId);
+
+        if (index !== -1) {
+            this.questions.splice(index, 1);
+            this.save('questions', this.questions);
+
+            // Renumber remaining questions
+            const remainingQuestions = this.getQuestionsByTestId(testId);
+            remainingQuestions.forEach((q, i) => {
+                q.question_number = i + 1;
+            });
+            this.save('questions', this.questions);
+
+            // Update test question count
+            this.updateTest(testId, {
+                total_questions: remainingQuestions.length
+            });
+
+            console.log(`✅ Deleted question ${questionId}`);
+            return true;
+        }
+        return false;
+    }
+
+    getQuestionById(questionId) {
+        return this.questions.find(q => q.id === questionId);
+    }
+
+    // ===== TEST UTILITIES =====
+
+    duplicateTest(testId) {
+        const originalTest = this.getTestById(testId);
+        if (!originalTest) return null;
+
+        const originalQuestions = this.getQuestionsByTestId(testId);
+
+        // Create new test with copied data
+        const newTest = this.createTest({
+            name_en: originalTest.name_en + ' (Copy)',
+            name_hi: originalTest.name_hi ? originalTest.name_hi + ' (प्रति)' : '',
+            subject: originalTest.subject_id,
+            difficulty: originalTest.difficulty,
+            questions: originalQuestions.length,
+            time: originalTest.time_limit,
+            mark_correct: originalTest.mark_correct,
+            mark_wrong: originalTest.mark_wrong,
+            source: originalTest.source,
+            description: originalTest.description
+        });
+
+        // Copy questions
+        if (originalQuestions.length > 0) {
+            this.addQuestionsToTest(newTest.id, originalQuestions);
+        }
+
+        console.log(`✅ Duplicated test: ${newTest.name_en}`);
+        return newTest;
+    }
+
+    exportTest(testId, format = 'json') {
+        const test = this.getTestById(testId);
+        if (!test) return null;
+
+        const questions = this.getQuestionsByTestId(testId);
+
+        const exportData = {
+            test: {
+                name_en: test.name_en,
+                name_hi: test.name_hi,
+                subject: test.subject_id,
+                difficulty: test.difficulty,
+                time_limit_minutes: test.time_limit,
+                mark_correct: test.mark_correct,
+                mark_wrong: test.mark_wrong,
+                source: test.source,
+                description: test.description
+            },
+            questions: questions.map(q => ({
+                question_number: q.question_number,
+                question_text_en: q.question_text_en,
+                question_text_hi: q.question_text_hi,
+                option_a_en: q.option_a_en,
+                option_b_en: q.option_b_en,
+                option_c_en: q.option_c_en,
+                option_d_en: q.option_d_en,
+                option_a_hi: q.option_a_hi,
+                option_b_hi: q.option_b_hi,
+                option_c_hi: q.option_c_hi,
+                option_d_hi: q.option_d_hi,
+                correct_option: q.correct_option,
+                explanation_en: q.explanation_en,
+                explanation_hi: q.explanation_hi,
+                difficulty: q.difficulty
+            })),
+            exported_at: new Date().toISOString(),
+            total_questions: questions.length
+        };
+
+        if (format === 'json') {
+            return JSON.stringify(exportData, null, 2);
+        }
+
+        return exportData;
+    }
+
     // ===== ACCESS KEYS =====
 
     getAllKeys() {

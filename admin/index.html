@@ -600,6 +600,10 @@
                     <span class="icon">🔑</span>
                     <span>Access Keys</span>
                 </a>
+                <a href="#" class="admin-nav-item" id="navSettings">
+                    <span class="icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
                 <a href="../dashboard.html" class="admin-nav-item">
                     <span class="icon">🌐</span>
                     <span>View Site</span>
@@ -675,33 +679,208 @@
         </main>
     </div>
 
-    <!-- Create/Edit Test Modal -->
+    <!-- Unified Create/Edit Test Modal with Tabs -->
     <div class="modal" id="testModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2 id="modalTitle">Create New Mock Test</h2>
+                <h2 id="modalTitle">📝 Create Mock Test</h2>
                 <span class="modal-close" id="modalClose">&times;</span>
             </div>
-            <div class="modal-body">
-                <form id="testForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Test Name (English) *</label>
-                            <input type="text" class="form-input" id="testNameEn" placeholder="e.g., Polity Mock Test 1"
-                                required>
+
+            <!-- Tab Navigation -->
+            <div class="modal-tabs"
+                style="display: flex; border-bottom: 1px solid var(--border-color); padding: 0 var(--spacing-xl);">
+                <button class="modal-tab active" data-tab="manual"
+                    style="padding: 1rem 1.5rem; background: none; border: none; color: var(--text-primary); font-weight: 600; cursor: pointer; border-bottom: 2px solid var(--primary-500); transition: all 0.3s;">
+                    📝 Manual
+                </button>
+                <button class="modal-tab" data-tab="pdf"
+                    style="padding: 1rem 1.5rem; background: none; border: none; color: var(--text-muted); font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s;">
+                    📥 Import PDF
+                </button>
+                <button class="modal-tab" data-tab="ai"
+                    style="padding: 1rem 1.5rem; background: none; border: none; color: var(--text-muted); font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s;">
+                    🤖 AI Generate
+                </button>
+                <button class="modal-tab" data-tab="json"
+                    style="padding: 1rem 1.5rem; background: none; border: none; color: var(--text-muted); font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s;">
+                    📋 JSON
+                </button>
+            </div>
+
+            <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Tab 1: Manual Creation -->
+                <div class="tab-content active" id="tab-manual">
+                    <form id="testForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Test Name (English) *</label>
+                                <input type="text" class="form-input" id="testNameEn"
+                                    placeholder="e.g., Polity Mock Test 1" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Test Name (Hindi)</label>
+                                <input type="text" class="form-input" id="testNameHi"
+                                    placeholder="e.g., राजव्यवस्था मॉक टेस्ट 1">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Test Name (Hindi)</label>
-                            <input type="text" class="form-input" id="testNameHi"
-                                placeholder="e.g., राजव्यवस्था मॉक टेस्ट 1">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Subject *</label>
+                                <select class="form-select" id="testSubject" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="polity">⚖️ Indian Polity</option>
+                                    <option value="history">📜 History</option>
+                                    <option value="geography">🌍 Geography</option>
+                                    <option value="economy">📊 Economy</option>
+                                    <option value="environment">🌱 Environment</option>
+                                    <option value="science">🔬 Science & Tech</option>
+                                    <option value="current">📰 Current Affairs</option>
+                                    <option value="culture">🎨 Art & Culture</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Difficulty</label>
+                                <div class="difficulty-pills" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <button type="button" class="pill-btn" data-value="easy"
+                                        style="padding: 0.5rem 1rem; border-radius: 2rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.3s;">Easy</button>
+                                    <button type="button" class="pill-btn active" data-value="moderate"
+                                        style="padding: 0.5rem 1rem; border-radius: 2rem; border: none; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; cursor: pointer; transition: all 0.3s;">Moderate</button>
+                                    <button type="button" class="pill-btn" data-value="difficult"
+                                        style="padding: 0.5rem 1rem; border-radius: 2rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.3s;">Hard</button>
+                                </div>
+                                <input type="hidden" id="testDifficulty" value="moderate">
+                            </div>
                         </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Time Limit</label>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <input type="range" id="testTimeSlider" min="10" max="180" value="60"
+                                        style="flex: 1; accent-color: var(--primary-500);">
+                                    <span id="testTimeDisplay" style="min-width: 60px; font-weight: 600;">60 min</span>
+                                </div>
+                                <input type="hidden" id="testTime" value="60">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Marking Scheme</label>
+                                <div
+                                    style="display: flex; gap: 1rem; background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-md);">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="color: #22c55e;">✓</span>
+                                        <input type="number" id="markCorrect" value="2" step="0.01"
+                                            style="width: 60px; padding: 0.25rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); text-align: center;">
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="color: #ef4444;">✗</span>
+                                        <input type="number" id="markWrong" value="-0.66" step="0.01"
+                                            style="width: 60px; padding: 0.25rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); text-align: center;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Source <small>(optional)</small></label>
+                            <input type="text" class="form-input" id="testSource"
+                                placeholder="e.g., Laxmikant Chapter 5">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description <small>(optional)</small></label>
+                            <textarea class="form-textarea" id="testDescription"
+                                placeholder="Brief description of the test..." style="min-height: 60px;"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tab 2: PDF Import with AI -->
+                <div class="tab-content" id="tab-pdf" style="display: none;">
+                    <div class="form-row" style="margin-bottom: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Test Name *</label>
+                            <input type="text" class="form-input" id="pdfTestName"
+                                placeholder="e.g., Indian Polity Full Test">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select" id="pdfSubject">
+                                <option value="polity">⚖️ Indian Polity</option>
+                                <option value="history">📜 History</option>
+                                <option value="geography">🌍 Geography</option>
+                                <option value="economy">📊 Economy</option>
+                                <option value="environment">🌱 Environment</option>
+                                <option value="science">🔬 Science & Tech</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- PDF Drop Zone -->
+                    <div id="pdfDropZone" class="import-section" style="margin-bottom: 1rem;">
+                        <div class="icon">📄</div>
+                        <h3>Drop PDF file here</h3>
+                        <p>or click to browse • AI will extract questions automatically</p>
+                        <input type="file" id="pdfFileInput" accept=".pdf">
+                    </div>
+
+                    <!-- AI Status -->
+                    <div id="aiStatus"
+                        style="display: none; padding: 1rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: var(--radius-md); margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="spinner"
+                                style="width: 24px; height: 24px; border: 3px solid var(--border-color); border-top-color: var(--primary-500); border-radius: 50%; animation: spin 1s linear infinite;">
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;" id="aiStatusTitle">🤖 AI Processing...</div>
+                                <div style="font-size: 0.875rem; color: var(--text-muted);" id="aiStatusText">Extracting
+                                    questions from PDF</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Area -->
+                    <div id="pdfPreview" style="display: none;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h4 style="margin: 0;">🎯 Extracted Questions</h4>
+                            <span id="pdfQuestionCount"
+                                style="background: var(--primary-500); color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem;">0
+                                questions</span>
+                        </div>
+                        <div id="pdfQuestionsList"
+                            style="max-height: 250px; overflow-y: auto; background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 1rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: AI Question Generation -->
+                <div class="tab-content" id="tab-ai" style="display: none;">
+                    <div
+                        style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1)); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(139, 92, 246, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span style="font-size: 1.5rem;">🤖</span>
+                            <h3 style="margin: 0;">AI Question Generator</h3>
+                        </div>
+                        <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Generate exam-quality MCQ
+                            questions on any topic using AI. Perfect for UPSC, SSC, Banking exams.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Topic / Subject Area *</label>
+                        <input type="text" class="form-input" id="aiTopic"
+                            placeholder="e.g., Indian Constitution - Fundamental Rights, Ancient Indian History - Mauryan Empire">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Subject *</label>
-                            <select class="form-select" id="testSubject" required>
-                                <option value="">Select Subject</option>
+                            <label class="form-label">Test Name</label>
+                            <input type="text" class="form-input" id="aiTestName" placeholder="Auto-generated if empty">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select" id="aiSubject">
                                 <option value="polity">⚖️ Indian Polity</option>
                                 <option value="history">📜 History</option>
                                 <option value="geography">🌍 Geography</option>
@@ -709,65 +888,138 @@
                                 <option value="environment">🌱 Environment</option>
                                 <option value="science">🔬 Science & Tech</option>
                                 <option value="current">📰 Current Affairs</option>
-                                <option value="culture">🎨 Art & Culture</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Difficulty</label>
-                            <select class="form-select" id="testDifficulty">
-                                <option value="easy">Easy</option>
-                                <option value="moderate" selected>Moderate</option>
-                                <option value="difficult">Difficult</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Number of Questions *</label>
-                            <input type="number" class="form-input" id="testQuestions" placeholder="100" min="1"
-                                required>
+                            <label class="form-label">Number of Questions</label>
+                            <select class="form-select" id="aiCount">
+                                <option value="5">5 Questions</option>
+                                <option value="10" selected>10 Questions</option>
+                                <option value="15">15 Questions</option>
+                                <option value="20">20 Questions</option>
+                                <option value="25">25 Questions</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Time Limit (minutes) *</label>
-                            <input type="number" class="form-input" id="testTime" placeholder="120" min="1" required>
+                            <label class="form-label">Difficulty</label>
+                            <select class="form-select" id="aiDifficulty">
+                                <option value="easy">Easy</option>
+                                <option value="moderate" selected>Moderate</option>
+                                <option value="difficult">Hard</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Marking Scheme</label>
-                        <div class="marking-scheme">
-                            <div class="marking-item">
-                                <label>Correct Answer:</label>
-                                <input type="number" id="markCorrect" value="2" step="0.01">
-                                <span>marks</span>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="aiExplanations" checked
+                                style="width: 18px; height: 18px; accent-color: var(--primary-500);">
+                            <span>Include explanations for each answer</span>
+                        </label>
+                    </div>
+
+                    <!-- AI Generation Status -->
+                    <div id="aiGenStatus"
+                        style="display: none; padding: 1rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: var(--radius-md); margin-top: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="spinner"
+                                style="width: 24px; height: 24px; border: 3px solid var(--border-color); border-top-color: var(--primary-500); border-radius: 50%; animation: spin 1s linear infinite;">
                             </div>
-                            <div class="marking-item">
-                                <label>Wrong Answer:</label>
-                                <input type="number" id="markWrong" value="-0.66" step="0.01">
-                                <span>marks</span>
+                            <div>
+                                <div style="font-weight: 600;">🤖 Generating Questions...</div>
+                                <div style="font-size: 0.875rem; color: var(--text-muted);">This may take 10-20 seconds
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Source <small>(optional)</small></label>
-                        <input type="text" class="form-input" id="testSource" placeholder="e.g., Laxmikant Chapter 5">
+                    <!-- AI Preview -->
+                    <div id="aiPreview" style="display: none; margin-top: 1rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h4 style="margin: 0;">✨ Generated Questions</h4>
+                            <span id="aiQuestionCount"
+                                style="background: var(--success-500); color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem;">0
+                                questions</span>
+                        </div>
+                        <div id="aiQuestionsList"
+                            style="max-height: 200px; overflow-y: auto; background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 1rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: JSON Import -->
+                <div class="tab-content" id="tab-json" style="display: none;">
+                    <div style="margin-bottom: 1rem;">
+                        <label class="form-label">Paste JSON Data</label>
+                        <textarea class="form-textarea" id="jsonInput" placeholder='Paste your JSON here...
+Example format:
+{
+  "title_en": "Test Name",
+  "subject": "polity",
+  "questions": [
+    {
+      "question_text_en": "Question text?",
+      "option_a_en": "Option A",
+      "option_b_en": "Option B",
+      "option_c_en": "Option C",
+      "option_d_en": "Option D",
+      "correct_option": "a"
+    }
+  ]
+}' style="min-height: 200px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;"></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Description <small>(optional)</small></label>
-                        <textarea class="form-textarea" id="testDescription"
-                            placeholder="Brief description of the test..."></textarea>
+                    <div id="jsonPreview"
+                        style="display: none; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="jsonStatus">✅ Valid JSON</span>
+                            <span id="jsonQuestionCount"
+                                style="background: var(--primary-500); color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem;">0
+                                questions</span>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
+
             <div class="modal-footer">
                 <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
-                <button class="btn btn-primary" id="saveTestBtn">Save Test</button>
+                <button class="btn btn-primary" id="saveTestBtn">
+                    <span id="saveTestBtnText">💾 Create Test</span>
+                </button>
             </div>
         </div>
     </div>
+
+    <style>
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-tab:hover {
+            color: var(--text-primary) !important;
+        }
+
+        .modal-tab.active {
+            color: var(--primary-400) !important;
+            border-bottom-color: var(--primary-500) !important;
+        }
+
+        .pill-btn:hover {
+            background: var(--bg-tertiary) !important;
+        }
+
+        .pill-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+            border: none !important;
+            color: white !important;
+        }
+    </style>
 
     <!-- Import PDF Modal -->
     <div class="modal" id="importModal">
@@ -1030,6 +1282,67 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <span class="modal-close" id="settingsModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- API Key Section -->
+                <div
+                    style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1)); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(139, 92, 246, 0.2);">
+                    <h3 style="margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        🤖 Groq AI API Key
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                        Required for AI-powered PDF extraction and question generation. Get your free key from
+                        <a href="https://console.groq.com/keys" target="_blank"
+                            style="color: var(--primary-400);">console.groq.com/keys</a>
+                    </p>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <input type="password" class="form-input" id="groqApiKey" placeholder="gsk_xxxxxxxxxxxxxxxx"
+                            style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" id="saveApiKeyBtn" style="flex: 1;">💾 Save API Key</button>
+                        <button class="btn btn-outline" id="testApiKeyBtn">🔍 Test</button>
+                    </div>
+
+                    <div id="apiKeyStatus"
+                        style="margin-top: 0.75rem; padding: 0.5rem; border-radius: var(--radius-sm); display: none;">
+                    </div>
+                </div>
+
+                <!-- Other Settings -->
+                <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">🔧 General Settings</h4>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                        <span>Dark Mode</span>
+                        <span style="color: var(--success-500);">✓ Enabled</span>
+                    </div>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                        <span>Admin Password</span>
+                        <span style="color: var(--text-muted); font-family: monospace;">genz2024admin</span>
+                    </div>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
+                        <span>Data Storage</span>
+                        <span style="color: var(--text-muted);">localStorage</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
@@ -1043,6 +1356,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
     <script src="../js/pdf-extractor.js"></script>
+    <script src="../js/ai-extractor.js"></script>
 
     <script>
         // Modal Handlers
@@ -1167,7 +1481,236 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateDashboardStats();
             refreshTestsTable();
+            initializeModalTabHandlers();
+            initializeFormEnhancements();
         });
+
+        // ===== TAB SWITCHING =====
+        let currentTab = 'manual';
+        let extractedQuestions = [];
+
+        function initializeModalTabHandlers() {
+            document.querySelectorAll('.modal-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+
+            // Update tab buttons
+            document.querySelectorAll('.modal-tab').forEach(t => {
+                t.classList.remove('active');
+                t.style.borderBottomColor = 'transparent';
+                t.style.color = 'var(--text-muted)';
+            });
+            const activeTab = document.querySelector(`.modal-tab[data-tab="${tabName}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.style.borderBottomColor = 'var(--primary-500)';
+                activeTab.style.color = 'var(--primary-400)';
+            }
+
+            // Show/hide tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            const content = document.getElementById('tab-' + tabName);
+            if (content) content.style.display = 'block';
+
+            // Update save button text
+            const btnText = document.getElementById('saveTestBtnText');
+            if (btnText) {
+                switch (tabName) {
+                    case 'manual': btnText.textContent = '💾 Create Test'; break;
+                    case 'pdf': btnText.textContent = '📥 Import from PDF'; break;
+                    case 'ai': btnText.textContent = '🤖 Generate & Save'; break;
+                    case 'json': btnText.textContent = '📋 Import JSON'; break;
+                }
+            }
+        }
+
+        // ===== FORM ENHANCEMENTS =====
+        function initializeFormEnhancements() {
+            // Time slider
+            const slider = document.getElementById('testTimeSlider');
+            const display = document.getElementById('testTimeDisplay');
+            const timeInput = document.getElementById('testTime');
+
+            if (slider && display && timeInput) {
+                slider.addEventListener('input', () => {
+                    display.textContent = slider.value + ' min';
+                    timeInput.value = slider.value;
+                });
+            }
+
+            // Difficulty pills
+            document.querySelectorAll('.pill-btn').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('.pill-btn').forEach(p => {
+                        p.classList.remove('active');
+                        p.style.background = 'transparent';
+                        p.style.border = '1px solid var(--border-color)';
+                        p.style.color = 'var(--text-secondary)';
+                    });
+                    pill.classList.add('active');
+                    pill.style.background = 'linear-gradient(135deg, #3b82f6, #8b5cf6)';
+                    pill.style.border = 'none';
+                    pill.style.color = 'white';
+                    document.getElementById('testDifficulty').value = pill.dataset.value;
+                });
+            });
+
+            // PDF Drop Zone
+            const dropZone = document.getElementById('pdfDropZone');
+            const fileInput = document.getElementById('pdfFileInput');
+
+            if (dropZone && fileInput) {
+                dropZone.addEventListener('click', () => fileInput.click());
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type === 'application/pdf') {
+                        handlePDFUpload(file);
+                    }
+                });
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files[0]) handlePDFUpload(e.target.files[0]);
+                });
+            }
+
+            // JSON validation
+            const jsonInput = document.getElementById('jsonInput');
+            if (jsonInput) {
+                jsonInput.addEventListener('input', validateJSON);
+            }
+        }
+
+        // ===== PDF UPLOAD WITH AI =====
+        async function handlePDFUpload(file) {
+            const statusDiv = document.getElementById('aiStatus');
+            const statusTitle = document.getElementById('aiStatusTitle');
+            const statusText = document.getElementById('aiStatusText');
+            const preview = document.getElementById('pdfPreview');
+
+            if (!aiExtractor.hasApiKey()) {
+                alert('⚠️ Please configure your Groq API key first!\n\nGo to Settings and add your key from console.groq.com');
+                return;
+            }
+
+            statusDiv.style.display = 'block';
+            preview.style.display = 'none';
+            statusTitle.textContent = '🤖 AI Processing...';
+            statusText.textContent = 'Extracting text from PDF...';
+
+            try {
+                const testName = document.getElementById('pdfTestName').value || file.name.replace('.pdf', '');
+                const subject = document.getElementById('pdfSubject').value;
+
+                const result = await aiExtractor.extractFromPDF(file, { testName, subject });
+
+                if (result.success && result.questions.length > 0) {
+                    extractedQuestions = result.questions;
+                    statusDiv.style.display = 'none';
+                    preview.style.display = 'block';
+
+                    document.getElementById('pdfQuestionCount').textContent = result.questions.length + ' questions';
+                    document.getElementById('pdfQuestionsList').innerHTML = result.questions.slice(0, 5).map((q, i) => `
+                        <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light);">
+                            <strong>Q${q.question_number || i + 1}:</strong> ${q.question_text_en?.substring(0, 100)}...
+                            ${q.correct_option ? `<span style="color: #22c55e; margin-left: 0.5rem;">✓ ${q.correct_option.toUpperCase()}</span>` : ''}
+                        </div>
+                    `).join('') + (result.questions.length > 5 ? `<div style="padding: 0.5rem 0; color: var(--text-muted);">...and ${result.questions.length - 5} more questions</div>` : '');
+                } else {
+                    statusTitle.textContent = '❌ Extraction Failed';
+                    statusText.textContent = result.error || 'No questions found in PDF';
+                }
+            } catch (error) {
+                statusTitle.textContent = '❌ Error';
+                statusText.textContent = error.message;
+            }
+        }
+
+        // ===== AI QUESTION GENERATION =====
+        async function generateAIQuestions() {
+            const topic = document.getElementById('aiTopic').value;
+            if (!topic.trim()) {
+                alert('Please enter a topic for question generation');
+                return;
+            }
+
+            if (!aiExtractor.hasApiKey()) {
+                alert('⚠️ Please configure your Groq API key first!');
+                return;
+            }
+
+            const statusDiv = document.getElementById('aiGenStatus');
+            const preview = document.getElementById('aiPreview');
+
+            statusDiv.style.display = 'block';
+            preview.style.display = 'none';
+
+            try {
+                const result = await aiExtractor.generateQuestions({
+                    topic: topic,
+                    subject: document.getElementById('aiSubject').value,
+                    count: parseInt(document.getElementById('aiCount').value),
+                    difficulty: document.getElementById('aiDifficulty').value,
+                    includeExplanations: document.getElementById('aiExplanations').checked
+                });
+
+                if (result.success && result.questions.length > 0) {
+                    extractedQuestions = result.questions;
+                    statusDiv.style.display = 'none';
+                    preview.style.display = 'block';
+
+                    document.getElementById('aiQuestionCount').textContent = result.questions.length + ' questions';
+                    document.getElementById('aiQuestionsList').innerHTML = result.questions.slice(0, 3).map((q, i) => `
+                        <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light);">
+                            <strong>Q${i + 1}:</strong> ${q.question_text_en?.substring(0, 80)}...
+                            <span style="color: #22c55e; margin-left: 0.5rem;">✓ ${q.correct_option?.toUpperCase()}</span>
+                        </div>
+                    `).join('') + `<div style="padding: 0.5rem 0; color: var(--text-muted);">...and ${result.questions.length - 3} more</div>`;
+                } else {
+                    statusDiv.innerHTML = `<div style="color: #ef4444;">❌ ${result.error || 'Generation failed'}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div style="color: #ef4444;">❌ ${error.message}</div>`;
+            }
+        }
+
+        // ===== JSON VALIDATION =====
+        function validateJSON() {
+            const input = document.getElementById('jsonInput').value;
+            const preview = document.getElementById('jsonPreview');
+            const status = document.getElementById('jsonStatus');
+            const count = document.getElementById('jsonQuestionCount');
+
+            if (!input.trim()) {
+                preview.style.display = 'none';
+                return;
+            }
+
+            try {
+                const data = JSON.parse(input);
+                const questions = data.questions || [];
+                extractedQuestions = questions;
+                preview.style.display = 'block';
+                status.innerHTML = '✅ Valid JSON';
+                count.textContent = questions.length + ' questions';
+            } catch {
+                preview.style.display = 'block';
+                status.innerHTML = '❌ Invalid JSON';
+                count.textContent = '0 questions';
+            }
+        }
 
         // Create Test
         document.getElementById('createTestBtn').addEventListener('click', () => {
@@ -1340,6 +1883,74 @@
         });
         document.getElementById('usersModalClose').addEventListener('click', () => {
             usersModal.classList.remove('active');
+        });
+
+        // Settings nav
+        const settingsModal = document.getElementById('settingsModal');
+        document.getElementById('navSettings').addEventListener('click', (e) => {
+            e.preventDefault();
+            // Load current API key if exists
+            const currentKey = aiExtractor.getApiKey();
+            if (currentKey) {
+                document.getElementById('groqApiKey').value = currentKey;
+            }
+            settingsModal.classList.add('active');
+        });
+        document.getElementById('settingsModalClose').addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+
+        // Save API Key
+        document.getElementById('saveApiKeyBtn').addEventListener('click', () => {
+            const key = document.getElementById('groqApiKey').value.trim();
+            const statusDiv = document.getElementById('apiKeyStatus');
+
+            if (!key) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(239, 68, 68, 0.2)';
+                statusDiv.innerHTML = '❌ Please enter an API key';
+                return;
+            }
+
+            aiExtractor.setApiKey(key);
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(34, 197, 94, 0.2)';
+            statusDiv.innerHTML = '✅ API key saved successfully!';
+        });
+
+        // Test API Key
+        document.getElementById('testApiKeyBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('testApiKeyBtn');
+            const statusDiv = document.getElementById('apiKeyStatus');
+            const key = document.getElementById('groqApiKey').value.trim();
+
+            if (!key) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(239, 68, 68, 0.2)';
+                statusDiv.innerHTML = '❌ Enter an API key first';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Testing...';
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(59, 130, 246, 0.2)';
+            statusDiv.innerHTML = '🔄 Testing connection...';
+
+            // Temporarily set key for testing
+            aiExtractor.setApiKey(key);
+            const result = await aiExtractor.testConnection();
+
+            if (result.success) {
+                statusDiv.style.background = 'rgba(34, 197, 94, 0.2)';
+                statusDiv.innerHTML = '✅ ' + result.message;
+            } else {
+                statusDiv.style.background = 'rgba(239, 68, 68, 0.2)';
+                statusDiv.innerHTML = '❌ ' + result.error;
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🔍 Test';
         });
 
         // Drag and Drop
@@ -1520,38 +2131,134 @@
             }
         });
 
-        // Save Test
-        document.getElementById('saveTestBtn').addEventListener('click', () => {
-            const form = document.getElementById('testForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
+        // Save Test - Unified handler for all tabs
+        document.getElementById('saveTestBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('saveTestBtn');
+            const btnText = document.getElementById('saveTestBtnText');
+            const originalText = btnText.textContent;
+
+            try {
+                btn.disabled = true;
+                btnText.textContent = '⏳ Processing...';
+
+                switch (currentTab) {
+                    case 'manual':
+                        await saveManualTest();
+                        break;
+                    case 'pdf':
+                        await savePDFImport();
+                        break;
+                    case 'ai':
+                        await saveAIGenerated();
+                        break;
+                    case 'json':
+                        await saveJSONImport();
+                        break;
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = originalText;
+            }
+        });
+
+        async function saveManualTest() {
+            const testNameEn = document.getElementById('testNameEn').value;
+            const testSubject = document.getElementById('testSubject').value;
+
+            if (!testNameEn || !testSubject) {
+                alert('Please fill in required fields (Test Name and Subject)');
                 return;
             }
 
             const testData = {
-                name_en: document.getElementById('testNameEn').value,
+                name_en: testNameEn,
                 name_hi: document.getElementById('testNameHi').value,
-                subject: document.getElementById('testSubject').value,
+                subject: testSubject,
                 difficulty: document.getElementById('testDifficulty').value,
-                questions: parseInt(document.getElementById('testQuestions').value) || 0,
-                time: parseInt(document.getElementById('testTime').value) || 120,
+                questions: 0,
+                time: parseInt(document.getElementById('testTime').value) || 60,
                 mark_correct: parseFloat(document.getElementById('markCorrect').value) || 2,
-                mark_wrong: parseFloat(document.getElementById('markWrong').value) || 0.66,
+                mark_wrong: parseFloat(document.getElementById('markWrong').value) || -0.66,
                 source: document.getElementById('testSource').value,
                 description: document.getElementById('testDescription').value
             };
 
-            // Save using adminData manager
             const newTest = adminData.createTest(testData);
-
-            // Update stats on dashboard
             updateDashboardStats();
             refreshTestsTable();
-
-            alert('✅ Test "' + newTest.name_en + '" created successfully!');
+            alert('✅ Test "' + newTest.name_en + '" created!\n\nNow add questions using "Import PDF" or "AI Generate" tabs.');
             testModal.classList.remove('active');
-            form.reset();
-        });
+            document.getElementById('testForm').reset();
+        }
+
+        async function savePDFImport() {
+            if (!extractedQuestions || extractedQuestions.length === 0) {
+                alert('Please upload a PDF first and wait for AI extraction.');
+                return;
+            }
+
+            const testName = document.getElementById('pdfTestName').value || 'Imported from PDF';
+            const subject = document.getElementById('pdfSubject').value;
+
+            const importData = aiExtractor.toImportFormat(extractedQuestions, testName, subject);
+            const newTest = adminData.importTestWithQuestions(importData);
+
+            updateDashboardStats();
+            refreshTestsTable();
+            alert('✅ Successfully imported "' + newTest.name_en + '" with ' + extractedQuestions.length + ' questions!');
+            testModal.classList.remove('active');
+            extractedQuestions = [];
+            document.getElementById('pdfPreview').style.display = 'none';
+            document.getElementById('pdfTestName').value = '';
+        }
+
+        async function saveAIGenerated() {
+            // First generate if not already done
+            if (!extractedQuestions || extractedQuestions.length === 0) {
+                await generateAIQuestions();
+                if (!extractedQuestions || extractedQuestions.length === 0) return;
+            }
+
+            const topic = document.getElementById('aiTopic').value;
+            const testName = document.getElementById('aiTestName').value || 'AI: ' + topic.substring(0, 30);
+            const subject = document.getElementById('aiSubject').value;
+
+            const importData = aiExtractor.toImportFormat(extractedQuestions, testName, subject);
+            const newTest = adminData.importTestWithQuestions(importData);
+
+            updateDashboardStats();
+            refreshTestsTable();
+            alert('✅ Created "' + newTest.name_en + '" with ' + extractedQuestions.length + ' AI-generated questions!');
+            testModal.classList.remove('active');
+            extractedQuestions = [];
+            document.getElementById('aiPreview').style.display = 'none';
+            document.getElementById('aiTopic').value = '';
+            document.getElementById('aiTestName').value = '';
+        }
+
+        async function saveJSONImport() {
+            const input = document.getElementById('jsonInput').value;
+            if (!input.trim()) {
+                alert('Please paste JSON data first.');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(input);
+                const newTest = adminData.importTestWithQuestions(data);
+
+                updateDashboardStats();
+                refreshTestsTable();
+                alert('✅ Successfully imported "' + newTest.name_en + '" with ' + (data.questions?.length || 0) + ' questions!');
+                testModal.classList.remove('active');
+                document.getElementById('jsonInput').value = '';
+                document.getElementById('jsonPreview').style.display = 'none';
+            } catch (e) {
+                alert('❌ Invalid JSON: ' + e.message);
+            }
+        }
 
         // Update dashboard stats
         function updateDashboardStats() {
