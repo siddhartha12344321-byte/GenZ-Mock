@@ -826,7 +826,7 @@
                         <div class="w-24 text-center text-gray-500 text-xs font-medium">${test.time_limit || 10} min</div>
                         <div class="flex-1 text-xs pr-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded font-bold">✓ Completed</span></div>
                         <div class="w-32 text-right">
-                            <button onclick="openTestModal('${test.id}', true)" class="border border-blue-600 text-blue-600 bg-blue-50 px-4 py-1.5 rounded text-xs font-bold hover:bg-blue-100 transition-colors">Resume Test</button>
+                            <a href="results.html?testId=${test.id}" class="border border-purple-600 text-purple-600 bg-purple-50 px-4 py-1.5 rounded text-xs font-bold hover:bg-purple-100 transition-colors inline-block">📊 Analysis</a>
                         </div>
                     </div>
                 `;
