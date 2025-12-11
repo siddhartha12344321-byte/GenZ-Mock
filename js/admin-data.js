@@ -23,7 +23,7 @@ class AdminDataManager {
     }
 
     initDefaultKeys() {
-        const defaultKeys = ['GenZTesting1', 'GenZTesting2', 'GenZTesting3'];
+        const defaultKeys = ['GenZTesting1', 'GenZTesting2', 'GenZTesting3', 'GenZTesting4', 'GenZTesting5'];
         let validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
 
         let added = false;
