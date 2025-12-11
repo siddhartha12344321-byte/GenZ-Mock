@@ -317,14 +317,27 @@
             const correctMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
 
             container.innerHTML = questions.map((q, idx) => {
-                const options = [
-                    q.option_a_en || q.option_a || '',
-                    q.option_b_en || q.option_b || '',
-                    q.option_c_en || q.option_c || '',
-                    q.option_d_en || q.option_d || ''
-                ];
+                // Support both old format (option_a_en) and new format (options array)
+                let options;
+                if (q.options && Array.isArray(q.options)) {
+                    options = q.options;
+                } else {
+                    options = [
+                        q.option_a_en || q.option_a || '',
+                        q.option_b_en || q.option_b || '',
+                        q.option_c_en || q.option_c || '',
+                        q.option_d_en || q.option_d || ''
+                    ];
+                }
 
-                const correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
+                // Support both correct_option (letter/index) formats
+                let correctIdx;
+                if (typeof q.correct_option === 'number') {
+                    correctIdx = q.correct_option;
+                } else {
+                    correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
+                }
+
                 const userAnswer = userAnswers[idx];
                 const isAttempted = userAnswer !== undefined;
                 const isCorrect = userAnswer === correctIdx;
@@ -342,7 +355,7 @@
                 const subjectName = subject.charAt(0).toUpperCase() + subject.slice(1).replace('_', ' ');
 
                 // Format question text with line breaks
-                const questionText = (q.question_text_en || q.question_text || q.text || '')
+                const questionText = (q.question_en || q.question_text_en || q.question_text || q.text || '')
                     .replace(/\n/g, '<br>');
 
                 // Render options
@@ -374,7 +387,7 @@
                 }).join('');
 
                 // Format explanation
-                const explanation = (q.explanation_en || q.explanation || 'No explanation available.')
+                const explanation = (q.explanation || q.explanation_en || 'No explanation available.')
                     .replace(/\n/g, '<br>')
                     .replace(/Statement (\d+): (Correct|Incorrect)/g, '<strong>Statement $1: $2</strong>');
 
