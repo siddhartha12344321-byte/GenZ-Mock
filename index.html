@@ -560,6 +560,32 @@
     </div>
 
     <script>
+        // ===== SESSION MANAGEMENT =====
+        const SESSION_DURATION_MS = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+
+        // Check for existing valid session on page load
+        function checkExistingSession() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || 'null');
+
+            if (userData && userData.loginTime) {
+                const elapsed = Date.now() - userData.loginTime;
+
+                // If session is still valid (less than 3 days old)
+                if (elapsed < SESSION_DURATION_MS) {
+                    // Auto-redirect to dashboard
+                    window.location.href = 'student-dashboard.html';
+                    return true;
+                } else {
+                    // Session expired, clear it
+                    localStorage.removeItem('user_data');
+                }
+            }
+            return false;
+        }
+
+        // Run session check immediately
+        checkExistingSession();
+
         function openModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
         }
@@ -577,6 +603,23 @@
             });
         });
 
+        // Validate access key against admin-generated keys
+        function validateAccessKey(key) {
+            if (!key || key === '') return false;
+
+            // Get valid keys from localStorage (set by admin panel)
+            const validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
+
+            // Also check genz_access_keys for active keys
+            const accessKeysData = JSON.parse(localStorage.getItem('genz_access_keys') || '[]');
+            const activeKeys = accessKeysData.filter(k => k.is_active).map(k => k.key);
+
+            // Merge both sources
+            const allValidKeys = [...new Set([...validKeys, ...activeKeys])];
+
+            return allValidKeys.includes(key);
+        }
+
         function studentLogin(e) {
             e.preventDefault();
             const name = document.getElementById('studentName').value.trim();
@@ -587,15 +630,26 @@
                 return;
             }
 
-            // Save to localStorage
+            if (!key) {
+                showError('studentError', 'Access key is required. Get it from admin.');
+                return;
+            }
+
+            // Validate the access key
+            if (!validateAccessKey(key)) {
+                showError('studentError', 'Invalid access key. Please contact admin for a valid key.');
+                return;
+            }
+
+            // Save to localStorage with timestamp for session management
             localStorage.setItem('user_data', JSON.stringify({
                 name: name,
-                key: key || 'guest',
+                key: key,
                 type: 'student',
                 loginTime: Date.now()
             }));
 
-            // Redirect
+            // Redirect to dashboard
             window.location.href = 'student-dashboard.html';
         }
 
@@ -603,7 +657,7 @@
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
 
-            // Check admin password (simple check for demo)
+            // Check admin password
             if (password === 'admin123' || password === 'genz2024') {
                 localStorage.setItem('admin_auth', JSON.stringify({
                     authenticated: true,
@@ -621,7 +675,7 @@
             errorEl.style.display = 'block';
             setTimeout(() => {
                 errorEl.style.display = 'none';
-            }, 3000);
+            }, 4000);
         }
     </script>
 </body>

@@ -195,10 +195,10 @@
                                 <div class="relative z-10">
                                     <h1 class="text-2xl font-bold text-white mb-4" id="greetingName">Hi, Student</h1>
                                     <div class="relative">
-                                        <input type="text" placeholder="Ask any doubt"
+                                        <input type="text" id="askDoubtInput" placeholder="Ask any doubt"
                                             class="w-full max-w-md px-4 py-3 rounded-xl border-0 text-base focus:outline-none focus:ring-2 focus:ring-white/50"
-                                            onclick="showPage('ai')">
-                                        <button
+                                            onkeypress="if(event.key==='Enter') askDoubtFromHome()">
+                                        <button onclick="askDoubtFromHome()"
                                             class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white hover:bg-blue-600">
                                             <svg width="16" height="16" fill="none" stroke="currentColor"
                                                 stroke-width="2" viewBox="0 0 24 24">
@@ -767,6 +767,29 @@
             loadLeaderboard();
         });
 
+        // Ask Doubt from Home - redirects to AI page with question
+        function askDoubtFromHome() {
+            const input = document.getElementById('askDoubtInput');
+            const question = input ? input.value.trim() : '';
+
+            // Switch to AI view
+            showPage('ai');
+
+            // If there's a question, send it after a small delay
+            if (question) {
+                setTimeout(() => {
+                    const chatInput = document.getElementById('chatInput');
+                    if (chatInput) {
+                        chatInput.value = question;
+                        sendMessage(); // This function already exists in the AI section
+                    }
+                }, 300);
+            }
+
+            // Clear the home input
+            if (input) input.value = '';
+        }
+
 
         function logout() {
             localStorage.removeItem('user_data');
@@ -818,16 +841,117 @@
             // Get FRESH data from localStorage
             const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
             const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+            const streakData = JSON.parse(localStorage.getItem('streak_data') || '{"currentStreak":0,"lastActivityDate":null,"weeklyDays":[]}');
 
+            // Update Today's Activity stats
             document.getElementById('mcqCount').textContent = userProgress.total || 0;
             document.getElementById('testsCount').textContent = userProgress.tests || 0;
 
             if (userProgress.total > 0) {
                 const acc = Math.round((userProgress.correct / userProgress.total) * 100);
                 document.getElementById('accuracyVal').textContent = acc + '%';
+            } else {
+                document.getElementById('accuracyVal').textContent = '—';
             }
 
-            document.getElementById('rankVal').textContent = attemptedTests.length > 0 ? '#' + Math.min(attemptedTests.length * 5, 100) : '-';
+            document.getElementById('rankVal').textContent = attemptedTests.length > 0 ? '#' + Math.min(attemptedTests.length * 5, 100) : '—';
+
+            // Update streak
+            updateStreakDisplay(streakData);
+        }
+
+        // Streak calculation and display
+        function updateStreakDisplay(streakData) {
+            const today = new Date().toISOString().split('T')[0];
+            const streakTitle = document.querySelector('#homeView .bg-white.border h3');
+
+            // Check if user was active today
+            if (streakData.lastActivityDate === today) {
+                // Already logged today
+            } else {
+                // Check if streak should continue or reset
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                if (streakData.lastActivityDate !== yesterdayStr && streakData.lastActivityDate !== today) {
+                    // Streak broken - reset
+                    streakData.currentStreak = 0;
+                    streakData.weeklyDays = [];
+                }
+            }
+
+            // Update streak title
+            if (streakTitle) {
+                streakTitle.textContent = streakData.currentStreak + '-day streak';
+            }
+
+            // Update weekly dots
+            updateStreakDots(streakData.weeklyDays || []);
+        }
+
+        function updateStreakDots(weeklyDays) {
+            const days = ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'];
+            const today = new Date().getDay();
+
+            // Find all streak dot containers
+            const streakContainer = document.querySelector('#homeView .flex.justify-between');
+            if (!streakContainer) return;
+
+            const dotContainers = streakContainer.querySelectorAll('.text-center');
+            dotContainers.forEach((container, i) => {
+                const dayIndex = (today - 6 + i + 7) % 7; // Last 7 days
+                const dateForDay = new Date();
+                dateForDay.setDate(dateForDay.getDate() - (6 - i));
+                const dateStr = dateForDay.toISOString().split('T')[0];
+
+                const dot = container.querySelector('.w-8.h-8');
+                if (weeklyDays.includes(dateStr)) {
+                    // Active day
+                    dot.className = 'w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white';
+                    dot.textContent = '✓';
+                } else {
+                    // Inactive day
+                    dot.className = 'w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-300';
+                    dot.textContent = '○';
+                }
+            });
+        }
+
+        // Record activity for streak - call this when user completes a test
+        function recordActivity() {
+            const today = new Date().toISOString().split('T')[0];
+            let streakData = JSON.parse(localStorage.getItem('streak_data') || '{"currentStreak":0,"lastActivityDate":null,"weeklyDays":[]}');
+
+            if (streakData.lastActivityDate !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                if (streakData.lastActivityDate === yesterdayStr) {
+                    // Continue streak
+                    streakData.currentStreak++;
+                } else if (!streakData.lastActivityDate) {
+                    // First activity ever
+                    streakData.currentStreak = 1;
+                } else {
+                    // Streak broken, start new
+                    streakData.currentStreak = 1;
+                }
+
+                streakData.lastActivityDate = today;
+
+                // Add to weekly days
+                if (!streakData.weeklyDays.includes(today)) {
+                    streakData.weeklyDays.push(today);
+                    // Keep only last 7 days
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    streakData.weeklyDays = streakData.weeklyDays.filter(d => new Date(d) >= sevenDaysAgo);
+                }
+
+                localStorage.setItem('streak_data', JSON.stringify(streakData));
+            }
         }
 
         function loadLeaderboard() {

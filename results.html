@@ -284,6 +284,35 @@
             progress.total += total;
             progress.time += Math.round(timeTaken / 60);
             localStorage.setItem('user_progress', JSON.stringify(progress));
+
+            // Record activity for streak tracking
+            const today = new Date().toISOString().split('T')[0];
+            let streakData = JSON.parse(localStorage.getItem('streak_data') || '{"currentStreak":0,"lastActivityDate":null,"weeklyDays":[]}');
+
+            if (streakData.lastActivityDate !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                if (streakData.lastActivityDate === yesterdayStr) {
+                    streakData.currentStreak++;
+                } else if (!streakData.lastActivityDate) {
+                    streakData.currentStreak = 1;
+                } else {
+                    streakData.currentStreak = 1;
+                }
+
+                streakData.lastActivityDate = today;
+
+                if (!streakData.weeklyDays.includes(today)) {
+                    streakData.weeklyDays.push(today);
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    streakData.weeklyDays = streakData.weeklyDays.filter(d => new Date(d) >= sevenDaysAgo);
+                }
+
+                localStorage.setItem('streak_data', JSON.stringify(streakData));
+            }
         }
 
         // Animate score circle
@@ -327,14 +356,16 @@
             document.getElementById('upscScore').textContent = upscScore.toFixed(1);
             document.getElementById('upscBreakdown').textContent = `(+2 × ${correct}) - (0.66 × ${wrong}) = ${upscScore.toFixed(1)} marks`;
 
-            // Time
-            const mins = Math.floor(timeTaken / 60);
-            const secs = timeTaken % 60;
+            // Time - with safe number conversion
+            const safeTime = (typeof timeTaken === 'number' && !isNaN(timeTaken)) ? timeTaken : 0;
+            const mins = Math.floor(safeTime / 60);
+            const secs = Math.floor(safeTime % 60);
             document.getElementById('timeTaken').textContent = `${mins}:${String(secs).padStart(2, '0')}`;
 
-            const avgTime = (correct + wrong) > 0 ? Math.round(timeTaken / (correct + wrong)) : 0;
+            const answeredCount = (correct || 0) + (wrong || 0);
+            const avgTime = answeredCount > 0 ? Math.round(safeTime / answeredCount) : 0;
             document.getElementById('avgTime').textContent = avgTime + 's';
-            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('accuracy').textContent = (accuracy || 0) + '%';
 
             // Score message
             const msgEl = document.getElementById('scoreMessage');

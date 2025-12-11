@@ -1214,6 +1214,17 @@
             else { updatePalette(); updateLegend(); }
         });
 
+        // ===== PAUSE TEST - Save progress and go to dashboard =====
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            // Save current progress
+            saveProgress();
+
+            // Show confirmation
+            if (confirm('Test paused! Your progress has been saved. You can resume from Mock Tests section.\\n\\nGo to Dashboard?')) {
+                window.location.href = 'student-dashboard.html';
+            }
+        });
+
         // ===== SUBMIT =====
         document.getElementById('submitBtn').addEventListener('click', () => {
             const answered = Object.keys(state.answers).length;
