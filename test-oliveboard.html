@@ -1227,6 +1227,22 @@
             const timeTaken = totalTime - state.time;
 
             // Save answers for answers page (separate from progress)
+            // We use a unique key for each attempt to avoid overwriting or valid simple retrieval
+            // For now, let's keep the latest answers in 'test_answers_[id]' for immediate view
+            // BUT we also need to store attempt history.
+
+            const attemptData = {
+                date: Date.now(),
+                score: correct * 2 - (Object.keys(state.answers).length - correct) * 0.66, // Approx scoring
+                correct,
+                wrong: Object.keys(state.answers).length - correct,
+                total: state.total,
+                timeTaken,
+                answers: state.answers,
+                marked: Array.from(state.marked)
+            };
+
+            // 1. Save Latest Answers for immediate "View Answers"
             const answersKey = `test_answers_${testId}`;
             localStorage.setItem(answersKey, JSON.stringify({
                 answers: state.answers,
@@ -1234,13 +1250,38 @@
                 submittedAt: Date.now()
             }));
 
+            // 2. Save to Test Attempts History
+            const allAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
+            if (!allAttempts[testId]) {
+                allAttempts[testId] = [];
+            }
+            allAttempts[testId].push(attemptData);
+            localStorage.setItem('test_attempts', JSON.stringify(allAttempts));
+
+            // 3. Update User Aggregate Progress
+            const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
+            userProgress.tests += 1;
+            userProgress.correct += correct;
+            userProgress.total += state.total;
+            userProgress.time += Math.round(timeTaken / 60);
+            localStorage.setItem('user_progress', JSON.stringify(userProgress));
+
+            // 4. Update Attempted Tests List (if not already there)
+            const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+            if (!attemptedTests.includes(testId)) {
+                attemptedTests.push(testId);
+                localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+            }
+
             const params = new URLSearchParams({
                 testId: testId || '',
                 correct,
                 wrong: Object.keys(state.answers).length - correct,
                 total: state.total,
-                time: timeTaken
+                time: timeTaken,
+                attempt: allAttempts[testId].length // Pass attempt number
             });
+
             // Clear progress on successful submit
             clearProgress();
             window.location.href = `results.html?${params}`;
