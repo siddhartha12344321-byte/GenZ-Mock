@@ -384,8 +384,8 @@
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
 
-            // Check admin password
-            if (password === 'genz2024admin') {
+            // Check admin password - must match ADMIN_KEY in admin/index.html
+            if (password === 'admin123') {
                 sessionStorage.setItem('admin_authenticated', 'true');
                 window.location.href = 'admin/index.html';
             } else {

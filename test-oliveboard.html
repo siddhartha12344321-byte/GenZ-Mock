@@ -36,24 +36,27 @@
             background: #e8e8e8;
         }
 
-        /* ===== EXACT OLIVEBOARD COLORS ===== */
+        /* ===== SUPERKALAM THEME COLORS ===== */
         :root {
-            --header-bg: linear-gradient(to bottom, #4a9fd4 0%, #2d7bb8 100%);
-            --header-blue: #3a8bc5;
-            --answered-green: #5cb85c;
-            --not-answered-red: #d9534f;
-            --marked-orange: #f0ad4e;
-            --not-visited-gray: #999;
-            --button-blue: #337ab7;
-            --button-blue-hover: #286090;
-            --save-green: #5cb85c;
-            --save-green-hover: #449d44;
-            --border-light: #ddd;
-            --border-medium: #ccc;
-            --bg-light: #f5f5f5;
-            --bg-white: #fff;
-            --text-dark: #333;
-            --text-gray: #666;
+            --header-bg: #f97316;
+            --header-orange: #f97316;
+            --primary-orange: #f97316;
+            --primary-orange-hover: #ea580c;
+            --answered-green: #22c55e;
+            --not-answered-red: #ef4444;
+            --marked-purple: #a855f7;
+            --not-visited-gray: #9ca3af;
+            --option-blue: #3b82f6;
+            --option-blue-light: #eff6ff;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --text-orange: #ea580c;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         /* ===== HEADER - EXACT OLIVEBOARD STYLE ===== */
@@ -233,80 +236,101 @@
         }
 
         .question-header {
-            background: var(--bg-light);
+            background: var(--bg-white);
             border-bottom: 1px solid var(--border-light);
-            padding: 10px 15px;
+            padding: 16px 24px;
             font-size: 14px;
             font-weight: 600;
             color: var(--text-dark);
         }
 
+        .question-number-label {
+            color: var(--primary-orange);
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
         .question-body {
             flex: 1;
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
+            background: var(--bg-white);
         }
 
         .question-text {
-            font-size: 14px;
-            line-height: 1.7;
+            font-size: 15px;
+            line-height: 1.8;
             color: var(--text-dark);
-            margin-bottom: 25px;
+            margin-bottom: 28px;
+            white-space: pre-line;
         }
 
-        /* ===== OPTIONS - EXACT OLIVEBOARD RADIO STYLE ===== */
+        /* ===== OPTIONS - SUPERKALAM STYLE ===== */
+        .select-label {
+            color: var(--text-orange);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
         .options-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
 
         .option-row {
             display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            padding: 8px 0;
+            align-items: center;
+            gap: 0;
+            padding: 0;
             cursor: pointer;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            background: var(--bg-white);
         }
 
         .option-row:hover {
-            background: #f9f9f9;
+            border-color: var(--option-blue);
+            box-shadow: var(--shadow-sm);
         }
 
-        .option-radio {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #999;
-            border-radius: 50%;
-            margin-top: 2px;
-            flex-shrink: 0;
+        .option-row.selected {
+            border-color: var(--option-blue);
+            background: var(--option-blue-light);
+        }
+
+        .option-letter-box {
+            width: 44px;
+            height: 48px;
+            background: var(--option-blue);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
         }
 
-        .option-row.selected .option-radio {
-            border-color: var(--button-blue);
-        }
-
-        .option-row.selected .option-radio::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: var(--button-blue);
-            border-radius: 50%;
+        .option-row.selected .option-letter-box {
+            background: var(--option-blue);
         }
 
         .option-label {
-            font-size: 13px;
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 14px;
             line-height: 1.5;
             color: var(--text-dark);
         }
 
         .option-letter {
-            font-weight: 600;
-            margin-right: 3px;
+            display: none;
         }
 
         /* ===== BOTTOM NAV - EXACT OLIVEBOARD STYLE ===== */
@@ -346,45 +370,72 @@
         }
 
         .btn-primary {
-            background: var(--save-green);
-            border-color: var(--save-green);
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
             color: #fff;
         }
 
         .btn-primary:hover {
-            background: var(--save-green-hover);
-            border-color: var(--save-green-hover);
+            background: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
         }
 
-        /* ===== SIDEBAR - EXACT OLIVEBOARD STYLE ===== */
+        /* ===== SIDEBAR - SUPERKALAM STYLE ===== */
         .sidebar {
-            width: 250px;
-            background: var(--bg-light);
+            width: 280px;
+            background: var(--bg-white);
             border-left: 1px solid var(--border-light);
-            padding: 10px;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 16px;
         }
 
         .sidebar-card {
-            background: #fff;
+            background: var(--bg-white);
             border: 1px solid var(--border-light);
-            border-radius: 3px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
         }
 
         .card-header {
-            background: #f0f0f0;
+            background: var(--bg-white);
             border-bottom: 1px solid var(--border-light);
-            padding: 8px 12px;
-            font-size: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-header-nav button {
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .card-header-nav button:hover {
+            background: var(--border-light);
         }
 
         .card-body {
-            padding: 12px;
+            padding: 16px;
         }
 
         /* ===== LEGEND - EXACT OLIVEBOARD STYLE ===== */
@@ -421,7 +472,7 @@
         }
 
         .legend-badge.marked {
-            background: var(--marked-orange);
+            background: var(--marked-purple);
         }
 
         .legend-badge.not-visited {
@@ -446,11 +497,11 @@
             color: var(--text-dark);
         }
 
-        /* ===== PALETTE - EXACT OLIVEBOARD STYLE ===== */
+        /* ===== PALETTE - SUPERKALAM STYLE ===== */
         .palette-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
         }
 
         .palette-btn {
@@ -458,24 +509,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            border-radius: 3px;
+            border-radius: 6px;
             cursor: pointer;
             border: 1px solid var(--border-medium);
-            background: #fff;
+            background: var(--bg-white);
             color: var(--text-dark);
-            transition: all 0.1s;
+            transition: all 0.15s ease;
         }
 
         .palette-btn:hover {
-            border-color: var(--button-blue);
-            transform: scale(1.02);
+            border-color: var(--primary-orange);
+            transform: scale(1.05);
         }
 
         .palette-btn.current {
-            background: var(--button-blue);
-            border-color: var(--button-blue);
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
             color: #fff;
             box-shadow: 0 0 0 2px rgba(51, 122, 183, 0.3);
         }
@@ -544,6 +595,69 @@
 
         .action-btn.green:hover {
             background: var(--save-green-hover);
+        }
+
+        /* ===== SUPERKALAM LEGEND SUMMARY ===== */
+        .legend-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-dark);
+        }
+
+        .legend-check {
+            font-size: 16px;
+            color: var(--text-gray);
+        }
+
+        /* ===== SUBMIT TEST BUTTON - SUPERKALAM ===== */
+        .submit-test-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+        }
+
+        .submit-test-btn:hover {
+            background: var(--primary-orange-hover);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* ===== MARK FOR REVIEW BUTTON ===== */
+        .mark-review-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-gray);
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .mark-review-btn:hover {
+            border-color: var(--marked-purple);
+            color: var(--marked-purple);
         }
 
         /* ===== SUBMIT MODAL ===== */
@@ -726,12 +840,13 @@
         <!-- QUESTION PANEL -->
         <div class="question-panel">
             <div class="question-header">
-                Question No <span id="qNum">1</span>
+                <div class="question-number-label">QUESTION <span id="qNum">1</span></div>
             </div>
             <div class="question-body">
                 <div class="question-text" id="qText">
                     The yellow and orange colour of fruits and flowers is mainly due to ____________.
                 </div>
+                <div class="select-label">Select an option to attempt</div>
                 <div class="options-list" id="optionsList">
                     <!-- Options rendered by JS -->
                 </div>
@@ -772,11 +887,14 @@
                 </div>
             </div>
 
-            <!-- Palette Card -->
+            <!-- Palette Card - SuperKalam Style -->
             <div class="sidebar-card">
                 <div class="card-header">
-                    <div class="section-info">You are viewing <strong>S1</strong> section</div>
-                    Question Palette:
+                    <span>Questions</span>
+                    <div class="card-header-nav">
+                        <button onclick="goTo(Math.max(0, state.current - 1))">◀</button>
+                        <button onclick="goTo(Math.min(state.total - 1, state.current + 1))">▶</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="palette-grid" id="paletteGrid">
@@ -785,15 +903,26 @@
                 </div>
             </div>
 
-            <!-- Actions Card -->
+            <!-- Legend Summary Card -->
             <div class="sidebar-card">
                 <div class="card-body">
-                    <div class="sidebar-actions">
-                        <button class="action-btn">Question Paper</button>
-                        <button class="action-btn">Instructions</button>
-                        <button class="action-btn blue">Profile</button>
-                        <button class="action-btn green" id="submitBtn">Submit</button>
+                    <div class="legend-summary">
+                        <div class="legend-row">
+                            <span class="legend-check">☐</span>
+                            <span>Answered</span>
+                        </div>
+                        <div class="legend-row">
+                            <span class="legend-check">☐</span>
+                            <span>Marked for Review</span>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Submit Button Card -->
+            <div class="sidebar-card">
+                <div class="card-body">
+                    <button class="submit-test-btn" id="submitBtn">Submit Test</button>
                 </div>
             </div>
         </aside>
@@ -927,6 +1056,64 @@
             time: currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60
         };
 
+        // ===== SAVE/LOAD PROGRESS FOR RESUME =====
+        const PROGRESS_KEY = `test_progress_${testId}`;
+
+        function saveProgress() {
+            if (!testId) return;
+            const progressData = {
+                current: state.current,
+                answers: state.answers,
+                marked: Array.from(state.marked),
+                visited: Array.from(state.visited),
+                time: state.time,
+                savedAt: Date.now()
+            };
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressData));
+            console.log('💾 Progress saved:', progressData);
+        }
+
+        function loadProgress() {
+            if (!testId) return false;
+            const saved = localStorage.getItem(PROGRESS_KEY);
+            if (!saved) return false;
+
+            try {
+                const data = JSON.parse(saved);
+                // Check if saved less than 24 hours ago
+                if (Date.now() - data.savedAt > 24 * 60 * 60 * 1000) {
+                    localStorage.removeItem(PROGRESS_KEY);
+                    return false;
+                }
+
+                state.current = data.current || 0;
+                state.answers = data.answers || {};
+                state.marked = new Set(data.marked || []);
+                state.visited = new Set(data.visited || [0]);
+                state.time = data.time || state.time;
+                console.log('📂 Progress loaded:', data);
+                return true;
+            } catch (e) {
+                console.error('Failed to load progress:', e);
+                return false;
+            }
+        }
+
+        function clearProgress() {
+            localStorage.removeItem(PROGRESS_KEY);
+        }
+
+        // Auto-save on page unload
+        window.addEventListener('beforeunload', (e) => {
+            saveProgress();
+            // Show confirmation dialog
+            e.preventDefault();
+            e.returnValue = 'You have an ongoing test. Are you sure you want to leave?';
+        });
+
+        // Load saved progress if exists
+        const hasResume = loadProgress();
+
         // ===== RENDER =====
         function renderQuestion(idx) {
             state.current = idx;
@@ -935,12 +1122,16 @@
             document.getElementById('qNum').textContent = idx + 1;
             document.getElementById('qText').textContent = questions[idx].text;
 
-            document.getElementById('optionsList').innerHTML = questions[idx].options.map((opt, i) => `
+            const letters = ['A', 'B', 'C', 'D'];
+            document.getElementById('optionsList').innerHTML = questions[idx].options.map((opt, i) => {
+                // Remove any existing letter prefix like "a) " or "A. "
+                const cleanOpt = opt.replace(/^[a-dA-D][\)\.\s]+/, '');
+                return `
                 <div class="option-row ${state.answers[idx] === i ? 'selected' : ''}" onclick="selectOption(${i})">
-                    <div class="option-radio"></div>
-                    <div class="option-label">${opt}</div>
+                    <div class="option-letter-box">${letters[i]}</div>
+                    <div class="option-label">${cleanOpt}</div>
                 </div>
-            `).join('');
+            `}).join('');
 
             updatePalette();
             updateLegend();
@@ -1034,6 +1225,15 @@
             });
             const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
             const timeTaken = totalTime - state.time;
+
+            // Save answers for answers page (separate from progress)
+            const answersKey = `test_answers_${testId}`;
+            localStorage.setItem(answersKey, JSON.stringify({
+                answers: state.answers,
+                marked: Array.from(state.marked),
+                submittedAt: Date.now()
+            }));
+
             const params = new URLSearchParams({
                 testId: testId || '',
                 correct,
@@ -1041,6 +1241,8 @@
                 total: state.total,
                 time: timeTaken
             });
+            // Clear progress on successful submit
+            clearProgress();
             window.location.href = `results.html?${params}`;
         });
 
@@ -1061,7 +1263,11 @@
 
         // ===== INIT =====
         renderPalette();
-        renderQuestion(0);
+        // Resume from saved question or start from beginning
+        renderQuestion(hasResume ? state.current : 0);
+        if (hasResume) {
+            console.log('🔄 Resumed test from question', state.current + 1);
+        }
     </script>
 </body>
 

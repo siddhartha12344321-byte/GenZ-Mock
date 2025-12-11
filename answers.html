@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Answers - GenZMocks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/admin-data.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* SuperKalam Colors */
+        :root {
+            --primary-orange: #f97316;
+            --correct-green: #22c55e;
+            --incorrect-red: #ef4444;
+            --unattempted-gray: #9ca3af;
+            --subject-purple: #a855f7;
+            --explanation-blue: #3b82f6;
+        }
+
+        .tab-active {
+            color: var(--primary-orange);
+            border-bottom: 3px solid var(--primary-orange);
+        }
+
+        .option-correct {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: var(--correct-green);
+        }
+
+        .option-incorrect {
+            background: #fef2f2;
+            border-color: var(--incorrect-red);
+        }
+
+        .option-selected {
+            border-width: 2px;
+        }
+
+        .explanation-box {
+            border-left: 4px solid var(--explanation-blue);
+            background: #f8faff;
+        }
+
+        .question-nav-btn {
+            transition: all 0.15s ease;
+        }
+
+        .question-nav-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .question-nav-btn.correct {
+            background: var(--correct-green);
+            color: white;
+        }
+
+        .question-nav-btn.incorrect {
+            background: var(--incorrect-red);
+            color: white;
+        }
+
+        .question-nav-btn.unattempted {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .subject-tag {
+            background: #faf5ff;
+            color: var(--subject-purple);
+            border: 1px solid #e9d5ff;
+        }
+
+        .status-badge {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .status-badge.correct {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-badge.incorrect {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .letter-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .letter-circle.default {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .letter-circle.correct {
+            background: var(--correct-green);
+            color: white;
+        }
+
+        .letter-circle.incorrect {
+            background: var(--incorrect-red);
+            color: white;
+        }
+
+        .checkmark-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--correct-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header with Tabs -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center gap-8">
+                    <!-- Tabs -->
+                    <a href="results.html" id="tabAnalysis"
+                        class="text-gray-500 hover:text-gray-700 font-medium py-2 px-1 border-b-3 border-transparent">
+                        Test Analysis
+                    </a>
+                    <a href="#" id="tabAnswers" class="tab-active font-semibold py-2 px-1">
+                        Answers
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <!-- Attempt Selector -->
+                    <select id="attemptSelect"
+                        class="border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium bg-white">
+                        <option>1st Attempt - 11 Dec '25</option>
+                    </select>
+
+                    <!-- Download Button -->
+                    <button onclick="downloadAnswers()"
+                        class="flex items-center gap-2 px-4 py-2 text-orange-500 hover:text-orange-600 font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        <div class="flex gap-8">
+            <!-- Questions List -->
+            <div class="flex-1 space-y-6" id="questionsContainer">
+                <!-- Questions will be rendered here -->
+                <div class="text-center py-12 text-gray-500">
+                    Loading answers...
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="w-72 flex-shrink-0">
+                <div class="sticky top-24 space-y-4">
+                    <!-- Questions Navigation -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-800">Questions</h3>
+                            <div class="flex gap-1">
+                                <button onclick="scrollToQuestion('prev')"
+                                    class="w-7 h-7 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200">
+                                    ◀
+                                </button>
+                                <button onclick="scrollToQuestion('next')"
+                                    class="w-7 h-7 bg-gray-100 rounded flex items-center justify-center hover:bg-gray-200">
+                                    ▶
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-5 gap-2" id="questionNav">
+                            <!-- Question buttons will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-4">
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                <span class="text-sm text-gray-600">Correct</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-red-500 rounded"></div>
+                                <span class="text-sm text-gray-600">Incorrect</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-gray-300 rounded"></div>
+                                <span class="text-sm text-gray-600">Unattempted</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        // Get test data from URL
+        const params = new URLSearchParams(window.location.search);
+        const testId = params.get('testId');
+        const attemptNum = params.get('attempt') || 1;
+
+        // Load test answers from localStorage
+        let testData = null;
+        let questions = [];
+        let userAnswers = {};
+
+        function getTestFromStorage(id) {
+            const tests = JSON.parse(localStorage.getItem('genz_mock_tests') || '[]');
+            return tests.find(t => t.id === id);
+        }
+
+        function getQuestionsFromStorage(id) {
+            const allQuestions = JSON.parse(localStorage.getItem('genz_questions') || '[]');
+            return allQuestions.filter(q => q.test_id === id);
+        }
+
+        function getAttemptData(id, attemptNum) {
+            const testAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
+            const attempts = testAttempts[id] || [];
+            return attempts[attemptNum - 1] || null;
+        }
+
+        // Load saved answers from submitted test
+        function loadSavedAnswers(id) {
+            // First try the answers key (saved on submit)
+            const answersKey = `test_answers_${id}`;
+            const savedAnswers = localStorage.getItem(answersKey);
+            if (savedAnswers) {
+                try {
+                    const data = JSON.parse(savedAnswers);
+                    return data.answers || {};
+                } catch (e) {
+                    console.error('Failed to load answers:', e);
+                }
+            }
+
+            // Fallback to progress key (for in-progress tests)
+            const progressKey = `test_progress_${id}`;
+            const savedProgress = localStorage.getItem(progressKey);
+            if (savedProgress) {
+                try {
+                    const data = JSON.parse(savedProgress);
+                    return data.answers || {};
+                } catch (e) {
+                    return {};
+                }
+            }
+            return {};
+        }
+
+        // Render questions
+        function renderQuestions() {
+            testData = testId ? getTestFromStorage(testId) : null;
+            questions = testId ? getQuestionsFromStorage(testId) : [];
+            userAnswers = loadSavedAnswers(testId);
+
+            // Fallback demo if no questions
+            if (questions.length === 0) {
+                questions = [
+                    {
+                        question_text_en: 'With reference to the evolution of federalism in India, consider the following statements:\n1. The Simon Commission Report (1930) was the first official document to recommend a federal system for India.\n2. The Government of India Act, 1935 fully operationalized the federal provisions, bringing both British India and the Princely States into a common federal structure.\n3. The Union Powers Committee of the Constituent Assembly recommended vesting residuary powers in the Centre rather than the States.\nWhich of the statements given above is/are correct?',
+                        option_a_en: '1 and 2 only',
+                        option_b_en: '1 and 3 only',
+                        option_c_en: '2 and 3 only',
+                        option_d_en: '1, 2 and 3',
+                        correct_option: 'b',
+                        explanation_en: 'Statement 1: Correct\nThe Simon Commission Report (1930) laid the earliest official foundation for a federal system in India. It emphasized the need for an all-India federation.\n\nStatement 2: Incorrect\nThe Government of India Act, 1935 provided for a federation of British Indian provinces and princely states. However, the federal provisions never came into force because princely states were reluctant to join.\n\nStatement 3: Correct\nIn the Constituent Assembly, the Union Powers Committee recommended that residuary powers should vest in the Centre, not in the States.',
+                        subject_id: 'polity'
+                    },
+                    {
+                        question_text_en: 'Which of the following features tilt India\'s federal scheme towards a strong Centre?\n1. Residuary powers with the Union\n2. Overriding power of Union law on Concurrent List conflicts\n3. More important subjects placed in the Union List\nWhich of the statements given above is/are correct?',
+                        option_a_en: '1 and 2 only',
+                        option_b_en: '2 and 3 only',
+                        option_c_en: '1 and 3 only',
+                        option_d_en: '1, 2 and 3',
+                        correct_option: 'd',
+                        explanation_en: 'All three statements are correct.\n\nResiduary powers, unlike in the USA, are vested in the Union. Article 248 and Entry 97 of List I give the Centre exclusive power to legislate on any matter not enumerated in the three lists.\n\nIn case of conflict between Union and State laws on Concurrent List subjects, Union law prevails (Article 254).\n\nThe most important subjects like defence, foreign affairs, atomic energy, and banking are in the Union List.',
+                        subject_id: 'polity'
+                    }
+                ];
+            }
+
+            const container = document.getElementById('questionsContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const correctMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+
+            container.innerHTML = questions.map((q, idx) => {
+                const options = [
+                    q.option_a_en || q.option_a || '',
+                    q.option_b_en || q.option_b || '',
+                    q.option_c_en || q.option_c || '',
+                    q.option_d_en || q.option_d || ''
+                ];
+
+                const correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
+                const userAnswer = userAnswers[idx];
+                const isAttempted = userAnswer !== undefined;
+                const isCorrect = userAnswer === correctIdx;
+
+                // Status badge
+                let statusBadge = '<span class="status-badge px-3 py-1 rounded-full text-xs font-medium">⊖ Unattempted</span>';
+                if (isAttempted) {
+                    statusBadge = isCorrect
+                        ? '<span class="status-badge correct px-3 py-1 rounded-full text-xs font-medium">✓ Correct</span>'
+                        : '<span class="status-badge incorrect px-3 py-1 rounded-full text-xs font-medium">✗ Incorrect</span>';
+                }
+
+                // Subject tag
+                const subject = q.subject_id || testData?.subject_id || 'General';
+                const subjectName = subject.charAt(0).toUpperCase() + subject.slice(1).replace('_', ' ');
+
+                // Format question text with line breaks
+                const questionText = (q.question_text_en || q.question_text || q.text || '')
+                    .replace(/\n/g, '<br>');
+
+                // Render options
+                const optionsHtml = options.map((opt, i) => {
+                    let optionClass = 'border border-gray-200 bg-white';
+                    let letterClass = 'letter-circle default';
+                    let checkmark = '';
+
+                    if (i === correctIdx) {
+                        optionClass = 'option-correct border-2 border-green-400';
+                        letterClass = 'letter-circle correct';
+                        checkmark = '<div class="checkmark-icon">✓</div>';
+                    } else if (userAnswer === i && !isCorrect) {
+                        optionClass = 'option-incorrect border-2 border-red-400';
+                        letterClass = 'letter-circle incorrect';
+                    }
+
+                    if (userAnswer === i) {
+                        optionClass += ' option-selected';
+                    }
+
+                    return `
+                        <div class="${optionClass} rounded-xl p-4 flex items-center gap-4">
+                            <div class="${letterClass}">${letters[i]}</div>
+                            <div class="flex-1 text-gray-700">${opt}</div>
+                            ${i === correctIdx ? checkmark : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                // Format explanation
+                const explanation = (q.explanation_en || q.explanation || 'No explanation available.')
+                    .replace(/\n/g, '<br>')
+                    .replace(/Statement (\d+): (Correct|Incorrect)/g, '<strong>Statement $1: $2</strong>');
+
+                return `
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6" id="question-${idx}">
+                        <!-- Question Header -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <h2 class="text-lg font-bold text-orange-500">QUESTION ${idx + 1}</h2>
+                                ${statusBadge}
+                            </div>
+                            <span class="subject-tag px-3 py-1 rounded-full text-sm font-medium">${subjectName}</span>
+                        </div>
+
+                        <!-- Question Text -->
+                        <div class="text-gray-800 leading-relaxed mb-6">
+                            ${questionText}
+                        </div>
+
+                        <!-- Options -->
+                        <div class="space-y-3 mb-6">
+                            ${optionsHtml}
+                        </div>
+
+                        <!-- Correct Answer -->
+                        <div class="border-t border-gray-100 pt-6">
+                            <div class="font-semibold text-gray-800 mb-3">
+                                Correct Answer: <span class="text-blue-600">${letters[correctIdx]}</span>
+                            </div>
+
+                            <!-- Explanation -->
+                            <div class="explanation-box rounded-lg p-4">
+                                <div class="text-blue-600 font-semibold mb-2">Explanation:</div>
+                                <div class="text-gray-700 leading-relaxed">
+                                    ${explanation}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render question navigation
+            renderQuestionNav();
+        }
+
+        function renderQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            const correctMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+
+            nav.innerHTML = questions.map((q, idx) => {
+                const correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
+                const userAnswer = userAnswers[idx];
+                const isAttempted = userAnswer !== undefined;
+                const isCorrect = userAnswer === correctIdx;
+
+                let btnClass = 'question-nav-btn unattempted';
+                if (isAttempted) {
+                    btnClass = isCorrect ? 'question-nav-btn correct' : 'question-nav-btn incorrect';
+                }
+
+                return `
+                    <button onclick="scrollToQuestionById(${idx})"
+                        class="${btnClass} w-9 h-9 rounded-lg font-semibold text-sm flex items-center justify-center">
+                        ${idx + 1}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function scrollToQuestionById(idx) {
+            document.getElementById(`question-${idx}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        let currentQuestionIdx = 0;
+        function scrollToQuestion(direction) {
+            if (direction === 'next' && currentQuestionIdx < questions.length - 1) {
+                currentQuestionIdx++;
+            } else if (direction === 'prev' && currentQuestionIdx > 0) {
+                currentQuestionIdx--;
+            }
+            scrollToQuestionById(currentQuestionIdx);
+        }
+
+        function downloadAnswers() {
+            // Generate text content
+            let content = `GenZMocks - Test Answers\n${'='.repeat(50)}\n\n`;
+            const letters = ['A', 'B', 'C', 'D'];
+            const correctMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+
+            questions.forEach((q, idx) => {
+                const correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
+                content += `Q${idx + 1}. ${q.question_text_en || q.text}\n\n`;
+                content += `Correct Answer: ${letters[correctIdx]}\n`;
+                content += `Explanation: ${q.explanation_en || q.explanation || 'N/A'}\n`;
+                content += `\n${'-'.repeat(50)}\n\n`;
+            });
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'GenZMocks_Answers.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Update attempt dropdown
+        function updateAttemptDropdown() {
+            const testAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
+            const attempts = testAttempts[testId] || [];
+            const select = document.getElementById('attemptSelect');
+
+            if (attempts.length > 0) {
+                select.innerHTML = attempts.map((a, i) => {
+                    const date = new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+                    return `<option value="${i + 1}" ${i + 1 == attemptNum ? 'selected' : ''}>${i + 1}${getOrdinal(i + 1)} Attempt - ${date}</option>`;
+                }).join('');
+
+                select.onchange = () => {
+                    window.location.href = `answers.html?testId=${testId}&attempt=${select.value}`;
+                };
+            }
+        }
+
+        function getOrdinal(n) {
+            const s = ['th', 'st', 'nd', 'rd'];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+        }
+
+        // Update tab link to preserve testId
+        document.getElementById('tabAnalysis').href = `results.html?testId=${testId}&attempt=${attemptNum}`;
+
+        // Initialize
+        renderQuestions();
+        updateAttemptDropdown();
+    </script>
+</body>
+
+</html>
