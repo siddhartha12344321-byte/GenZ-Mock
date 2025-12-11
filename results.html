@@ -179,22 +179,73 @@
         // Get results from URL
         const params = new URLSearchParams(window.location.search);
         const testId = params.get('testId') || '';
-        const correct = parseInt(params.get('correct')) || 0;
-        const wrong = parseInt(params.get('wrong')) || 0;
-        const total = parseInt(params.get('total')) || 0;
-        const timeTaken = parseInt(params.get('time')) || 0;
+        const attemptNum = parseInt(params.get('attempt')) || 0; // 0 = new submission, 1+ = viewing saved
 
-        const skipped = total - correct - wrong;
-        const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
-        const upscScore = (correct * 2) - (wrong * 0.66);
-        const accuracy = (correct + wrong) > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
+        let correct, wrong, total, timeTaken, percentage, upscScore, accuracy, skipped;
+        let isNewAttempt = false;
 
-        // Save attempt to localStorage
+        // Check if viewing saved attempt or new submission
+        if (attemptNum > 0 && testId) {
+            // Load from localStorage
+            const testAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
+            const attempts = testAttempts[testId] || [];
+            const attemptData = attempts[attemptNum - 1]; // 0-indexed
+
+            if (attemptData) {
+                correct = attemptData.correct;
+                wrong = attemptData.wrong;
+                total = attemptData.total;
+                timeTaken = attemptData.time;
+                percentage = attemptData.percentage;
+            } else {
+                correct = 0; wrong = 0; total = 0; timeTaken = 0; percentage = 0;
+            }
+        } else {
+            // New submission - get from URL params
+            correct = parseInt(params.get('correct')) || 0;
+            wrong = parseInt(params.get('wrong')) || 0;
+            total = parseInt(params.get('total')) || 0;
+            timeTaken = parseInt(params.get('time')) || 0;
+            percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+            isNewAttempt = correct > 0 || wrong > 0 || total > 0; // Has URL data = new submission
+        }
+
+        skipped = total - correct - wrong;
+        upscScore = (correct * 2) - (wrong * 0.66);
+        accuracy = (correct + wrong) > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
+
+        // Save attempt to localStorage with full details
         function saveAttempt() {
-            let attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
-            if (testId && !attemptedTests.includes(testId)) {
-                attemptedTests.push(testId);
-                localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+            // Get existing attempts structure
+            let testAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
+
+            if (testId) {
+                // Initialize array for this test if not exists
+                if (!testAttempts[testId]) {
+                    testAttempts[testId] = [];
+                }
+
+                // Check if max 5 attempts reached
+                if (testAttempts[testId].length < 5) {
+                    const attemptNumber = testAttempts[testId].length + 1;
+                    testAttempts[testId].push({
+                        attempt: attemptNumber,
+                        correct: correct,
+                        wrong: wrong,
+                        total: total,
+                        time: timeTaken,
+                        percentage: percentage,
+                        date: new Date().toISOString()
+                    });
+                    localStorage.setItem('test_attempts', JSON.stringify(testAttempts));
+                }
+
+                // Also update attempted_tests for backward compatibility
+                let attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+                if (!attemptedTests.includes(testId)) {
+                    attemptedTests.push(testId);
+                    localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+                }
             }
 
             // Update user progress
@@ -295,7 +346,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            saveAttempt();
+            // Only save if this is a new attempt (has URL data, not viewing saved)
+            if (isNewAttempt) {
+                saveAttempt();
+            }
             updateUI();
             animateScore();
         });
