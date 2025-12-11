@@ -610,12 +610,15 @@
             // Get valid keys from localStorage (set by admin panel)
             const validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
 
-            // Also check genz_access_keys for active keys
+            // Check genz_access_keys (admin panel stores with prefix genz_)
             const accessKeysData = JSON.parse(localStorage.getItem('genz_access_keys') || '[]');
             const activeKeys = accessKeysData.filter(k => k.is_active).map(k => k.key);
 
-            // Merge both sources
+            // Merge all sources
             const allValidKeys = [...new Set([...validKeys, ...activeKeys])];
+
+            console.log('Valid keys found:', allValidKeys);
+            console.log('Checking key:', key);
 
             return allValidKeys.includes(key);
         }
