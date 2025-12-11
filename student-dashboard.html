@@ -159,6 +159,14 @@
                     </svg>
                     Admin Panel
                 </a>
+                <button onclick="clearProgress()"
+                    class="flex items-center gap-3 w-full px-3 py-2 text-sm text-red-500 hover:text-red-700 font-medium mb-1">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Clear Progress
+                </button>
                 <button onclick="logout()"
                     class="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium mb-2">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -638,7 +646,7 @@
         const GROQ_MODEL = 'llama-3.3-70b-versatile';
         let chatHistory = [];
 
-        // User data
+        // User data - with validation
         let attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
         let userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
 
@@ -649,6 +657,21 @@
                 return;
             }
 
+            // Validate attemptedTests - remove IDs that don't exist in actual tests
+            const allTests = adminData?.getAllTests() || [];
+            const validTestIds = allTests.map(t => t.id);
+            const validAttempted = attemptedTests.filter(id => validTestIds.includes(id));
+
+            // If there's a mismatch, clear invalid data
+            if (validAttempted.length !== attemptedTests.length) {
+                console.log('Cleaned up invalid attempted test IDs:', attemptedTests.filter(id => !validTestIds.includes(id)));
+                attemptedTests = validAttempted;
+                localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+            }
+
+            console.log('Attempted Tests:', attemptedTests);
+            console.log('All Test IDs:', validTestIds);
+
             const userName = userData.name || userData.key || 'User';
             document.getElementById('userName').textContent = userName;
             document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
@@ -657,9 +680,19 @@
             loadLeaderboard();
         });
 
+
         function logout() {
             localStorage.removeItem('user_data');
             window.location.href = 'index.html';
+        }
+
+        function clearProgress() {
+            if (confirm('This will clear all your test progress and attempted tests. Continue?')) {
+                localStorage.removeItem('attempted_tests');
+                localStorage.removeItem('user_progress');
+                alert('Progress cleared! Page will refresh.');
+                window.location.reload();
+            }
         }
 
         function showPage(page, navElement) {
@@ -742,13 +775,16 @@
             const tests = adminData?.getAllTests() || [];
             const container = document.getElementById('mockTestsBody');
 
+            // Always get fresh data from localStorage
+            const currentAttempted = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+
             if (tests.length === 0) {
                 container.innerHTML = '<div class="px-6 py-12 text-center text-gray-500">No mock tests available yet. Ask admin to create tests.</div>';
                 return;
             }
 
             container.innerHTML = tests.map(test => {
-                const isAttempted = attemptedTests.includes(test.id);
+                const isAttempted = currentAttempted.includes(test.id);
                 const questions = test.total_questions || 10;
                 const marks = questions * 2;
                 return `
@@ -771,7 +807,9 @@
 
         function loadMyTests() {
             const tests = adminData?.getAllTests() || [];
-            const myTests = tests.filter(t => attemptedTests.includes(t.id));
+            // Always get fresh data from localStorage
+            const currentAttempted = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+            const myTests = tests.filter(t => currentAttempted.includes(t.id));
             const container = document.getElementById('myTestsBody');
 
             if (myTests.length === 0) {
