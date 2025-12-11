@@ -1032,9 +1032,14 @@
             questions.forEach((q, i) => {
                 if (state.answers[i] === q.correct) correct++;
             });
+            const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
+            const timeTaken = totalTime - state.time;
             const params = new URLSearchParams({
-                correct, wrong: Object.keys(state.answers).length - correct,
-                total: state.total, time: (15 * 60) - state.time
+                testId: testId || '',
+                correct,
+                wrong: Object.keys(state.answers).length - correct,
+                total: state.total,
+                time: timeTaken
             });
             window.location.href = `results.html?${params}`;
         });

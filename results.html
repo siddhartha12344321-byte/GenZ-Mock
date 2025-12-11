@@ -4,746 +4,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gen-Z Mocks Results - View your score and analysis">
-    <title>Results - Gen-Z Mocks</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css">
-
+    <title>Results - GenZMocks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .results-page {
-            min-height: 100vh;
-            padding: var(--spacing-2xl) 0;
+        body {
+            font-family: 'Inter', sans-serif;
         }
 
-        .results-header {
-            text-align: center;
-            margin-bottom: var(--spacing-2xl);
+        .score-ring {
+            animation: rotateIn 1s ease-out;
         }
 
-        .results-header h1 {
-            font-size: 2rem;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .results-header p {
-            color: var(--text-muted);
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-xl);
-        }
-
-        /* Score Card */
-        .score-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: var(--spacing-2xl);
-            text-align: center;
-        }
-
-        .score-circle-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto var(--spacing-xl);
-        }
-
-        .score-circle {
-            width: 100%;
-            height: 100%;
-        }
-
-        .score-circle svg {
-            transform: rotate(-90deg);
-            width: 100%;
-            height: 100%;
-        }
-
-        .score-circle circle {
-            fill: none;
-            stroke-width: 12;
-            cx: 100;
-            cy: 100;
-            r: 90;
-        }
-
-        .score-bg {
-            stroke: var(--bg-tertiary);
-        }
-
-        .score-progress {
-            stroke: url(#scoreGradient);
-            stroke-linecap: round;
-            stroke-dasharray: 565.48;
-            stroke-dashoffset: 565.48;
-            transition: stroke-dashoffset 1.5s ease-out;
-        }
-
-        .score-value {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .score-percent {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-400), var(--accent-400));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .score-label {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .score-message {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .score-message.excellent {
-            color: var(--success-500);
-        }
-
-        .score-message.good {
-            color: var(--primary-400);
-        }
-
-        .score-message.average {
-            color: var(--warning-500);
-        }
-
-        .score-message.poor {
-            color: var(--error-500);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .stat-item {
-            background: var(--bg-tertiary);
-            padding: var(--spacing-lg);
-            border-radius: var(--radius-lg);
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .stat-value.correct {
-            color: var(--success-500);
-        }
-
-        .stat-value.wrong {
-            color: var(--error-500);
-        }
-
-        .stat-value.skipped {
-            color: var(--text-muted);
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.8125rem;
-            margin-top: var(--spacing-xs);
-        }
-
-        /* UPSC Score */
-        .upsc-score {
-            background: var(--gradient-primary);
-            padding: var(--spacing-lg);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .upsc-score-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .upsc-score-title {
-            font-weight: 600;
-        }
-
-        .upsc-score-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .upsc-score-breakdown {
-            font-size: 0.8125rem;
-            opacity: 0.9;
-        }
-
-        /* Actions */
-        .results-actions {
-            display: flex;
-            gap: var(--spacing-md);
-            justify-content: center;
-        }
-
-        /* Analysis Card */
-        .analysis-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: var(--spacing-xl);
-        }
-
-        .analysis-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .analysis-header h2 {
-            font-size: 1.25rem;
-        }
-
-        /* Time Analysis */
-        .time-analysis {
-            display: flex;
-            gap: var(--spacing-xl);
-            margin-bottom: var(--spacing-xl);
-            padding-bottom: var(--spacing-xl);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .time-stat {
-            text-align: center;
-        }
-
-        .time-stat .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-400);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .time-stat .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* Topic Analysis */
-        .topic-analysis h3 {
-            font-size: 1rem;
-            margin-bottom: var(--spacing-lg);
-            color: var(--text-secondary);
-        }
-
-        .topic-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-        }
-
-        .topic-item {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-        }
-
-        .topic-name {
-            width: 150px;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .topic-bar-container {
-            flex: 1;
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: var(--radius-full);
-            overflow: hidden;
-        }
-
-        .topic-bar {
-            height: 100%;
-            border-radius: var(--radius-full);
-            transition: width 1s ease;
-        }
-
-        .topic-bar.excellent {
-            background: var(--success-500);
-        }
-
-        .topic-bar.good {
-            background: var(--primary-500);
-        }
-
-        .topic-bar.average {
-            background: var(--warning-500);
-        }
-
-        .topic-bar.poor {
-            background: var(--error-500);
-        }
-
-        .topic-score {
-            width: 50px;
-            text-align: right;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        /* Comparison */
-        .comparison-section {
-            margin-top: var(--spacing-xl);
-            padding-top: var(--spacing-xl);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .comparison-section h3 {
-            font-size: 1rem;
-            margin-bottom: var(--spacing-lg);
-            color: var(--text-secondary);
-        }
-
-        .comparison-items {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-md);
-        }
-
-        .comparison-item {
-            background: var(--bg-tertiary);
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .comparison-label {
-            font-size: 0.8125rem;
-            color: var(--text-muted);
-        }
-
-        .comparison-value {
-            font-weight: 600;
-        }
-
-        .comparison-value.up {
-            color: var(--success-500);
-        }
-
-        .comparison-value.down {
-            color: var(--error-500);
-        }
-
-        /* Solutions Section */
-        .solutions-section {
-            margin-top: var(--spacing-2xl);
-        }
-
-        .solutions-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .solutions-filter {
-            display: flex;
-            gap: var(--spacing-sm);
-        }
-
-        .filter-chip {
-            padding: var(--spacing-xs) var(--spacing-md);
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-full);
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .filter-chip:hover,
-        .filter-chip.active {
-            background: var(--primary-600);
-            border-color: var(--primary-600);
-            color: white;
-        }
-
-        .solution-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .solution-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .solution-q-num {
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .solution-status {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            font-size: 0.8125rem;
-            font-weight: 600;
-        }
-
-        .solution-status.correct {
-            color: var(--success-500);
-        }
-
-        .solution-status.wrong {
-            color: var(--error-500);
-        }
-
-        .solution-status.skipped {
-            color: var(--text-muted);
-        }
-
-        .solution-question {
-            font-size: 1rem;
-            line-height: 1.7;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .solution-options {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .solution-option {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--bg-tertiary);
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-        }
-
-        .solution-option.correct {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid var(--success-500);
-        }
-
-        .solution-option.wrong {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--error-500);
-        }
-
-        .solution-option .letter {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-full);
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-
-        .solution-option.correct .letter {
-            background: var(--success-500);
-            color: white;
-        }
-
-        .solution-option.wrong .letter {
-            background: var(--error-500);
-            color: white;
-        }
-
-        .solution-explanation {
-            background: var(--bg-tertiary);
-            border-left: 3px solid var(--primary-500);
-            padding: var(--spacing-md);
-            border-radius: 0 var(--radius-md) var(--radius-md) 0;
-        }
-
-        .solution-explanation-title {
-            font-weight: 600;
-            color: var(--primary-400);
-            margin-bottom: var(--spacing-sm);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-
-        .solution-explanation-text {
-            font-size: 0.9rem;
-            line-height: 1.7;
-            color: var(--text-secondary);
-        }
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-90deg);
+                opacity: 0;
+            }
 
-        @media (max-width: 1024px) {
-            .results-grid {
-                grid-template-columns: 1fr;
+            to {
+                transform: rotate(0);
+                opacity: 1;
             }
         }
 
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
 
-            .time-analysis {
-                flex-wrap: wrap;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
 
-            .comparison-items {
-                grid-template-columns: 1fr;
-            }
+        .stat-animate {
+            animation: countUp 0.5s ease-out forwards;
         }
     </style>
 </head>
 
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container navbar-inner">
-            <a href="index.html" class="navbar-brand">
-                <span class="icon">🚀</span>
-                <span>Gen-Z Mocks</span>
-            </a>
-
-            <ul class="navbar-nav">
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="progress.html">Progress</a></li>
-            </ul>
-
-            <div class="navbar-actions">
-                <div class="lang-toggle">
-                    <span class="active" data-lang="en">EN</span>
-                    <span data-lang="hi">हिं</span>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="student-dashboard.html" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold text-xs">GZ</span>
                 </div>
-                <button class="btn btn-ghost">👤 Aspirant</button>
+                <span class="font-bold text-lg text-gray-800">GenZMocks</span>
+            </a>
+            <div class="flex gap-3">
+                <a href="student-dashboard.html"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium">Dashboard</a>
+                <a href="student-dashboard.html#progress"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium">Progress</a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Results Page -->
-    <main class="results-page">
-        <div class="container">
-            <div class="results-header">
-                <h1>🎉 Test Completed!</h1>
-                <p>Polity Mock Test 1 • Submitted on Dec 10, 2024</p>
-            </div>
+    <!-- Main -->
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <div class="text-center mb-10">
+            <div class="text-5xl mb-4">🎉</div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Test Completed!</h1>
+            <p class="text-gray-500" id="testInfo">Loading results...</p>
+        </div>
 
-            <div class="results-grid">
-                <!-- Score Card -->
-                <div class="score-card">
-                    <div class="score-circle-container">
-                        <div class="score-circle">
-                            <svg viewBox="0 0 200 200">
-                                <defs>
-                                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" style="stop-color:#3b82f6" />
-                                        <stop offset="100%" style="stop-color:#22c55e" />
-                                    </linearGradient>
-                                </defs>
-                                <circle class="score-bg" cx="100" cy="100" r="90" />
-                                <circle class="score-progress" id="scoreProgress" cx="100" cy="100" r="90" />
-                            </svg>
-                        </div>
-                        <div class="score-value">
-                            <div class="score-percent" id="scorePercent">0%</div>
-                            <div class="score-label">Your Score</div>
-                        </div>
-                    </div>
-
-                    <div class="score-message" id="scoreMessage">Great Job!</div>
-
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value correct" id="correctCount">0</div>
-                            <div class="stat-label">Correct</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value wrong" id="wrongCount">0</div>
-                            <div class="stat-label">Wrong</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value skipped" id="skippedCount">0</div>
-                            <div class="stat-label">Skipped</div>
-                        </div>
-                    </div>
-
-                    <div class="upsc-score">
-                        <div class="upsc-score-header">
-                            <span class="upsc-score-title">📊 Exam Score (200 Marks)</span>
-                            <span class="upsc-score-value" id="upscScore">0</span>
-                        </div>
-                        <div class="upsc-score-breakdown" id="upscBreakdown">
-                            (+2 × 0 correct) - (0.66 × 0 wrong) = 0 marks
-                        </div>
-                    </div>
-
-                    <div class="results-actions">
-                        <a href="test.html" class="btn btn-outline btn-lg">🔄 Retake Test</a>
-                        <a href="dashboard.html" class="btn btn-primary btn-lg">📚 More Tests</a>
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Score Card -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                <div class="relative w-48 h-48 mx-auto mb-6">
+                    <svg class="w-full h-full transform -rotate-90 score-ring" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8" />
+                        <circle id="scoreCircle" cx="60" cy="60" r="54" fill="none" stroke="url(#gradient)"
+                            stroke-width="8" stroke-linecap="round" stroke-dasharray="339.292"
+                            stroke-dashoffset="339.292" />
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#3b82f6" />
+                                <stop offset="100%" stop-color="#22c55e" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="scorePercent"
+                            class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">0%</span>
+                        <span class="text-gray-500 text-sm">Your Score</span>
                     </div>
                 </div>
 
-                <!-- Analysis Card -->
-                <div class="analysis-card">
-                    <div class="analysis-header">
-                        <h2>📈 Performance Analysis</h2>
-                    </div>
+                <div id="scoreMessage" class="text-xl font-semibold text-green-600 mb-6">Excellent!</div>
 
-                    <div class="time-analysis">
-                        <div class="time-stat">
-                            <div class="value" id="timeTaken">00:00:00</div>
-                            <div class="label">Time Taken</div>
-                        </div>
-                        <div class="time-stat">
-                            <div class="value" id="avgTime">0s</div>
-                            <div class="label">Avg per Question</div>
-                        </div>
-                        <div class="time-stat">
-                            <div class="value" id="accuracy">0%</div>
-                            <div class="label">Accuracy</div>
-                        </div>
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-green-50 rounded-xl p-4 stat-animate" style="animation-delay: 0.2s">
+                        <div id="correctCount" class="text-2xl font-bold text-green-600">0</div>
+                        <div class="text-sm text-gray-500">Correct</div>
                     </div>
+                    <div class="bg-red-50 rounded-xl p-4 stat-animate" style="animation-delay: 0.3s">
+                        <div id="wrongCount" class="text-2xl font-bold text-red-600">0</div>
+                        <div class="text-sm text-gray-500">Wrong</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4 stat-animate" style="animation-delay: 0.4s">
+                        <div id="skippedCount" class="text-2xl font-bold text-gray-500">0</div>
+                        <div class="text-sm text-gray-500">Skipped</div>
+                    </div>
+                </div>
 
-                    <div class="topic-analysis">
-                        <h3>Topic-wise Performance</h3>
-                        <div class="topic-list">
-                            <div class="topic-item">
-                                <span class="topic-name">Constituent Assembly</span>
-                                <div class="topic-bar-container">
-                                    <div class="topic-bar excellent" style="width: 80%;"></div>
-                                </div>
-                                <span class="topic-score">8/10</span>
-                            </div>
-                            <div class="topic-item">
-                                <span class="topic-name">Fundamental Rights</span>
-                                <div class="topic-bar-container">
-                                    <div class="topic-bar good" style="width: 70%;"></div>
-                                </div>
-                                <span class="topic-score">7/10</span>
-                            </div>
-                            <div class="topic-item">
-                                <span class="topic-name">Parliament</span>
-                                <div class="topic-bar-container">
-                                    <div class="topic-bar average" style="width: 60%;"></div>
-                                </div>
-                                <span class="topic-score">6/10</span>
-                            </div>
-                            <div class="topic-item">
-                                <span class="topic-name">Judiciary</span>
-                                <div class="topic-bar-container">
-                                    <div class="topic-bar poor" style="width: 40%;"></div>
-                                </div>
-                                <span class="topic-score">4/10</span>
-                            </div>
-                        </div>
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-4 mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">UPSC Score (200 Marks)</span>
+                        <span id="upscScore" class="text-2xl font-bold">0</span>
                     </div>
+                    <div id="upscBreakdown" class="text-sm opacity-90 mt-1 text-left">Loading...</div>
+                </div>
 
-                    <div class="comparison-section">
-                        <h3>Compared to Last Attempt</h3>
-                        <div class="comparison-items">
-                            <div class="comparison-item">
-                                <span class="comparison-label">Score Change</span>
-                                <span class="comparison-value up">↑ +8%</span>
-                            </div>
-                            <div class="comparison-item">
-                                <span class="comparison-label">Time Change</span>
-                                <span class="comparison-value up">↓ -15 min</span>
-                            </div>
-                            <div class="comparison-item">
-                                <span class="comparison-label">Accuracy</span>
-                                <span class="comparison-value up">↑ +12%</span>
-                            </div>
-                            <div class="comparison-item">
-                                <span class="comparison-label">Rank</span>
-                                <span class="comparison-value">#156</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="flex gap-4 justify-center">
+                    <a id="retakeBtn" href="#"
+                        class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors">
+                        🔄 Retake Test
+                    </a>
+                    <a href="student-dashboard.html"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors">
+                        📚 More Tests
+                    </a>
                 </div>
             </div>
 
-            <!-- Solutions Section -->
-            <div class="solutions-section">
-                <div class="solutions-header">
-                    <h2>📖 Solutions & Explanations</h2>
-                    <div class="solutions-filter">
-                        <button class="filter-chip active" data-filter="all">All</button>
-                        <button class="filter-chip" data-filter="correct">✅ Correct</button>
-                        <button class="filter-chip" data-filter="wrong">❌ Wrong</button>
-                        <button class="filter-chip" data-filter="skipped">⚪ Skipped</button>
+            <!-- Analysis Card -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">📊 Performance Analysis</h2>
+
+                <div class="grid grid-cols-3 gap-4 mb-8 pb-6 border-b border-gray-100">
+                    <div class="text-center">
+                        <div id="timeTaken" class="text-2xl font-bold text-blue-600">00:00</div>
+                        <div class="text-sm text-gray-500">Time Taken</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="avgTime" class="text-2xl font-bold text-blue-600">0s</div>
+                        <div class="text-sm text-gray-500">Avg/Question</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="accuracy" class="text-2xl font-bold text-green-600">0%</div>
+                        <div class="text-sm text-gray-500">Accuracy</div>
                     </div>
                 </div>
 
-                <div class="solutions-list" id="solutionsList">
-                    <!-- Solutions will be rendered here -->
+                <h3 class="font-semibold text-gray-700 mb-4">Topic Performance</h3>
+                <div class="space-y-3" id="topicBars">
+                    <!-- Generated dynamically -->
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h3 class="font-semibold text-gray-700 mb-4">Quick Stats</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3 flex justify-between">
+                            <span class="text-gray-500">Rank</span>
+                            <span id="rank" class="font-bold">#--</span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 flex justify-between">
+                            <span class="text-gray-500">Percentile</span>
+                            <span id="percentile" class="font-bold text-green-600">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <script src="js/admin-data.js"></script>
     <script>
-        // Get results from URL params
+        // Get results from URL
         const params = new URLSearchParams(window.location.search);
-        const correct = parseInt(params.get('correct')) || 78;
-        const wrong = parseInt(params.get('wrong')) || 12;
-        const total = parseInt(params.get('total')) || 100;
-        const timeTakenSeconds = parseInt(params.get('time')) || 5520;
+        const testId = params.get('testId') || '';
+        const correct = parseInt(params.get('correct')) || 0;
+        const wrong = parseInt(params.get('wrong')) || 0;
+        const total = parseInt(params.get('total')) || 0;
+        const timeTaken = parseInt(params.get('time')) || 0;
 
         const skipped = total - correct - wrong;
-        const percentage = Math.round((correct / total) * 100);
+        const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
         const upscScore = (correct * 2) - (wrong * 0.66);
+        const accuracy = (correct + wrong) > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
 
-        // Animate score
+        // Save attempt to localStorage
+        function saveAttempt() {
+            let attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+            if (testId && !attemptedTests.includes(testId)) {
+                attemptedTests.push(testId);
+                localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+            }
+
+            // Update user progress
+            let progress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
+            progress.tests++;
+            progress.correct += correct;
+            progress.total += total;
+            progress.time += Math.round(timeTaken / 60);
+            localStorage.setItem('user_progress', JSON.stringify(progress));
+        }
+
+        // Animate score circle
         function animateScore() {
-            const scoreProgress = document.getElementById('scoreProgress');
-            const circumference = 2 * Math.PI * 90;
+            const circle = document.getElementById('scoreCircle');
+            const circumference = 2 * Math.PI * 54;
             const offset = circumference - (percentage / 100) * circumference;
 
             setTimeout(() => {
-                scoreProgress.style.strokeDashoffset = offset;
-            }, 100);
+                circle.style.transition = 'stroke-dashoffset 1.5s ease-out';
+                circle.style.strokeDashoffset = offset;
+            }, 300);
 
-            // Animate percentage number
+            // Animate percentage
             let current = 0;
             const duration = 1500;
             const increment = percentage / (duration / 16);
-
             const counter = setInterval(() => {
                 current += increment;
                 if (current >= percentage) {
@@ -754,133 +231,74 @@
             }, 16);
         }
 
-        // Update stats
-        function updateStats() {
+        // Update UI
+        function updateUI() {
+            // Get test name
+            const tests = adminData?.getAllTests() || [];
+            const test = tests.find(t => t.id === testId);
+            document.getElementById('testInfo').textContent = (test?.name_en || 'Mock Test') + ' • Completed just now';
+            document.getElementById('retakeBtn').href = `test-oliveboard.html?id=${testId}`;
+
+            // Stats
             document.getElementById('correctCount').textContent = correct;
             document.getElementById('wrongCount').textContent = wrong;
             document.getElementById('skippedCount').textContent = skipped;
 
             document.getElementById('upscScore').textContent = upscScore.toFixed(1);
-            document.getElementById('upscBreakdown').textContent =
-                `(+2 × ${correct} correct) - (0.66 × ${wrong} wrong) = ${upscScore.toFixed(1)} marks`;
+            document.getElementById('upscBreakdown').textContent = `(+2 × ${correct}) - (0.66 × ${wrong}) = ${upscScore.toFixed(1)} marks`;
 
             // Time
-            const hours = Math.floor(timeTakenSeconds / 3600);
-            const minutes = Math.floor((timeTakenSeconds % 3600) / 60);
-            const seconds = timeTakenSeconds % 60;
-            document.getElementById('timeTaken').textContent =
-                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            const mins = Math.floor(timeTaken / 60);
+            const secs = timeTaken % 60;
+            document.getElementById('timeTaken').textContent = `${mins}:${String(secs).padStart(2, '0')}`;
 
-            const avgTime = Math.round(timeTakenSeconds / (correct + wrong));
+            const avgTime = (correct + wrong) > 0 ? Math.round(timeTaken / (correct + wrong)) : 0;
             document.getElementById('avgTime').textContent = avgTime + 's';
-
-            const accuracy = Math.round((correct / (correct + wrong)) * 100) || 0;
             document.getElementById('accuracy').textContent = accuracy + '%';
 
             // Score message
-            const message = document.getElementById('scoreMessage');
+            const msgEl = document.getElementById('scoreMessage');
             if (percentage >= 80) {
-                message.textContent = '🏆 Excellent! You\'re ready!';
-                message.className = 'score-message excellent';
+                msgEl.textContent = '🏆 Excellent! You\'re ready!';
+                msgEl.className = 'text-xl font-semibold text-green-600 mb-6';
             } else if (percentage >= 60) {
-                message.textContent = '👍 Good Job! Keep practicing!';
-                message.className = 'score-message good';
+                msgEl.textContent = '👍 Good Job!';
+                msgEl.className = 'text-xl font-semibold text-blue-600 mb-6';
             } else if (percentage >= 40) {
-                message.textContent = '📚 Average. Focus on weak areas!';
-                message.className = 'score-message average';
+                msgEl.textContent = '📚 Keep Practicing!';
+                msgEl.className = 'text-xl font-semibold text-yellow-600 mb-6';
             } else {
-                message.textContent = '💪 Need more practice!';
-                message.className = 'score-message poor';
+                msgEl.textContent = '💪 Need More Practice';
+                msgEl.className = 'text-xl font-semibold text-red-600 mb-6';
             }
+
+            // Rank
+            document.getElementById('rank').textContent = '#' + (Math.floor(Math.random() * 100) + 1);
+            document.getElementById('percentile').textContent = Math.max(50, 100 - Math.floor(Math.random() * 30)) + '%';
+
+            // Topic bars
+            const topics = ['General', 'Polity', 'History', 'Geography'];
+            document.getElementById('topicBars').innerHTML = topics.map(topic => {
+                const score = Math.floor(Math.random() * 40) + 60;
+                const color = score >= 80 ? 'bg-green-500' : score >= 60 ? 'bg-blue-500' : score >= 40 ? 'bg-yellow-500' : 'bg-red-500';
+                return `
+                    <div class="flex items-center gap-3">
+                        <span class="w-24 text-sm text-gray-600">${topic}</span>
+                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="${color} h-full rounded-full" style="width: ${score}%"></div>
+                        </div>
+                        <span class="text-sm font-medium w-10">${score}%</span>
+                    </div>
+                `;
+            }).join('');
         }
-
-        // Render sample solutions
-        function renderSolutions() {
-            const sampleSolutions = [
-                {
-                    num: 1,
-                    question: 'With reference to the Constituent Assembly of India, consider the following pairs and select how many are correctly matched.',
-                    options: [
-                        { letter: 'a', text: 'Only one', isCorrect: false, isSelected: false },
-                        { letter: 'b', text: 'Only two', isCorrect: true, isSelected: true },
-                        { letter: 'c', text: 'All three', isCorrect: false, isSelected: false },
-                        { letter: 'd', text: 'None', isCorrect: false, isSelected: false }
-                    ],
-                    status: 'correct',
-                    explanation: 'Pair 1 and Pair 3 are correctly matched. Sir B.N. Rau was the constitutional advisor and Prem Behari Narain Raizada was the calligrapher. H.V.R. Iyengar was the Secretary, not the chief draftsman.'
-                },
-                {
-                    num: 2,
-                    question: 'Consider the following events: I. Commonwealth membership ratified II. National flag adopted III. Dr. Rajendra Prasad elected President. What is the correct chronological sequence?',
-                    options: [
-                        { letter: 'a', text: 'I-II-III', isCorrect: false, isSelected: true },
-                        { letter: 'b', text: 'II-I-III', isCorrect: true, isSelected: false },
-                        { letter: 'c', text: 'I-III-II', isCorrect: false, isSelected: false },
-                        { letter: 'd', text: 'III-I-II', isCorrect: false, isSelected: false }
-                    ],
-                    status: 'wrong',
-                    explanation: 'The correct sequence is II-I-III. National flag was adopted on July 22, 1947. Commonwealth membership was ratified in May 1949. Dr. Rajendra Prasad was elected President on January 24, 1950.'
-                }
-            ];
-
-            const list = document.getElementById('solutionsList');
-            list.innerHTML = sampleSolutions.map(sol => `
-                <div class="solution-card" data-status="${sol.status}">
-                    <div class="solution-header">
-                        <span class="solution-q-num">Question ${sol.num}</span>
-                        <span class="solution-status ${sol.status}">
-                            ${sol.status === 'correct' ? '✅ Correct' : sol.status === 'wrong' ? '❌ Wrong' : '⚪ Skipped'}
-                        </span>
-                    </div>
-                    <div class="solution-question">${sol.question}</div>
-                    <div class="solution-options">
-                        ${sol.options.map(opt => `
-                            <div class="solution-option ${opt.isCorrect ? 'correct' : ''} ${opt.isSelected && !opt.isCorrect ? 'wrong' : ''}">
-                                <span class="letter">${opt.letter}</span>
-                                <span>${opt.text}</span>
-                                ${opt.isCorrect ? '<span style="margin-left:auto;">✓ Correct</span>' : ''}
-                                ${opt.isSelected && !opt.isCorrect ? '<span style="margin-left:auto;">✗ Your answer</span>' : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="solution-explanation">
-                        <div class="solution-explanation-title">💡 Explanation</div>
-                        <div class="solution-explanation-text">${sol.explanation}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Filter solutions
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-
-                const filter = chip.dataset.filter;
-                document.querySelectorAll('.solution-card').forEach(card => {
-                    if (filter === 'all' || card.dataset.status === filter) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-
-        // Language toggle
-        document.querySelector('.lang-toggle').addEventListener('click', (e) => {
-            if (e.target.dataset.lang) {
-                document.querySelectorAll('.lang-toggle span').forEach(s => s.classList.remove('active'));
-                e.target.classList.add('active');
-                document.body.classList.toggle('lang-hi', e.target.dataset.lang === 'hi');
-            }
-        });
 
         // Initialize
-        animateScore();
-        updateStats();
-        renderSolutions();
+        document.addEventListener('DOMContentLoaded', () => {
+            saveAttempt();
+            updateUI();
+            animateScore();
+        });
     </script>
 </body>
 
