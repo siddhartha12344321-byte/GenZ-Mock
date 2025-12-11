@@ -1,20 +1,19 @@
 /**
- * AI-Powered Question Extractor for Gen-Z Mocks
- * ==============================================
- * Uses Groq API (FREE) for intelligent MCQ extraction
- * Features: PDF text parsing, AI extraction, question generation
+ * PDF Question Extractor for Gen-Z Mocks
+ * =======================================
+ * Extracts MCQs from PDF and outputs structured JSON
+ * Uses Groq API for intelligent parsing
  */
 
 class AIQuestionExtractor {
     constructor() {
         this.apiKey = this.getApiKey();
         this.baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
-        this.model = 'llama-3.3-70b-versatile'; // Updated: Current supported model
+        this.model = 'llama-3.3-70b-versatile';
         this.isProcessing = false;
     }
 
     // ===== API KEY MANAGEMENT =====
-
     getApiKey() {
         return localStorage.getItem('genz_groq_api_key') || '';
     }
@@ -29,48 +28,80 @@ class AIQuestionExtractor {
         return this.apiKey && this.apiKey.length > 20;
     }
 
-    // ===== CORE AI EXTRACTION =====
+    // ===== PDF TEXT EXTRACTION =====
+    async extractTextFromPDF(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
+            reader.onload = async (e) => {
+                try {
+                    const typedArray = new Uint8Array(e.target.result);
+                    const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+                    let fullText = '';
+                    const totalPages = pdf.numPages;
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n\n--- PAGE BREAK ---\n\n';
+                    }
+
+                    console.log(`📄 Extracted ${totalPages} pages, ${fullText.length} characters`);
+                    resolve({
+                        success: true,
+                        text: fullText,
+                        pages: totalPages,
+                        chars: fullText.length
+                    });
+
+                } catch (error) {
+                    console.error('❌ PDF extraction failed:', error);
+                    reject(error);
+                }
+            };
+
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    // ===== AI-POWERED QUESTION EXTRACTION =====
     async extractQuestionsFromText(rawText, options = {}) {
         if (!this.hasApiKey()) {
-            throw new Error('Groq API key not configured. Please add your API key in settings.');
+            throw new Error('Groq API key not configured. Please add your API key in Settings.');
         }
 
-        const testName = options.testName || 'Imported Test';
-        const subject = options.subject || 'General';
+        // Limit text to avoid token limits
+        const textToProcess = rawText.substring(0, 20000);
 
-        const systemPrompt = `You are an expert MCQ question parser. Your task is to extract ALL multiple choice questions from the given text.
+        const systemPrompt = `You are an MCQ extraction expert. Your ONLY job is to extract multiple choice questions from the given text and output them as a JSON array.
 
-IMPORTANT RULES:
-1. Extract EVERY question you find - do not skip any
-2. Identify options A, B, C, D for each question
-3. Look for answer keys at the end to find correct answers
-4. If answer key exists, match question numbers to answers
-5. If no answer key, set correct_option to null
-6. Clean up any OCR artifacts or formatting issues
-7. Preserve the original question numbering
+CRITICAL RULES:
+1. OUTPUT ONLY VALID JSON - no explanations, no markdown, just pure JSON
+2. Extract ALL questions you find in the text
+3. Translate any Hindi/regional content to ENGLISH
+4. Find the correct answer from answer keys if present
+5. Each question MUST have: question text, 4 options (A,B,C,D), correct answer
 
-OUTPUT FORMAT (strict JSON):
-{
-  "questions": [
-    {
-      "question_number": 1,
-      "question_text_en": "The complete question text here",
-      "option_a_en": "Option A text",
-      "option_b_en": "Option B text", 
-      "option_c_en": "Option C text",
-      "option_d_en": "Option D text",
-      "correct_option": "a" or "b" or "c" or "d" or null,
-      "explanation_en": "Brief explanation if available, otherwise empty string"
-    }
-  ],
-  "total_extracted": 10,
-  "has_answer_key": true
-}
+OUTPUT THIS EXACT JSON FORMAT:
+[
+  {
+    "qno": 1,
+    "question": "What is the capital of India?",
+    "a": "Mumbai",
+    "b": "Delhi",
+    "c": "Kolkata",
+    "d": "Chennai",
+    "answer": "b",
+    "explanation": "Delhi is the capital of India"
+  }
+]
 
-RESPOND ONLY WITH VALID JSON. No markdown, no explanations.`;
+IMPORTANT: Start your response with [ and end with ] - ONLY JSON, nothing else!`;
 
-        const userPrompt = `Extract all MCQ questions from this text:\n\n${rawText.substring(0, 15000)}`;
+        const userPrompt = `Extract all MCQ questions from this text and return as JSON array:\n\n${textToProcess}`;
 
         try {
             this.isProcessing = true;
@@ -104,31 +135,23 @@ RESPOND ONLY WITH VALID JSON. No markdown, no explanations.`;
                 throw new Error('Empty response from AI');
             }
 
-            // Clean up response - extract JSON from markdown if present
-            content = content.trim();
-            if (content.startsWith('```json')) {
-                content = content.slice(7);
-            }
-            if (content.startsWith('```')) {
-                content = content.slice(3);
-            }
-            if (content.endsWith('```')) {
-                content = content.slice(0, -3);
-            }
-            content = content.trim();
+            // Extract JSON from response
+            const questions = this.parseJsonResponse(content);
 
-            const result = JSON.parse(content);
-            console.log(`✅ AI extracted ${result.questions?.length || 0} questions`);
+            if (!questions || questions.length === 0) {
+                throw new Error('No questions found in response');
+            }
+
+            console.log(`✅ Extracted ${questions.length} questions`);
 
             return {
                 success: true,
-                questions: result.questions || [],
-                total: result.total_extracted || result.questions?.length || 0,
-                hasAnswerKey: result.has_answer_key || false
+                questions: questions,
+                total: questions.length
             };
 
         } catch (error) {
-            console.error('❌ AI extraction failed:', error);
+            console.error('❌ Extraction failed:', error);
             return {
                 success: false,
                 error: error.message,
@@ -139,8 +162,122 @@ RESPOND ONLY WITH VALID JSON. No markdown, no explanations.`;
         }
     }
 
-    // ===== AI QUESTION GENERATION =====
+    // ===== JSON PARSING WITH FALLBACKS =====
+    parseJsonResponse(content) {
+        // Clean the response
+        let text = content.trim();
 
+        // Try to find JSON array in the response
+        const jsonStart = text.indexOf('[');
+        const jsonEnd = text.lastIndexOf(']');
+
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+            text = text.substring(jsonStart, jsonEnd + 1);
+        }
+
+        // Remove markdown code blocks
+        text = text.replace(/```json\s*/gi, '');
+        text = text.replace(/```\s*/gi, '');
+        text = text.trim();
+
+        try {
+            const parsed = JSON.parse(text);
+
+            // Handle if it's wrapped in an object
+            if (parsed.questions && Array.isArray(parsed.questions)) {
+                return parsed.questions;
+            }
+
+            // Direct array
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+
+            throw new Error('Invalid JSON structure');
+        } catch (e) {
+            console.error('JSON parse error:', e);
+            console.log('Raw content:', content.substring(0, 500));
+            throw new Error('Failed to parse AI response as JSON');
+        }
+    }
+
+    // ===== MAIN EXTRACTION WORKFLOW =====
+    async extractFromPDF(file, options = {}) {
+        try {
+            // Step 1: Extract raw text from PDF
+            console.log('📄 Step 1: Extracting text from PDF...');
+            const textResult = await this.extractTextFromPDF(file);
+
+            if (!textResult.success) {
+                return { success: false, error: 'Failed to extract text from PDF' };
+            }
+
+            console.log(`📝 Got ${textResult.chars} characters from ${textResult.pages} pages`);
+
+            // Step 2: Send to AI for question extraction
+            console.log('🤖 Step 2: AI extracting questions...');
+            const aiResult = await this.extractQuestionsFromText(textResult.text, options);
+
+            if (!aiResult.success) {
+                return aiResult;
+            }
+
+            // Step 3: Convert to import format
+            const formattedQuestions = this.formatForImport(aiResult.questions);
+
+            return {
+                success: true,
+                questions: formattedQuestions,
+                total: formattedQuestions.length,
+                pdfInfo: {
+                    pages: textResult.pages,
+                    chars: textResult.chars
+                }
+            };
+
+        } catch (error) {
+            console.error('❌ PDF extraction workflow failed:', error);
+            return {
+                success: false,
+                error: error.message,
+                questions: []
+            };
+        }
+    }
+
+    // ===== FORMAT FOR MOCK ENGINE =====
+    formatForImport(questions) {
+        return questions.map((q, index) => ({
+            question_number: q.qno || index + 1,
+            question_text_en: q.question || '',
+            question_text_hi: '',
+            option_a_en: q.a || q.option_a || '',
+            option_a_hi: '',
+            option_b_en: q.b || q.option_b || '',
+            option_b_hi: '',
+            option_c_en: q.c || q.option_c || '',
+            option_c_hi: '',
+            option_d_en: q.d || q.option_d || '',
+            option_d_hi: '',
+            correct_option: (q.answer || 'a').toLowerCase(),
+            explanation_en: q.explanation || '',
+            explanation_hi: '',
+            difficulty: 'moderate'
+        }));
+    }
+
+    // ===== CONVERT TO ADMIN DATA FORMAT =====
+    toImportFormat(questions, testName, subject) {
+        return {
+            title_en: testName,
+            subject: subject,
+            total_questions: questions.length,
+            time_limit_minutes: Math.ceil(questions.length * 1.5),
+            questions: questions
+        };
+    }
+
+    // ===== AI QUESTION GENERATION =====
     async generateQuestions(options) {
         if (!this.hasApiKey()) {
             throw new Error('Groq API key not configured');
@@ -148,51 +285,31 @@ RESPOND ONLY WITH VALID JSON. No markdown, no explanations.`;
 
         const {
             topic = 'General Knowledge',
-            subject = 'General',
             count = 10,
-            difficulty = 'moderate',
-            language = 'english',
-            includeExplanations = true
+            difficulty = 'moderate'
         } = options;
 
-        const systemPrompt = `You are an expert question paper creator for competitive exams like UPSC, SSC, Banking.
-Create high-quality MCQ questions that are factually accurate and exam-relevant.
+        const systemPrompt = `You are an expert question paper creator. Generate exactly ${count} high-quality MCQ questions.
+
+OUTPUT ONLY THIS JSON FORMAT - no other text:
+[
+  {
+    "qno": 1,
+    "question": "Question text here?",
+    "a": "Option A",
+    "b": "Option B",
+    "c": "Option C",
+    "d": "Option D",
+    "answer": "a",
+    "explanation": "Brief explanation"
+  }
+]
 
 RULES:
-1. Create exactly ${count} unique questions
-2. Difficulty level: ${difficulty}
-3. Topic: ${topic}
-4. All options should be plausible
-5. Questions should test real knowledge, not trivial facts
-6. Include Hindi translations if possible
-${includeExplanations ? '7. Add brief, informative explanations for each answer' : ''}
-
-OUTPUT FORMAT (strict JSON):
-{
-  "questions": [
-    {
-      "question_number": 1,
-      "question_text_en": "...",
-      "question_text_hi": "...",
-      "option_a_en": "...",
-      "option_a_hi": "...",
-      "option_b_en": "...",
-      "option_b_hi": "...",
-      "option_c_en": "...",
-      "option_c_hi": "...",
-      "option_d_en": "...",
-      "option_d_hi": "...",
-      "correct_option": "a|b|c|d",
-      "explanation_en": "...",
-      "explanation_hi": "...",
-      "difficulty": "easy|moderate|difficult"
-    }
-  ],
-  "topic": "${topic}",
-  "total_generated": ${count}
-}
-
-RESPOND ONLY WITH VALID JSON.`;
+- Difficulty: ${difficulty}
+- All options should be plausible
+- Questions should be factually accurate
+- START WITH [ and END WITH ]`;
 
         const userPrompt = `Generate ${count} ${difficulty} MCQ questions on: ${topic}`;
 
@@ -222,37 +339,26 @@ RESPOND ONLY WITH VALID JSON.`;
             }
 
             const data = await response.json();
-            let content = data.choices[0]?.message?.content;
+            const content = data.choices[0]?.message?.content;
 
             if (!content) {
                 throw new Error('Empty response from AI');
             }
 
-            // Clean up response - extract JSON from markdown if present
-            content = content.trim();
-            if (content.startsWith('```json')) {
-                content = content.slice(7);
-            }
-            if (content.startsWith('```')) {
-                content = content.slice(3);
-            }
-            if (content.endsWith('```')) {
-                content = content.slice(0, -3);
-            }
-            content = content.trim();
+            const questions = this.parseJsonResponse(content);
+            const formattedQuestions = this.formatForImport(questions);
 
-            const result = JSON.parse(content);
-            console.log(`✅ AI generated ${result.questions?.length || 0} questions`);
+            console.log(`✅ Generated ${formattedQuestions.length} questions`);
 
             return {
                 success: true,
-                questions: result.questions || [],
-                total: result.total_generated || result.questions?.length || 0,
-                topic: result.topic
+                questions: formattedQuestions,
+                total: formattedQuestions.length,
+                topic: topic
             };
 
         } catch (error) {
-            console.error('❌ AI generation failed:', error);
+            console.error('❌ Generation failed:', error);
             return {
                 success: false,
                 error: error.message,
@@ -263,97 +369,7 @@ RESPOND ONLY WITH VALID JSON.`;
         }
     }
 
-    // ===== PDF TEXT EXTRACTION =====
-
-    async extractTextFromPDF(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = async (e) => {
-                try {
-                    const typedArray = new Uint8Array(e.target.result);
-                    const pdf = await pdfjsLib.getDocument(typedArray).promise;
-
-                    let fullText = '';
-                    const totalPages = pdf.numPages;
-
-                    for (let i = 1; i <= totalPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageText = textContent.items.map(item => item.str).join(' ');
-                        fullText += pageText + '\n\n';
-                    }
-
-                    console.log(`📄 Extracted ${totalPages} pages, ${fullText.length} characters`);
-                    resolve({
-                        success: true,
-                        text: fullText,
-                        pages: totalPages,
-                        chars: fullText.length
-                    });
-
-                } catch (error) {
-                    console.error('❌ PDF extraction failed:', error);
-                    reject(error);
-                }
-            };
-
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
-    // ===== COMBINED WORKFLOW =====
-
-    async extractFromPDF(file, options = {}) {
-        // Step 1: Extract text from PDF
-        const textResult = await this.extractTextFromPDF(file);
-        if (!textResult.success) {
-            return { success: false, error: 'Failed to extract text from PDF' };
-        }
-
-        // Step 2: Use AI to parse questions
-        const aiResult = await this.extractQuestionsFromText(textResult.text, options);
-
-        return {
-            ...aiResult,
-            pdfInfo: {
-                pages: textResult.pages,
-                chars: textResult.chars
-            }
-        };
-    }
-
-    // ===== CONVERT TO IMPORT FORMAT =====
-
-    toImportFormat(questions, testName, subject) {
-        return {
-            title_en: testName,
-            subject: subject,
-            total_questions: questions.length,
-            time_limit_minutes: Math.ceil(questions.length * 1.5),
-            questions: questions.map((q, i) => ({
-                question_number: q.question_number || i + 1,
-                question_text_en: q.question_text_en || '',
-                question_text_hi: q.question_text_hi || '',
-                option_a_en: q.option_a_en || '',
-                option_a_hi: q.option_a_hi || '',
-                option_b_en: q.option_b_en || '',
-                option_b_hi: q.option_b_hi || '',
-                option_c_en: q.option_c_en || '',
-                option_c_hi: q.option_c_hi || '',
-                option_d_en: q.option_d_en || '',
-                option_d_hi: q.option_d_hi || '',
-                correct_option: q.correct_option || 'a',
-                explanation_en: q.explanation_en || '',
-                explanation_hi: q.explanation_hi || '',
-                difficulty: q.difficulty || 'moderate'
-            }))
-        };
-    }
-
-    // ===== STATUS CHECK =====
-
+    // ===== TEST CONNECTION =====
     async testConnection() {
         if (!this.hasApiKey()) {
             return { success: false, error: 'No API key configured' };
@@ -387,4 +403,4 @@ RESPOND ONLY WITH VALID JSON.`;
 
 // Create global instance
 window.aiExtractor = new AIQuestionExtractor();
-console.log('✅ AI Question Extractor loaded (Groq API)');
+console.log('✅ AI Question Extractor loaded');
