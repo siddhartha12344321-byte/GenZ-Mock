@@ -941,8 +941,11 @@
             const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
 
             // Real users only - no demo data
+            const leaderboardEl = document.getElementById('leaderboardList');
+            if (!leaderboardEl) return; // Element not on current page
+
             if (attemptedTests.length === 0) {
-                document.getElementById('leaderboardList').innerHTML = `
+                leaderboardEl.innerHTML = `
                     <div class="text-center py-8">
                         <div class="text-3xl mb-2">🏆</div>
                         <div class="text-gray-500 text-xs">Be the first to top the leaderboard!</div>
@@ -957,7 +960,7 @@
             const userName = userData.name || userData.key || 'You';
             const acc = userProgress.total > 0 ? Math.round((userProgress.correct / userProgress.total) * 100) : 0;
 
-            document.getElementById('leaderboardList').innerHTML = `
+            leaderboardEl.innerHTML = `
                 <div class="flex items-center p-2 bg-blue-50 rounded mb-1">
                     <div class="w-8"><div class="w-5 h-5 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-[10px] font-bold">1</div></div>
                     <div class="flex-1 min-w-0"><div class="text-xs font-bold text-gray-900">${userName} 🎉</div></div>
