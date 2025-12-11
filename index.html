@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen-Z Mocks | SuperKalam Interface</title>
+    <title>Gen-Z Mocks | SuperKalam UI</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
     <script src="js/supabase-config.js"></script>
     <script src="js/admin-data.js"></script>
@@ -21,539 +18,523 @@
     <script src="js/ai-extractor.js"></script>
 
     <style>
-        /* SUPERKALAM THEME BASE */
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; overflow: hidden; }
+        /* SUPERKALAM BASE THEME */
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; overflow: hidden; }
         
-        /* SCROLLBAR */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        /* SIDEBAR STYLES */
+        .sk-sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; height: 100vh; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 4px; border-radius: 8px; color: #64748b; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .nav-item:hover { background: #f1f5f9; color: #0f172a; }
+        .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin: 20px 16px 8px; }
 
-        /* OLIVEBOARD EXAM THEME (Your Original CSS restored) */
-        .ob-theme { font-family: 'Roboto', sans-serif; background-color: #e8e8e8; height: 100vh; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; }
-        .ob-header { background: linear-gradient(to bottom, #4a9fd4 0%, #2d7bb8 100%); color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); height: 50px; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
-        .ob-panel { background: white; border: 1px solid #ddd; }
-        
-        /* Palette Logic */
-        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; }
-        .palette-btn { height: 35px; width: 35px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 3px; font-weight: bold; font-size: 12px; }
-        .palette-btn:hover { transform: scale(1.05); }
-        .p-answered { background: #5cb85c; color: white; border-color: #4cae4c; }
-        .p-marked { background: #f0ad4e; color: white; border-color: #eea236; }
-        .p-not-visited { background: #e8e8e8; color: #333; }
-        .p-current { border: 2px solid #337ab7; box-shadow: 0 0 5px #337ab7; }
-        .p-marked-answered { background: #5cb85c; position: relative; }
-        .p-marked-answered::after { content: '★'; position: absolute; top: -5px; right: -2px; font-size: 10px; color: #f0ad4e; }
+        /* CONTENT AREA */
+        .main-content { margin-left: 260px; height: 100vh; overflow-y: auto; padding: 0; }
+        .view-section { display: none; padding: 32px; }
+        .view-section.active { display: block; }
 
-        /* SUPERKALAM SIDEBAR */
-        .sk-sidebar { background: white; border-right: 1px solid #e2e8f0; width: 260px; display: flex; flex-direction: column; height: 100vh; }
-        .sk-nav-btn { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 8px; color: #64748b; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; width: 100%; text-align: left; }
-        .sk-nav-btn:hover { background: #f1f5f9; color: #0f172a; }
-        .sk-nav-btn.active { background: #eff6ff; color: #2563eb; }
+        /* ADMIN TOGGLES & INPUTS (Restored from your file) */
+        .toggle-group { display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; display: inline-flex; }
+        .toggle-btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
+        .toggle-btn.active { background: white; color: #2563eb; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; transition: border 0.2s; }
+        .form-input:focus { border-color: #3b82f6; ring: 2px solid #eff6ff; }
+
+        /* OLIVEBOARD EXAM THEME (Full Screen Overlay) */
+        #exam-view { position: fixed; inset: 0; background: #e8e8e8; z-index: 100; font-family: 'Roboto', sans-serif; display: none; flex-direction: column; }
+        .ob-header { background: linear-gradient(to bottom, #4a9fd4 0%, #2d7bb8 100%); height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 10px; }
+        .pal-item { height: 34px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .pal-item.answered { background: #5cb85c; color: white; border-color: #4cae4c; }
+        .pal-item.marked { background: #f0ad4e; color: white; border-color: #eea236; }
+        .pal-item.not-visited { background: #e8e8e8; }
+        .pal-item.current { border: 2px solid #337ab7; }
+
+        /* LANDING PAGE */
+        #landing-view { position: fixed; inset: 0; z-index: 200; background: #0f172a; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-
-        // --- AUTH & VALIDATION ---
-        const ADMIN_PASS = "genz2024admin"; 
-
-        // --- COMPONENT: OLIVEBOARD EXAM ENGINE (Logic Restored) ---
-        // This component mimics your original test-oliveboard.html logic exactly
-        const ExamEngine = ({ test, onExit }) => {
-            // Restore Original Logic State
-            const [currentQIndex, setCurrentQIndex] = useState(0);
-            const [answers, setAnswers] = useState({});
-            const [marked, setMarked] = useState({});
-            const [visited, setVisited] = useState({0: true});
-            const [timeLeft, setTimeLeft] = useState((test.time_limit || 60) * 60);
+    <div id="landing-view">
+        <div class="w-full max-w-md bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl text-center">
+            <h1 class="text-4xl font-bold text-white mb-2 flex justify-center items-center gap-2">🚀 Gen<span class="text-blue-500">Z</span></h1>
+            <p class="text-slate-400 mb-8">Premium Exam Ecosystem</p>
             
-            // Get questions from AdminData (Your backend)
-            const questions = window.adminData.getQuestionsByTestId(test.id);
+            <div id="login-options" class="space-y-4">
+                <button onclick="showLogin('user')" class="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-xl flex items-center gap-4 transition text-white border border-slate-600">
+                    <div class="p-3 bg-blue-500/20 rounded-full text-blue-400">👤</div>
+                    <div class="text-left"><h3 class="font-bold">Student Login</h3><p class="text-xs text-slate-400">Access Key</p></div>
+                </button>
+                <button onclick="showLogin('admin')" class="w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-xl flex items-center gap-4 transition text-white border border-slate-600">
+                    <div class="p-3 bg-purple-500/20 rounded-full text-purple-400">🔒</div>
+                    <div class="text-left"><h3 class="font-bold">Admin Portal</h3><p class="text-xs text-slate-400">Management</p></div>
+                </button>
+            </div>
 
-            // Timer Logic
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    setTimeLeft(prev => {
-                        if (prev <= 0) {
-                            clearInterval(timer);
-                            submitTest();
-                            return 0;
-                        }
-                        return prev - 1;
-                    });
-                }, 1000);
-                return () => clearInterval(timer);
-            }, []);
+            <form id="user-form" class="hidden space-y-4" onsubmit="handleUserLogin(event)">
+                <input id="user-key" type="text" placeholder="ENTER KEY (e.g. DEMO-1234)" class="w-full p-3 bg-slate-900 border border-slate-600 rounded text-center text-white tracking-widest outline-none focus:border-blue-500">
+                <button class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded font-bold">Start Learning</button>
+                <button type="button" onclick="resetLogin()" class="text-slate-400 text-sm">Back</button>
+            </form>
 
-            // Helper: Format Time
-            const formatTime = (s) => {
-                const m = Math.floor(s / 60).toString().padStart(2, '0');
-                const sec = (s % 60).toString().padStart(2, '0');
-                return `${m}:${sec}`;
-            };
+            <form id="admin-form" class="hidden space-y-4" onsubmit="handleAdminLogin(event)">
+                <input id="admin-pass" type="password" placeholder="Password" class="w-full p-3 bg-slate-900 border border-slate-600 rounded text-center text-white outline-none focus:border-purple-500">
+                <button class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded font-bold">Access Panel</button>
+                <button type="button" onclick="resetLogin()" class="text-slate-400 text-sm">Back</button>
+            </form>
+        </div>
+    </div>
 
-            // Logic: Submit Test & Save to History
-            const submitTest = () => {
-                let correct = 0;
-                let wrong = 0;
-                let score = 0;
-
-                questions.forEach((q, i) => {
-                    if (answers[i]) {
-                        if (answers[i] === q.correct_option) {
-                            correct++;
-                            score += parseFloat(test.mark_correct || 2);
-                        } else {
-                            wrong++;
-                            score -= parseFloat(test.mark_wrong || 0.66);
-                        }
-                    }
-                });
-
-                // Save to localStorage (Restoring your original logic)
-                const attempt = {
-                    testId: test.id,
-                    testName: test.name_en,
-                    date: new Date().toISOString(),
-                    score: score.toFixed(2),
-                    accuracy: (correct + wrong) > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0,
-                    correct, wrong, total: questions.length
-                };
-
-                const history = JSON.parse(localStorage.getItem('user_history') || '[]');
-                history.unshift(attempt);
-                localStorage.setItem('user_history', JSON.stringify(history));
-
-                alert(`Test Submitted Successfully!\n\nScore: ${score.toFixed(2)}\nCorrect: ${correct}\nWrong: ${wrong}`);
-                onExit(); // Go back to dashboard
-            };
-
-            if (!questions || questions.length === 0) return <div className="h-screen flex items-center justify-center bg-white text-black">Error: No questions found for this test.</div>;
-
-            const q = questions[currentQIndex];
-
-            return (
-                <div className="ob-theme">
-                    {/* Header */}
-                    <div className="ob-header">
-                        <div className="font-bold text-lg">{test.name_en}</div>
-                        <div className="flex items-center gap-4">
-                            <div className="bg-white/20 px-3 py-1 rounded text-sm font-mono font-bold">Time Left: {formatTime(timeLeft)}</div>
-                            <button onClick={onExit} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Exit</button>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-1 overflow-hidden p-2 gap-2 h-full">
-                        {/* Question Panel */}
-                        <div className="flex-1 flex flex-col bg-white border border-gray-300">
-                            <div className="bg-gray-100 p-2 px-4 border-b flex justify-between font-bold text-gray-700">
-                                <span>Question No. {currentQIndex + 1}</span>
-                                <span className="text-xs text-gray-500">+2.0 / -0.66</span>
-                            </div>
-                            
-                            <div className="flex-1 p-6 overflow-y-auto">
-                                <div className="text-lg text-gray-900 mb-6 font-medium leading-relaxed">{q.question_text_en}</div>
-                                <div className="space-y-3">
-                                    {['a', 'b', 'c', 'd'].map(opt => (
-                                        q[`option_${opt}_en`] && (
-                                            <label key={opt} className={`flex items-start gap-3 p-3 border rounded cursor-pointer hover:bg-blue-50 ${answers[currentQIndex] === opt ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : ''}`}>
-                                                <input 
-                                                    type="radio" 
-                                                    name={`q${currentQIndex}`} 
-                                                    checked={answers[currentQIndex] === opt} 
-                                                    onChange={() => setAnswers({...answers, [currentQIndex]: opt})} 
-                                                    className="mt-1" 
-                                                />
-                                                <span className="text-gray-800">{q[`option_${opt}_en`]}</span>
-                                            </label>
-                                        )
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="p-3 bg-gray-50 border-t flex justify-between">
-                                <div className="flex gap-2">
-                                    <button className="px-4 py-2 bg-white border rounded hover:bg-gray-100 text-black" onClick={() => {
-                                        const n = {...answers}; delete n[currentQIndex]; setAnswers(n);
-                                    }}>Clear Response</button>
-                                    <button className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" onClick={() => setMarked({...marked, [currentQIndex]: !marked[currentQIndex]})}>
-                                        {marked[currentQIndex] ? 'Unmark' : 'Mark for Review'}
-                                    </button>
-                                </div>
-                                <button className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700" onClick={() => {
-                                    const next = Math.min(currentQIndex + 1, questions.length - 1);
-                                    setCurrentQIndex(next);
-                                    setVisited(prev => ({...prev, [next]: true}));
-                                }}>Save & Next</button>
-                            </div>
-                        </div>
-
-                        {/* Palette Panel */}
-                        <div className="w-80 bg-white border border-gray-300 flex flex-col">
-                            <div className="p-3 bg-gray-100 border-b font-bold text-gray-700 flex items-center gap-2">
-                                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">👤</div>
-                                Candidate
-                            </div>
-                            
-                            {/* Legend */}
-                            <div className="p-2 grid grid-cols-2 gap-2 text-xs border-b">
-                                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#5cb85c]"></span> Answered</div>
-                                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#d9534f]"></span> Not Answered</div>
-                                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#f0ad4e]"></span> Marked</div>
-                                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#e8e8e8] border"></span> Not Visited</div>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto p-2">
-                                <div className="font-bold text-sm mb-2 text-gray-600">Questions:</div>
-                                <div className="palette-grid">
-                                    {questions.map((_, i) => {
-                                        let cls = "palette-btn p-not-visited";
-                                        if (answers[i]) cls = "palette-btn p-answered";
-                                        else if (marked[i]) cls = "palette-btn p-marked";
-                                        else if (visited[i]) cls = "palette-btn p-not-visited"; // Should technically be red if visited & not answered but simplified here
-                                        
-                                        if (i === currentQIndex) cls += " p-current";
-                                        return (
-                                            <div key={i} className={cls} onClick={() => { setCurrentQIndex(i); setVisited(prev => ({...prev, [i]: true})); }}>
-                                                {i + 1}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            <div className="p-3 border-t bg-gray-50">
-                                <button onClick={submitTest} className="w-full bg-[#5cb85c] hover:bg-[#449d44] text-white font-bold py-3 rounded shadow">
-                                    SUBMIT TEST
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- COMPONENT: SUPERKALAM DASHBOARD (UI Shell) ---
-        const DashboardShell = ({ children, activeTab, setActiveTab, onLogout }) => {
-            return (
-                <div className="sk-theme">
-                    {/* Sidebar */}
-                    <div className="sk-sidebar shrink-0 z-20">
-                        <div className="p-6 flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">GZ</div>
-                            <span className="font-bold text-xl text-gray-800">SuperKalam</span>
-                        </div>
-                        
-                        <div className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                            <button onClick={() => setActiveTab('my_tests')} className={`sk-nav-btn ${activeTab === 'my_tests' ? 'active' : ''}`}>
-                                <span>📝</span> My Tests
-                            </button>
-                            <button onClick={() => setActiveTab('progress')} className={`sk-nav-btn ${activeTab === 'progress' ? 'active' : ''}`}>
-                                <span>📊</span> My Progress
-                            </button>
-                            <button onClick={() => setActiveTab('ask')} className={`sk-nav-btn ${activeTab === 'ask' ? 'active' : ''}`}>
-                                <span>🤖</span> Ask AI
-                            </button>
-                            {/* Admin Link visible only if needed or generic help */}
-                            <button onClick={() => setActiveTab('admin_login')} className={`sk-nav-btn mt-4 ${activeTab === 'admin_login' ? 'active' : ''}`}>
-                                <span>🛠️</span> Admin / Help
-                            </button>
-                        </div>
-
-                        <div className="p-4 border-t border-gray-100">
-                            <button onClick={onLogout} className="w-full flex items-center gap-2 text-red-500 hover:bg-red-50 p-2 rounded transition-colors text-sm font-medium">
-                                <span>🚪</span> Logout
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Content Area */}
-                    <div className="flex-1 h-full overflow-hidden bg-[#f8fafc] relative">
-                        {children}
-                    </div>
-                </div>
-            );
-        };
-
-        // --- VIEW: MY TESTS (Functional) ---
-        const MyTestsView = ({ onStartExam }) => {
-            const [tests, setTests] = useState([]);
-
-            useEffect(() => {
-                if (window.adminData) {
-                    setTests(window.adminData.getAllTests());
-                }
-            }, []);
-
-            return (
-                <div className="flex flex-col h-full">
-                    <div className="p-8 pb-4">
-                        <h1 className="text-2xl font-bold text-gray-800">My Tests</h1>
-                        <p className="text-gray-500 text-sm mt-1">Select a test to start practicing.</p>
-                    </div>
-                    <div className="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
-                        <div className="grid gap-4">
-                            {tests.length === 0 ? (
-                                <div className="p-10 text-center border-2 border-dashed border-gray-300 rounded-xl">
-                                    <div className="text-4xl mb-2">📂</div>
-                                    <p className="text-gray-500">No tests available.</p>
-                                </div>
-                            ) : tests.map(t => (
-                                <div key={t.id} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex justify-between items-center group">
-                                    <div>
-                                        <div className="font-bold text-lg text-gray-800 group-hover:text-blue-600 transition-colors">{t.name_en}</div>
-                                        <div className="text-sm text-gray-500 mt-1">{t.subject} • {t.total_questions || t.questions} Questions • {t.time_limit} Mins</div>
-                                    </div>
-                                    <button 
-                                        onClick={() => onStartExam(t)}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm transition-all active:scale-95"
-                                    >
-                                        Attempt Now
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- VIEW: PROGRESS (Functional) ---
-        const ProgressView = () => {
-            const [history, setHistory] = useState([]);
-            const [stats, setStats] = useState({ attempts: 0, avgScore: 0 });
-
-            useEffect(() => {
-                const h = JSON.parse(localStorage.getItem('user_history') || '[]');
-                setHistory(h);
-                if (h.length > 0) {
-                    const totalScore = h.reduce((acc, curr) => acc + parseFloat(curr.score), 0);
-                    setStats({ attempts: h.length, avgScore: (totalScore / h.length).toFixed(1) });
-                }
-            }, []);
-
-            return (
-                <div className="p-8 h-full overflow-y-auto custom-scrollbar">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6">Performance Analytics</h1>
-                    
-                    <div className="grid grid-cols-2 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <div className="text-gray-500 text-sm font-medium mb-1">Total Attempts</div>
-                            <div className="text-3xl font-bold text-blue-600">{stats.attempts}</div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <div className="text-gray-500 text-sm font-medium mb-1">Average Score</div>
-                            <div className="text-3xl font-bold text-green-600">{stats.avgScore}</div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b bg-gray-50 font-bold text-gray-700">Recent History</div>
-                        {history.length === 0 ? (
-                            <div className="p-8 text-center text-gray-500">No tests taken yet.</div>
-                        ) : (
-                            <div className="divide-y">
-                                {history.map((h, i) => (
-                                    <div key={i} className="px-6 py-4 flex justify-between items-center hover:bg-gray-50">
-                                        <div>
-                                            <div className="font-bold text-gray-800">{h.testName}</div>
-                                            <div className="text-xs text-gray-500">{new Date(h.date).toLocaleDateString()}</div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="font-bold text-lg text-blue-600">{h.score}</div>
-                                            <div className="text-xs text-gray-500">Score</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        // --- VIEW: ADMIN PANEL (Your Logic + SuperKalam UI) ---
-        const AdminView = () => {
-            const [isAuthenticated, setIsAuthenticated] = useState(false);
-            const [pass, setPass] = useState('');
+    <div id="app-layout" class="hidden">
+        <aside class="sk-sidebar">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">SK</div>
+                <span class="font-bold text-xl text-gray-800">SuperKalam</span>
+            </div>
             
-            // Logic State
-            const [testName, setTestName] = useState('');
-            const [subject, setSubject] = useState('Polity');
-            const [qsCount, setQsCount] = useState(10);
+            <div class="flex-1 px-4 py-2 overflow-y-auto custom-scrollbar">
+                <div class="nav-item active" onclick="switchView('dashboard')" id="nav-dashboard">
+                    <span>🏠</span> Home
+                </div>
+                
+                <div class="nav-section">PRACTICE</div>
+                <div class="nav-item" onclick="switchView('tests')" id="nav-tests">
+                    <span>📝</span> Mock Tests
+                </div>
+                <div class="nav-item" onclick="switchView('ask')">
+                    <span>🤖</span> Ask SuperKalam
+                </div>
+
+                <div class="nav-section">ADMINISTRATION</div>
+                <div class="nav-item" onclick="switchView('admin')" id="nav-admin">
+                    <span>🛠️</span> Admin Panel
+                </div>
+            </div>
+
+            <div class="p-4 border-t">
+                <button onclick="logout()" class="w-full flex items-center gap-2 text-red-500 hover:bg-red-50 p-2 rounded text-sm font-bold">
+                    🚪 Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
             
-            const handleLogin = (e) => {
-                e.preventDefault();
-                if (pass === ADMIN_PASS) setIsAuthenticated(true);
-                else alert("Wrong Password");
-            };
-
-            const handleCreate = () => {
-                if(!window.adminData) return alert("Admin Data not loaded");
-                window.adminData.createTest({
-                    name_en: testName,
-                    subject: subject,
-                    questions: parseInt(qsCount),
-                    time: 20
-                });
-                alert("Test Created Successfully!");
-                setTestName('');
-            };
-
-            const handlePDF = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                alert("Processing PDF... Please wait.");
-                try {
-                    window.aiExtractor.setApiKey("AIzaSyAje3aDrFfZsOEMw8mtTQSlpNlXXkO8Yi4"); // Gemini
-                    const res = await window.aiExtractor.extractFromPDF(file);
-                    if(res.success) {
-                        window.adminData.importTestWithQuestions(
-                            window.aiExtractor.toImportFormat(res.questions, file.name, 'Imported')
-                        );
-                        alert("Success! Imported " + res.questions.length + " questions.");
-                    } else {
-                        alert("Error: " + res.error);
-                    }
-                } catch(err) { alert(err.message); }
-            };
-
-            if (!isAuthenticated) {
-                return (
-                    <div className="flex h-full items-center justify-center">
-                        <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl shadow-lg border w-full max-w-sm">
-                            <h2 className="text-xl font-bold mb-4 text-center">Admin Login</h2>
-                            <input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="w-full p-3 border rounded mb-4" placeholder="Enter Password" />
-                            <button className="w-full bg-blue-600 text-white p-3 rounded font-bold">Login</button>
-                        </form>
+            <div id="view-dashboard" class="view-section active">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">Student Dashboard</h1>
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border shadow-sm">
+                        <div class="text-gray-500 text-xs uppercase font-bold">Tests Taken</div>
+                        <div class="text-3xl font-bold text-blue-600 mt-1" id="stat-tests">0</div>
                     </div>
-                );
+                    <div class="bg-white p-6 rounded-xl border shadow-sm">
+                        <div class="text-gray-500 text-xs uppercase font-bold">Accuracy</div>
+                        <div class="text-3xl font-bold text-green-600 mt-1" id="stat-accuracy">0%</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b font-bold bg-gray-50">Recent Activity</div>
+                    <div id="history-list" class="divide-y">
+                        </div>
+                </div>
+            </div>
+
+            <div id="view-tests" class="view-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Available Tests</h1>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">All</button>
+                        <button class="px-4 py-1.5 rounded-full hover:bg-gray-100 text-gray-600 text-sm font-bold">Attempted</button>
+                    </div>
+                </div>
+                <div id="tests-grid" class="grid gap-4">
+                    </div>
+            </div>
+
+            <div id="view-admin" class="view-section">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Control</h1>
+                
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl border shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Create New Test</h3>
+                        <div class="space-y-4">
+                            <input id="admin-test-name" class="form-input" placeholder="Test Name">
+                            <div class="flex gap-2">
+                                <select id="admin-subject" class="form-input">
+                                    <option>Polity</option><option>History</option><option>Geography</option>
+                                </select>
+                                <input id="admin-qs" type="number" class="form-input w-24" value="10">
+                            </div>
+                            <button onclick="createManualTest()" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">Create Test</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Import PDF (Gemini)</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 relative cursor-pointer">
+                            <input type="file" accept=".pdf" onchange="handlePDFUpload(event)" class="absolute inset-0 w-full h-full opacity-0">
+                            <div class="text-3xl mb-2">📄</div>
+                            <p class="text-gray-500">Click to upload PDF</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white p-6 rounded-xl border shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">Access Keys</h3>
+                        <button onclick="generateKey()" class="text-green-600 font-bold text-sm">+ Generate Key</button>
+                    </div>
+                    <div id="keys-list" class="space-y-2 max-h-60 overflow-y-auto">
+                        </div>
+                </div>
+            </div>
+
+            <div id="view-ask" class="view-section h-full flex flex-col">
+                <div class="flex-1 flex items-center justify-center text-gray-400">
+                    GenZ AI Chat Integration Ready
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="exam-view">
+        <div class="ob-header shrink-0">
+            <div class="font-bold text-lg" id="exam-title">Test Name</div>
+            <div class="flex items-center gap-4">
+                <div class="bg-white/20 px-3 py-1 rounded text-sm font-mono font-bold" id="exam-timer">00:00</div>
+                <button onclick="exitExam()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold">EXIT</button>
+            </div>
+        </div>
+
+        <div class="flex flex-1 overflow-hidden p-2 gap-2">
+            <div class="flex-1 flex flex-col bg-white border border-gray-300">
+                <div class="bg-gray-100 p-2 px-4 border-b flex justify-between font-bold text-gray-700">
+                    <span id="q-number">Question 1</span>
+                    <span class="text-xs text-gray-500">+2.0 / -0.66</span>
+                </div>
+                <div class="flex-1 p-6 overflow-y-auto" id="q-content">
+                    </div>
+                <div class="p-3 bg-gray-50 border-t flex justify-between">
+                    <button onclick="clearResponse()" class="px-4 py-2 border bg-white rounded text-sm">Clear</button>
+                    <button onclick="saveNext()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save & Next</button>
+                </div>
+            </div>
+
+            <div class="w-72 bg-white border border-gray-300 flex flex-col shrink-0">
+                <div class="p-2 bg-gray-100 border-b font-bold text-gray-700 text-xs">Question Palette</div>
+                <div class="flex-1 overflow-y-auto p-2">
+                    <div id="palette-container" class="palette-grid"></div>
+                </div>
+                <div class="p-3 border-t">
+                    <button onclick="submitTest()" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700">SUBMIT TEST</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let currentTest = null;
+        let currentQuestions = [];
+        let currentQIndex = 0;
+        let answers = {};
+        let marked = {};
+        let visited = {};
+        let timerInterval = null;
+        let timeLeft = 0;
+
+        // --- AUTH LOGIC ---
+        function showLogin(type) {
+            document.getElementById('login-options').classList.add('hidden');
+            document.getElementById(type + '-form').classList.remove('hidden');
+        }
+
+        function resetLogin() {
+            document.getElementById('login-options').classList.remove('hidden');
+            document.getElementById('user-form').classList.add('hidden');
+            document.getElementById('admin-form').classList.add('hidden');
+        }
+
+        function handleUserLogin(e) {
+            e.preventDefault();
+            const key = document.getElementById('user-key').value.trim().toUpperCase();
+            const keys = window.adminData.getAllKeys();
+            
+            if (key === "DEMO-1234" || keys.some(k => k.key === key && k.is_active)) {
+                localStorage.setItem('user_session', key);
+                initApp();
+            } else {
+                alert("Invalid Key!");
+            }
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === "genz2024admin") {
+                localStorage.setItem('user_session', 'ADMIN');
+                initApp();
+            } else {
+                alert("Wrong Password");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user_session');
+            location.reload();
+        }
+
+        function initApp() {
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('app-layout').classList.remove('hidden');
+            
+            const session = localStorage.getItem('user_session');
+            // Hide Admin Nav if student
+            if(session !== 'ADMIN') {
+                document.getElementById('nav-admin').style.display = 'none';
             }
 
-            return (
-                <div className="p-8 h-full overflow-y-auto custom-scrollbar">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6">Admin Control Panel</h1>
-                    
-                    <div className="grid gap-8">
-                        {/* Manual Create */}
-                        <div className="bg-white p-6 rounded-xl border shadow-sm">
-                            <h3 className="font-bold text-lg mb-4">Create New Test</h3>
-                            <div className="space-y-4">
-                                <input value={testName} onChange={e=>setTestName(e.target.value)} className="w-full p-3 border rounded" placeholder="Test Name" />
-                                <div className="flex gap-4">
-                                    <select value={subject} onChange={e=>setSubject(e.target.value)} className="flex-1 p-3 border rounded">
-                                        <option>Polity</option><option>History</option><option>Geography</option>
-                                    </select>
-                                    <input type="number" value={qsCount} onChange={e=>setQsCount(e.target.value)} className="w-24 p-3 border rounded" />
-                                </div>
-                                <button onClick={handleCreate} className="w-full bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700">Create Test</button>
-                            </div>
-                        </div>
+            renderTests();
+            renderStats();
+            renderKeys();
+        }
 
-                        {/* PDF Import */}
-                        <div className="bg-white p-6 rounded-xl border shadow-sm">
-                            <h3 className="font-bold text-lg mb-4">Import from PDF</h3>
-                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 relative">
-                                <input type="file" accept=".pdf" onChange={handlePDF} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                                <div className="text-3xl mb-2">📄</div>
-                                <p className="text-gray-600">Click to Upload PDF</p>
-                                <p className="text-xs text-gray-400">Uses Gemini AI to extract questions</p>
-                            </div>
-                        </div>
-                    </div>
+        // --- VIEW NAVIGATION ---
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + viewName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const navBtn = document.getElementById('nav-' + viewName);
+            if(navBtn) navBtn.classList.add('active');
+
+            if(viewName === 'tests') renderTests();
+            if(viewName === 'admin') renderKeys();
+        }
+
+        // --- ADMIN FUNCTIONS ---
+        function createManualTest() {
+            const name = document.getElementById('admin-test-name').value;
+            const subject = document.getElementById('admin-subject').value;
+            const qs = document.getElementById('admin-qs').value;
+            
+            if(!name) return alert("Name Required");
+            
+            window.adminData.createTest({
+                name_en: name, subject: subject, questions: parseInt(qs), time: 20
+            });
+            alert("Test Created!");
+            document.getElementById('admin-test-name').value = '';
+        }
+
+        async function handlePDFUpload(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            alert("Reading PDF... (Gemini AI)");
+            
+            // Set Key (Hardcoded for demo, move to secure storage in prod)
+            window.aiExtractor.setApiKey("AIzaSyAje3aDrFfZsOEMw8mtTQSlpNlXXkO8Yi4");
+            
+            const res = await window.aiExtractor.extractFromPDF(file);
+            if(res.success) {
+                const importData = window.aiExtractor.toImportFormat(res.questions, file.name, "Imported");
+                window.adminData.importTestWithQuestions(importData);
+                alert("Success! Imported " + res.questions.length + " questions.");
+            } else {
+                alert("Error: " + res.error);
+            }
+        }
+
+        function generateKey() {
+            const k = window.adminData.createKey();
+            renderKeys();
+            alert("Key Generated: " + k.key);
+        }
+
+        function renderKeys() {
+            const keys = window.adminData.getAllKeys();
+            const list = document.getElementById('keys-list');
+            list.innerHTML = keys.map(k => `
+                <div class="flex justify-between p-3 bg-gray-50 rounded border text-sm font-mono">
+                    <span class="text-blue-600 font-bold">${k.key}</span>
+                    <span class="${k.used ? 'text-red-500':'text-green-500'}">${k.used ? 'Used' : 'Active'}</span>
                 </div>
-            );
-        };
+            `).join('');
+        }
 
-        // --- VIEW: LANDING PAGE (Logic Restored) ---
-        const LandingPage = ({ onLogin }) => {
-            const [key, setKey] = useState('');
+        // --- EXAM ENGINE (Core Logic Restored) ---
+        function renderTests() {
+            const tests = window.adminData.getAllTests();
+            const grid = document.getElementById('tests-grid');
+            
+            if(tests.length === 0) {
+                grid.innerHTML = '<div class="text-gray-400 p-8 text-center">No tests available.</div>';
+                return;
+            }
 
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                // Check valid keys from adminData
-                const keys = window.adminData ? window.adminData.getAllKeys() : [];
-                // Allow specific backdoor or generated keys
-                if (keys.some(k => k.key === key) || key === "DEMO-1234") {
-                    localStorage.setItem('user_session', key);
-                    onLogin();
+            grid.innerHTML = tests.map(t => `
+                <div class="bg-white p-4 rounded-lg border shadow-sm flex justify-between items-center hover:shadow-md transition">
+                    <div>
+                        <div class="font-bold text-gray-800 text-lg">${t.name_en}</div>
+                        <div class="text-sm text-gray-500">${t.subject} • ${t.total_questions || t.questions} Qs • ${t.time_limit} Mins</div>
+                    </div>
+                    <button onclick="startExam('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold">Attempt</button>
+                </div>
+            `).join('');
+        }
+
+        function startExam(testId) {
+            currentTest = window.adminData.getTestById(testId);
+            currentQuestions = window.adminData.getQuestionsByTestId(testId);
+            
+            if(currentQuestions.length === 0) return alert("This test has no questions yet!");
+
+            // Reset State
+            currentQIndex = 0;
+            answers = {};
+            marked = {};
+            visited = {0: true};
+            timeLeft = (currentTest.time_limit || 60) * 60;
+
+            // Show Exam View
+            document.getElementById('app-layout').classList.add('hidden');
+            document.getElementById('exam-view').style.display = 'flex';
+            document.getElementById('exam-title').innerText = currentTest.name_en;
+
+            startTimer();
+            renderQuestion();
+            renderPalette();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(timeLeft <= 0) {
+                    submitTest();
                 } else {
-                    alert("Invalid Access Key!");
+                    timeLeft--;
+                    const m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+                    const s = (timeLeft % 60).toString().padStart(2,'0');
+                    document.getElementById('exam-timer').innerText = `${m}:${s}`;
                 }
-            };
+            }, 1000);
+        }
 
-            return (
-                <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4">
-                    <div className="w-full max-w-md bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl">
-                        <div className="text-center mb-8">
-                            <h1 className="text-4xl font-bold mb-2">Gen<span className="text-blue-500">Z</span> Mocks</h1>
-                            <p className="text-slate-400">SuperKalam Edition</p>
-                        </div>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-1">Student Access Key</label>
-                                <input 
-                                    value={key} 
-                                    onChange={e=>setKey(e.target.value)} 
-                                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-center text-white tracking-widest focus:border-blue-500 outline-none transition-colors" 
-                                    placeholder="XXXX-XXXX"
-                                />
-                            </div>
-                            <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-blue-900/20">
-                                Enter Dashboard
-                            </button>
-                        </form>
-                        <div className="mt-6 text-center text-xs text-slate-500">
-                            Admin Login available inside dashboard
-                        </div>
+        function renderQuestion() {
+            const q = currentQuestions[currentQIndex];
+            document.getElementById('q-number').innerText = `Question ${currentQIndex + 1}`;
+            
+            let html = `<div class="text-lg font-medium mb-6 text-gray-800">${q.question_text_en}</div><div class="space-y-3">`;
+            
+            ['a','b','c','d'].forEach(opt => {
+                if(q[`option_${opt}_en`]) {
+                    const isChecked = answers[currentQIndex] === opt ? 'checked' : '';
+                    const bgClass = answers[currentQIndex] === opt ? 'bg-blue-50 border-blue-500' : 'bg-white border-gray-300';
+                    
+                    html += `
+                    <label class="flex items-start gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50 ${bgClass}" onclick="selectOption('${opt}')">
+                        <input type="radio" name="opt" ${isChecked} class="mt-1">
+                        <span class="text-gray-700 text-sm">${q[`option_${opt}_en`]}</span>
+                    </label>`;
+                }
+            });
+            html += '</div>';
+            
+            document.getElementById('q-content').innerHTML = html;
+            renderPalette();
+        }
+
+        function selectOption(opt) {
+            answers[currentQIndex] = opt;
+            renderQuestion(); // Re-render to show selection
+        }
+
+        function clearResponse() {
+            delete answers[currentQIndex];
+            renderQuestion();
+        }
+
+        function saveNext() {
+            if(currentQIndex < currentQuestions.length - 1) {
+                currentQIndex++;
+                visited[currentQIndex] = true;
+                renderQuestion();
+            }
+        }
+
+        function renderPalette() {
+            const container = document.getElementById('palette-container');
+            container.innerHTML = currentQuestions.map((_, i) => {
+                let cls = 'pal-not-visited';
+                if(answers[i]) cls = 'pal-answered';
+                else if(marked[i]) cls = 'pal-marked';
+                else if(visited[i]) cls = 'pal-not-visited'; // simplified
+                
+                if(i === currentQIndex) cls += ' pal-current';
+                
+                return `<div class="pal-item ${cls}" onclick="jumpToQuestion(${i})">${i+1}</div>`;
+            }).join('');
+        }
+
+        function jumpToQuestion(i) {
+            currentQIndex = i;
+            visited[i] = true;
+            renderQuestion();
+        }
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            let score = 0;
+            let correct = 0;
+            
+            currentQuestions.forEach((q, i) => {
+                if(answers[i] === q.correct_option) { score += 2; correct++; }
+                else if(answers[i]) { score -= 0.66; }
+            });
+
+            // Save History
+            const history = JSON.parse(localStorage.getItem('user_history') || '[]');
+            history.unshift({
+                testName: currentTest.name_en,
+                score: score.toFixed(2),
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('user_history', JSON.stringify(history));
+
+            alert(`Test Finished!\nScore: ${score.toFixed(2)}\nCorrect: ${correct}`);
+            exitExam();
+        }
+
+        function exitExam() {
+            clearInterval(timerInterval);
+            document.getElementById('exam-view').style.display = 'none';
+            document.getElementById('app-layout').classList.remove('hidden');
+            renderStats(); // Update stats
+        }
+
+        function renderStats() {
+            const history = JSON.parse(localStorage.getItem('user_history') || '[]');
+            document.getElementById('stat-tests').innerText = history.length;
+            
+            const list = document.getElementById('history-list');
+            list.innerHTML = history.length === 0 ? '<div class="p-4 text-gray-500">No history yet.</div>' : 
+            history.map(h => `
+                <div class="px-6 py-4 flex justify-between hover:bg-gray-50">
+                    <div>
+                        <div class="font-bold text-gray-800">${h.testName}</div>
+                        <div class="text-xs text-gray-500">${new Date(h.date).toLocaleDateString()}</div>
                     </div>
+                    <div class="font-bold text-blue-600">${h.score}</div>
                 </div>
-            );
-        };
+            `).join('');
+        }
 
-        // --- ROOT APP ---
-        const App = () => {
-            const [view, setView] = useState('landing'); // landing, dash, exam
-            const [activeTab, setActiveTab] = useState('my_tests');
-            const [currentTest, setCurrentTest] = useState(null);
-
-            // Session Check
-            useEffect(() => {
-                if (localStorage.getItem('user_session')) {
-                    setView('dash');
-                }
-            }, []);
-
-            const handleLogout = () => {
-                localStorage.removeItem('user_session');
-                setView('landing');
-            };
-
-            const startExam = (test) => {
-                setCurrentTest(test);
-                setView('exam');
-            };
-
-            if (view === 'landing') return <LandingPage onLogin={() => setView('dash')} />;
-
-            if (view === 'exam' && currentTest) return <ExamEngine test={currentTest} onExit={() => setView('dash')} />;
-
-            return (
-                <DashboardShell activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
-                    {activeTab === 'my_tests' && <MyTestsView onStartExam={startExam} />}
-                    {activeTab === 'progress' && <ProgressView />}
-                    {activeTab === 'admin_login' && <AdminView />}
-                    {activeTab === 'ask' && <div className="flex h-full items-center justify-center text-gray-400">GenZ Chat (Coming Soon)</div>}
-                </DashboardShell>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // Check Session on Load
+        if(localStorage.getItem('user_session')) {
+            initApp();
+        }
     </script>
 </body>
 </html>
