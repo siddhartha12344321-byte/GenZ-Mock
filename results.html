@@ -780,8 +780,18 @@
                 // Save to Firebase for leaderboard and analytics
                 console.log('💾 Saving result to Firebase...');
                 try {
-                    await saveResultToFirebase();
-                    console.log('✅ Firebase save completed');
+                    if (window.FirebaseSync) {
+                        const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+                        await FirebaseSync.saveTestResult(testId, {
+                            userName: userData.name || 'Anonymous',
+                            userKey: userData.key || '',
+                            correct, wrong, total,
+                            score: (correct * 2) - (wrong * 0.66),
+                            accuracy: total > 0 ? Math.round(correct / total * 100) : 0,
+                            timeTaken
+                        });
+                        console.log('✅ Firebase save completed');
+                    }
                 } catch (e) {
                     console.error('❌ Firebase save failed:', e);
                 }
