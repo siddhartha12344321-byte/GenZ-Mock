@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="js/admin-data.js"></script>
+    <script src="js/firebase-sync.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -281,10 +282,31 @@
         }
 
         // Render questions
-        function renderQuestions() {
+        async function renderQuestions() {
             testData = testId ? getTestFromStorage(testId) : null;
             questions = testId ? getQuestionsFromStorage(testId) : [];
             userAnswers = loadSavedAnswers(testId);
+
+            console.log('📚 Answers page loaded:', { testId, testData, questionsCount: questions.length, userAnswers });
+
+            // Try Firebase if no local questions
+            if (questions.length === 0 && window.FirebaseSync && testId) {
+                console.log('⚠️ No local questions, trying Firebase...');
+                try {
+                    const firebaseQuestions = await FirebaseSync.getQuestionsByTestId(testId);
+                    if (firebaseQuestions && firebaseQuestions.length > 0) {
+                        questions = firebaseQuestions;
+                        // Save to localStorage for future use
+                        let allQuestions = JSON.parse(localStorage.getItem('genz_questions') || '[]');
+                        allQuestions = allQuestions.filter(q => q.test_id !== testId);
+                        allQuestions.push(...firebaseQuestions);
+                        localStorage.setItem('genz_questions', JSON.stringify(allQuestions));
+                        console.log('✅ Loaded', questions.length, 'questions from Firebase');
+                    }
+                } catch (e) {
+                    console.error('Firebase question load failed:', e);
+                }
+            }
 
             // Fallback demo if no questions
             if (questions.length === 0) {
@@ -523,8 +545,10 @@
         document.getElementById('tabAnalysis').href = `results.html?testId=${testId}&attempt=${attemptNum}`;
 
         // Initialize
-        renderQuestions();
-        updateAttemptDropdown();
+        (async () => {
+            await renderQuestions();
+            updateAttemptDropdown();
+        })();
     </script>
 </body>
 

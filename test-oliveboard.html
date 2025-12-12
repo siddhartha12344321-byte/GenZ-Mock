@@ -1352,7 +1352,7 @@
                 document.getElementById('submitModal').classList.remove('active');
             });
 
-            document.getElementById('confirmSubmit').addEventListener('click', () => {
+            document.getElementById('confirmSubmit').addEventListener('click', async () => {
                 // CRITICAL: Set flag and remove listener FIRST to prevent race condition
                 isSubmitting = true;
                 window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -1413,7 +1413,7 @@
                     attempt: allAttempts[testId].length
                 });
 
-                // Save to Firebase BEFORE redirect (for analytics)
+                // Save to Firebase BEFORE redirect (for analytics) - MUST AWAIT!
                 if (window.FirebaseSync && testId) {
                     const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
                     const resultData = {
@@ -1427,14 +1427,21 @@
                         timeTaken: timeTaken
                     };
                     console.log('💾 Saving to Firebase:', resultData);
-                    FirebaseSync.saveTestResult(testId, resultData).then(() => {
-                        console.log('✅ Test result saved to Firebase');
-                    }).catch(e => {
+                    try {
+                        const result = await FirebaseSync.saveTestResult(testId, resultData);
+                        if (result) {
+                            console.log('✅ Test result saved to Firebase:', result.id);
+                        } else {
+                            console.error('❌ Firebase save returned null');
+                        }
+                    } catch (e) {
                         console.error('❌ Firebase save error:', e);
-                    });
+                    }
+                } else {
+                    console.warn('⚠️ Cannot save to Firebase:', { hasFirebaseSync: !!window.FirebaseSync, testId });
                 }
 
-                // Clear progress AFTER removing listener
+                // Clear progress AFTER Firebase save
                 clearProgress();
                 window.location.href = `results.html?${params}`;
             });
