@@ -287,6 +287,23 @@
             questions = testId ? getQuestionsFromStorage(testId) : [];
             userAnswers = loadSavedAnswers(testId);
 
+            // Also try to load questions from saved test answers (new format)
+            if (questions.length === 0 && testId) {
+                const answersKey = `test_answers_${testId}`;
+                const savedData = localStorage.getItem(answersKey);
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        if (data.questions && Array.isArray(data.questions)) {
+                            questions = data.questions;
+                            console.log('📚 Loaded', questions.length, 'questions from test_answers');
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse saved questions:', e);
+                    }
+                }
+            }
+
             console.log('📚 Answers page loaded:', { testId, testData, questionsCount: questions.length, userAnswers });
 
             // Try Firebase if no local questions

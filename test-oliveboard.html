@@ -1367,11 +1367,12 @@
                 const timeTaken = Math.round(elapsedMs / 1000); // Convert to seconds
                 console.log('⏱️ Time calculation:', { startTime: state.startTime, now: Date.now(), elapsedMs, timeTaken });
 
-                // Save answers for answers page
+                // Save answers AND questions for answers page
                 const answersKey = `test_answers_${testId}`;
                 localStorage.setItem(answersKey, JSON.stringify({
                     answers: state.answers,
                     marked: Array.from(state.marked),
+                    questions: questions, // Include questions with options and explanations
                     submittedAt: Date.now()
                 }));
 
