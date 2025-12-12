@@ -173,9 +173,9 @@
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-center justify-between py-4">
                 <div class="flex items-center gap-8">
-                    <!-- Tab - My Answers only -->
-                    <a href="#" id="tabAnalysis"
-                        class="text-orange-500 font-semibold py-2 px-1 border-b-2 border-orange-500">
+                    <!-- Tab - My Answers - Links to answers page -->
+                    <a href="#" id="myAnswersTab"
+                        class="text-orange-500 font-semibold py-2 px-1 border-b-2 border-orange-500 cursor-pointer">
                         My Answers
                     </a>
                 </div>
@@ -793,12 +793,23 @@
 
             // Set up View Answers button
             const answersUrl = `answers.html?testId=${testId}&attempt=${attemptNum}`;
+
+            // Make My Answers tab clickable
+            const myAnswersTab = document.getElementById('myAnswersTab');
+            if (myAnswersTab) {
+                myAnswersTab.onclick = (e) => {
+                    e.preventDefault();
+                    window.location.href = answersUrl;
+                };
+            }
+
+            // Make View Answers button clickable
             const viewAnswersBtn = document.getElementById('viewAnswersBtn');
             if (viewAnswersBtn) {
                 viewAnswersBtn.onclick = () => {
                     window.location.href = answersUrl;
                 };
-                console.log('✅ View Answers button configured:', answersUrl);
+                console.log('✅ View Answers configured:', answersUrl);
             }
         });
     </script>
