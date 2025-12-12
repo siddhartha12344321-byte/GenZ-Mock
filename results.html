@@ -727,86 +727,92 @@
         async function loadLeaderboard() {
             const container = document.getElementById('leaderboardContent');
             const testNameEl = document.getElementById('leaderboardTestName');
-            const currentUser = getCurrentUser();
 
-            if (!testId) {
-                container.innerHTML = '<div class="text-center py-6 text-gray-500">No test selected</div>';
-                return;
-            }
-
-            // Show skeleton loading animation (more engaging than spinner)
-            container.innerHTML = `
-                <div class="space-y-3 animate-pulse">
-                    ${[1, 2, 3].map((_, i) => `
-                        <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
-                            <div class="flex-1 space-y-2">
-                                <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-                                <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-                            </div>
-                            <div class="w-16 h-8 bg-gray-200 rounded-full"></div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            // Get test name
-            const tests = adminData?.getAllTests() || [];
-            const test = tests.find(t => t.id === testId);
-            testNameEl.textContent = test ? `- ${test.name_en}` : '';
-
-            // Build leaderboard data with timeout
-            let leaderboard = [];
-            let loadedFromFirebase = false;
-
-            // Helper: Fetch with timeout
-            const fetchWithTimeout = async (promise, timeoutMs = 5000) => {
-                const timeout = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), timeoutMs)
-                );
-                return Promise.race([promise, timeout]);
-            };
-
+            // Wrap everything in try-catch to ensure we ALWAYS render something
             try {
-                if (window.FirebaseSync) {
-                    console.log('⏳ Fetching leaderboard from Firebase...');
-                    leaderboard = await fetchWithTimeout(
-                        FirebaseSync.getTestLeaderboard(testId),
-                        5000 // 5 second timeout
-                    ) || [];
-                    loadedFromFirebase = true;
-                    console.log('✅ Leaderboard loaded:', leaderboard.length, 'entries');
+                console.log('📊 loadLeaderboard called, testId:', testId);
+
+                const currentUser = getCurrentUser();
+                console.log('👤 Current user:', currentUser);
+
+                if (!testId) {
+                    container.innerHTML = '<div class="text-center py-6 text-gray-500">No test selected</div>';
+                    return;
                 }
-            } catch (e) {
-                console.warn('⚠️ Leaderboard fetch failed/timed out:', e.message);
-                loadedFromFirebase = false;
-            }
 
-            // If no Firebase data, show current user as #1 (they just completed the test)
-            if (leaderboard.length === 0 && (correct > 0 || total > 0)) {
-                leaderboard = [{
-                    rank: 1,
-                    userName: currentUser.name || 'You',
-                    userKey: currentUser.key,
-                    correct: correct,
-                    wrong: wrong,
-                    total: total,
-                    score: upscScore,
-                    accuracy: accuracy
-                }];
-            }
-
-            // Find current user's rank and update display
-            const userEntry = leaderboard.find(r => r.userName === currentUser.name || r.userKey === currentUser.key);
-            if (userEntry) {
-                document.getElementById('rank').textContent = '#' + userEntry.rank;
-            } else if (leaderboard.length === 0) {
-                document.getElementById('rank').textContent = '#1';
-            }
-
-            // Render the leaderboard
-            if (leaderboard.length === 0) {
+                // Show skeleton loading animation immediately
                 container.innerHTML = `
+                    <div class="space-y-3 animate-pulse">
+                        ${[1, 2, 3].map((_, i) => `
+                            <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+                                <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+                                </div>
+                                <div class="w-16 h-8 bg-gray-200 rounded-full"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Get test name
+                const tests = (window.adminData && typeof window.adminData.getAllTests === 'function') ? adminData.getAllTests() : [];
+                const test = tests.find(t => t.id === testId);
+                if (testNameEl) testNameEl.textContent = test ? `- ${test.name_en}` : '';
+
+                // Build leaderboard data with timeout
+                let leaderboard = [];
+
+                // Helper: Fetch with timeout
+                const fetchWithTimeout = async (promise, timeoutMs = 5000) => {
+                    const timeout = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Timeout')), timeoutMs)
+                    );
+                    return Promise.race([promise, timeout]);
+                };
+
+                try {
+                    if (window.FirebaseSync && typeof window.FirebaseSync.getTestLeaderboard === 'function') {
+                        console.log('⏳ Fetching from Firebase...');
+                        leaderboard = await fetchWithTimeout(
+                            FirebaseSync.getTestLeaderboard(testId),
+                            5000
+                        ) || [];
+                        console.log('✅ Firebase returned:', leaderboard.length, 'entries');
+                    } else {
+                        console.warn('⚠️ FirebaseSync not available');
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Firebase fetch failed:', e.message);
+                }
+
+                // If no Firebase data, show current user as #1
+                if (leaderboard.length === 0 && (correct > 0 || total > 0)) {
+                    console.log('📝 Using current user as fallback');
+                    leaderboard = [{
+                        rank: 1,
+                        userName: currentUser.name || 'You',
+                        userKey: currentUser.key,
+                        correct: correct,
+                        wrong: wrong,
+                        total: total,
+                        score: upscScore,
+                        accuracy: accuracy
+                    }];
+                }
+
+                // Find current user's rank and update display
+                const userEntry = leaderboard.find(r => r.userName === currentUser.name || r.userKey === currentUser.key);
+                if (userEntry) {
+                    document.getElementById('rank').textContent = '#' + userEntry.rank;
+                } else if (leaderboard.length === 0) {
+                    document.getElementById('rank').textContent = '#1';
+                }
+
+                // Render the leaderboard
+                if (leaderboard.length === 0) {
+                    container.innerHTML = `
                     <div class="text-center py-10">
                         <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-100 to-amber-50 rounded-full flex items-center justify-center">
                             <span class="text-4xl">🏆</span>
@@ -815,41 +821,41 @@
                         <div class="text-gray-500 text-sm">Complete this test to claim the #1 spot</div>
                     </div>
                 `;
-                return;
-            }
+                    return;
+                }
 
-            // Premium leaderboard cards
-            container.innerHTML = `
+                // Premium leaderboard cards
+                container.innerHTML = `
                 <div class="space-y-3">
                     ${leaderboard.slice(0, 10).map((entry, idx) => {
-                const isCurrentUser = entry.userName === currentUser.name || entry.userKey === currentUser.key;
-                const acc = entry.accuracy || (entry.total > 0 ? Math.round((entry.correct / entry.total) * 100) : 0);
+                    const isCurrentUser = entry.userName === currentUser.name || entry.userKey === currentUser.key;
+                    const acc = entry.accuracy || (entry.total > 0 ? Math.round((entry.correct / entry.total) * 100) : 0);
 
-                // Rank badge styling
-                let rankBadge, rankClass, cardBg;
-                if (entry.rank === 1) {
-                    rankBadge = '🥇';
-                    rankClass = 'text-2xl';
-                    cardBg = 'bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-amber-200';
-                } else if (entry.rank === 2) {
-                    rankBadge = '🥈';
-                    rankClass = 'text-xl';
-                    cardBg = 'bg-gradient-to-r from-gray-50 via-slate-50 to-gray-50 border-gray-200';
-                } else if (entry.rank === 3) {
-                    rankBadge = '🥉';
-                    rankClass = 'text-xl';
-                    cardBg = 'bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-orange-200';
-                } else {
-                    rankBadge = '#' + entry.rank;
-                    rankClass = 'text-sm font-bold text-gray-500';
-                    cardBg = 'bg-white border-gray-100';
-                }
+                    // Rank badge styling
+                    let rankBadge, rankClass, cardBg;
+                    if (entry.rank === 1) {
+                        rankBadge = '🥇';
+                        rankClass = 'text-2xl';
+                        cardBg = 'bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-amber-200';
+                    } else if (entry.rank === 2) {
+                        rankBadge = '🥈';
+                        rankClass = 'text-xl';
+                        cardBg = 'bg-gradient-to-r from-gray-50 via-slate-50 to-gray-50 border-gray-200';
+                    } else if (entry.rank === 3) {
+                        rankBadge = '🥉';
+                        rankClass = 'text-xl';
+                        cardBg = 'bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-orange-200';
+                    } else {
+                        rankBadge = '#' + entry.rank;
+                        rankClass = 'text-sm font-bold text-gray-500';
+                        cardBg = 'bg-white border-gray-100';
+                    }
 
-                if (isCurrentUser) {
-                    cardBg = 'bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-blue-300 ring-2 ring-blue-200';
-                }
+                    if (isCurrentUser) {
+                        cardBg = 'bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border-blue-300 ring-2 ring-blue-200';
+                    }
 
-                return `
+                    return `
                             <div class="leaderboard-card flex items-center gap-4 p-4 rounded-xl border ${cardBg} transition-all hover:shadow-md">
                                 <!-- Rank -->
                                 <div class="w-12 h-12 flex items-center justify-center ${entry.rank <= 3 ? '' : 'bg-gray-100 rounded-full'}">
@@ -868,16 +874,16 @@
                                 <!-- Accuracy Badge -->
                                 <div class="text-right">
                                     <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${acc >= 80 ? 'bg-green-100 text-green-700' :
-                        acc >= 60 ? 'bg-blue-100 text-blue-700' :
-                            acc >= 40 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                    }">
+                            acc >= 60 ? 'bg-blue-100 text-blue-700' :
+                                acc >= 40 ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-red-100 text-red-700'
+                        }">
                                         ${acc}%
                                     </div>
                                 </div>
                             </div>
                         `;
-            }).join('')}
+                }).join('')}
                 </div>
                 ${leaderboard.length > 10 ? `
                     <div class="text-center text-sm text-gray-500 mt-4 pt-4 border-t border-gray-100">
@@ -891,6 +897,19 @@
                     </div>
                 ` : ''}
             `;
+            } catch (error) {
+                // If ANYTHING fails, show error with retry button
+                console.error('❌ loadLeaderboard error:', error);
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 text-4xl mb-3">⚠️</div>
+                        <div class="text-gray-600 mb-3">Unable to load leaderboard</div>
+                        <button onclick="loadLeaderboard()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors">
+                            🔄 Retry
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         // Initialize
@@ -927,7 +946,25 @@
             }
 
             // Load leaderboard AFTER Firebase save completes (so user's data appears)
-            await loadLeaderboard();
+            console.log('📊 Starting leaderboard load...');
+            try {
+                await loadLeaderboard();
+                console.log('✅ Leaderboard load completed');
+            } catch (e) {
+                console.error('❌ Leaderboard load failed:', e);
+                // Show fallback if leaderboard fails
+                const container = document.getElementById('leaderboardContent');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="text-center py-6">
+                            <div class="text-gray-500 mb-2">Unable to load leaderboard</div>
+                            <button onclick="loadLeaderboard()" class="text-orange-500 hover:text-orange-600 font-medium">
+                                🔄 Try Again
+                            </button>
+                        </div>
+                    `;
+                }
+            }
 
             // View Answers button handler
             const answersUrl = `answers.html?testId=${testId}&attempt=${attemptNum}`;
