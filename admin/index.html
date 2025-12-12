@@ -1028,6 +1028,7 @@
             if (page === 'tests') loadAllTests();
             if (page === 'users') loadAccessKeys();
             if (page === 'analytics') loadAnalytics();
+            if (page === 'notifications') loadNotificationsAdmin();
         }
 
 
@@ -1262,6 +1263,102 @@
                 manualTab.classList.remove('hidden');
                 tabManual.className = 'flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-500 bg-blue-50';
                 tabJson.className = 'flex-1 py-4 text-center font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50';
+            }
+        }
+
+        // Edit Test - Open modal with test data pre-filled
+        function editTest(testId) {
+            const tests = adminData?.getAllTests() || [];
+            const test = tests.find(t => t.id === testId);
+
+            if (!test) {
+                alert('Test not found');
+                return;
+            }
+
+            // Create edit modal dynamically
+            const existingModal = document.getElementById('editTestModal');
+            if (existingModal) existingModal.remove();
+
+            const modalHTML = `
+                <div id="editTestModal" class="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div class="modal-content bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+                        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-gray-900">✏️ Edit Test</h2>
+                            <button onclick="closeModal('editTestModal')" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400">✕</button>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Test Name</label>
+                                    <input type="text" id="editTestName" value="${test.name_en || ''}" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
+                                    <select id="editTestSubject" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                        <option value="General" ${test.subject_id === 'General' ? 'selected' : ''}>General</option>
+                                        <option value="Polity" ${test.subject_id === 'Polity' ? 'selected' : ''}>Polity</option>
+                                        <option value="History" ${test.subject_id === 'History' ? 'selected' : ''}>History</option>
+                                        <option value="Geography" ${test.subject_id === 'Geography' ? 'selected' : ''}>Geography</option>
+                                        <option value="Economy" ${test.subject_id === 'Economy' ? 'selected' : ''}>Economy</option>
+                                        <option value="Science" ${test.subject_id === 'Science' ? 'selected' : ''}>Science</option>
+                                        <option value="Environment" ${test.subject_id === 'Environment' ? 'selected' : ''}>Environment</option>
+                                        <option value="Current Affairs" ${test.subject_id === 'Current Affairs' ? 'selected' : ''}>Current Affairs</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Time (min)</label>
+                                        <input type="number" id="editTestTime" value="${test.time_limit || 30}" class="w-full px-4 py-3 border border-gray-200 rounded-xl">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Questions</label>
+                                        <input type="text" value="${test.total_questions || 0}" disabled class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button onclick="closeModal('editTestModal')" class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">Cancel</button>
+                                <button onclick="saveTestEdit('${testId}')" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg">💾 Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        async function saveTestEdit(testId) {
+            const name = document.getElementById('editTestName').value.trim();
+            const subject = document.getElementById('editTestSubject').value;
+            const time = parseInt(document.getElementById('editTestTime').value) || 30;
+
+            if (!name) {
+                alert('Please enter a test name');
+                return;
+            }
+
+            // Update in adminData
+            const tests = adminData?.getAllTests() || [];
+            const test = tests.find(t => t.id === testId);
+
+            if (test) {
+                test.name_en = name;
+                test.subject_id = subject;
+                test.time_limit = time;
+
+                // Save to localStorage and Firebase
+                localStorage.setItem('mock_tests', JSON.stringify(tests));
+
+                if (window.FirebaseSync) {
+                    await FirebaseSync.saveTest(test);
+                }
+
+                closeModal('editTestModal');
+                loadDashboardStats();
+                loadTestsTable();
+                loadAllTests();
+                alert('✅ Test updated successfully!');
             }
         }
 

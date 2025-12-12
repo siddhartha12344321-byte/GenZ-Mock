@@ -225,41 +225,39 @@
                                 </div>
                             </div>
 
-                            <!-- Current Affairs Section -->
+                            <!-- Current Affairs Section - EMBEDDED -->
                             <div class="mb-6">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h2 class="text-xl font-bold text-gray-900">Current Affairs</h2>
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-2xl">📰</span>
+                                        <h2 class="text-xl font-bold text-gray-900">Today's Current Affairs</h2>
+                                    </div>
                                     <a href="current-affairs.html"
                                         class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All →</a>
                                 </div>
-                                <p class="text-gray-500 text-base mb-4">Stay updated with daily news and events</p>
 
-                                <div class="grid grid-cols-1 gap-4">
-                                    <!-- Current Affairs Card 1 -->
-                                    <a href="current-affairs.html"
-                                        class="bg-white rounded-xl border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer group">
-                                        <div
-                                            class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
-                                            <svg width="24" height="24" fill="none" stroke="#f97316" stroke-width="2"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                                            </svg>
+                                <!-- Articles Container -->
+                                <div id="currentAffairsWidget"
+                                    class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    <div class="text-center py-8 text-gray-400 text-sm">Loading articles...</div>
+                                </div>
+
+                                <!-- Generate MCQ Toggle -->
+                                <div
+                                    class="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-xl">🎯</span>
+                                            <div>
+                                                <div class="font-semibold text-gray-900 text-sm">Practice MCQs</div>
+                                                <div class="text-xs text-gray-500">Test yourself on today's news</div>
+                                            </div>
                                         </div>
-                                        <div class="flex-1">
-                                            <h3
-                                                class="font-semibold text-gray-900 text-base group-hover:text-orange-600 transition-colors">
-                                                Daily News Analysis</h3>
-                                            <p class="text-gray-500 text-sm">Latest updates for UPSC preparation</p>
-                                        </div>
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-all">
-                                            <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </div>
-                                    </a>
+                                        <button onclick="generateCAMCQ()"
+                                            class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700 transition-colors shadow-sm">
+                                            Generate MCQ
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -788,6 +786,120 @@
 
             // Load notifications
             loadNotifications();
+
+            // Load current affairs widget
+            loadCurrentAffairsWidget();
+        }
+
+        // Load Current Affairs Widget - embedded on dashboard
+        async function loadCurrentAffairsWidget() {
+            const container = document.getElementById('currentAffairsWidget');
+            if (!container) return;
+
+            container.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">Loading articles...</div>';
+
+            try {
+                // Try to fetch from local data file first (for demo)
+                let articles = [];
+
+                try {
+                    const response = await fetch('data/current_affairs_20251212.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        articles = data.articles || [];
+                    }
+                } catch (e) {
+                    console.log('Local data not available, using sample');
+                }
+
+                // If no articles, show sample data
+                if (articles.length === 0) {
+                    articles = [
+                        {
+                            title: "NSS 80th Round Survey: Education Costs in India",
+                            summary: "Survey reveals rising financial burden of education despite constitutional guarantees.",
+                            source: "hindu",
+                            category: "Polity & Governance",
+                            tags: ["★ Editorial", "GS 2"]
+                        },
+                        {
+                            title: "India-Italy Strategic Partnership Elevated",
+                            summary: "PM Modi discusses enhanced cooperation in defense, technology, and trade.",
+                            source: "pib",
+                            category: "International Relations",
+                            tags: ["Government", "GS 2"]
+                        },
+                        {
+                            title: "New Climate Finance Framework at COP29",
+                            summary: "Countries agree on enhanced climate finance mechanisms for developing nations.",
+                            source: "ie",
+                            category: "Environment & Ecology",
+                            tags: ["Explained", "GS 3"]
+                        }
+                    ];
+                }
+
+                if (articles.length === 0) {
+                    container.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">No current affairs available today</div>';
+                    return;
+                }
+
+                const sourceColors = {
+                    hindu: 'bg-blue-100 text-blue-700',
+                    pib: 'bg-green-100 text-green-700',
+                    ie: 'bg-purple-100 text-purple-700',
+                    mea: 'bg-orange-100 text-orange-700',
+                    prs: 'bg-teal-100 text-teal-700'
+                };
+
+                const sourceNames = {
+                    hindu: 'The Hindu',
+                    pib: 'PIB',
+                    ie: 'Indian Express',
+                    mea: 'MEA',
+                    prs: 'PRS'
+                };
+
+                container.innerHTML = articles.slice(0, 5).map(article => `
+                    <div class="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="showArticleDetail('${article.title.replace(/'/g, "\\'")}')">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sourceColors[article.source] || 'bg-gray-100 text-gray-600'}">${sourceNames[article.source] || article.source}</span>
+                                    <span class="text-[10px] text-gray-400">${article.category || 'General'}</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 text-sm leading-tight mb-1">${article.title}</h4>
+                                <p class="text-xs text-gray-500 line-clamp-2">${article.summary}</p>
+                                <div class="flex flex-wrap gap-1 mt-2">
+                                    ${(article.tags || []).slice(0, 3).map(tag => `<span class="px-1.5 py-0.5 bg-gray-50 text-gray-600 rounded text-[10px]">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                            <button class="shrink-0 w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center hover:bg-purple-100" onclick="event.stopPropagation(); generateMCQFor('${article.title.replace(/'/g, "\\'")}')">
+                                🎯
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (e) {
+                console.error('Error loading current affairs:', e);
+                container.innerHTML = '<div class="text-center py-6 text-red-400 text-sm">Failed to load articles</div>';
+            }
+        }
+
+        // Show article detail modal
+        function showArticleDetail(title) {
+            alert('📰 Article: ' + title + '\n\nFull article view coming soon!');
+        }
+
+        // Generate MCQ for specific article
+        function generateMCQFor(title) {
+            alert('🎯 Generating MCQ for:\n' + title + '\n\nMCQ generation feature coming soon!');
+        }
+
+        // Generate MCQ for all today's articles
+        function generateCAMCQ() {
+            alert('🎯 Practice MCQs\n\nGenerating quiz from today\'s current affairs...\n\nThis feature is coming soon!');
         }
 
         async function loadNotifications() {
@@ -1061,7 +1173,7 @@
                 const questions = test.total_questions || 10;
                 const marks = questions * 2;
                 const buttonHtml = isAttempted
-                    ? `<button onclick="startTest('${test.id}', true)" class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded text-xs font-semibold hover:bg-gray-200">Retake</button>`
+                    ? `<button onclick="startTest('${test.id}', true)" class="px-4 py-1.5 bg-orange-500 text-white rounded text-xs font-semibold hover:bg-orange-600 shadow-sm shadow-orange-200">🔄 Retake</button>`
                     : `<button onclick="startTest('${test.id}')" class="px-4 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 shadow-sm shadow-green-200">Start</button>`;
 
                 return `
@@ -1138,6 +1250,164 @@
             window.location.href = `results.html?testId=${testId}&attempt=${attemptNum}`;
         }
 
+        // Load user progress from Firebase - LIVE DATA
+        async function loadProgress() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const userName = userData.name || userData.key || 'User';
+
+            // Show loading state
+            document.getElementById('testHistory').innerHTML = '<div class="px-6 py-8 text-center text-gray-500">Loading...</div>';
+
+            try {
+                // Fetch results from Firebase
+                const allResults = await FirebaseSync.getAllResults();
+
+                let testsCount = 0;
+                let totalCorrect = 0;
+                let totalQuestions = 0;
+                let totalTime = 0;
+                const userResults = [];
+
+                // Filter results for current user
+                for (const testId in allResults) {
+                    const results = Object.values(allResults[testId]);
+                    const myResults = results.filter(r => r.userName === userName || r.userKey === userData.key);
+
+                    myResults.forEach(r => {
+                        testsCount++;
+                        totalCorrect += r.correct || 0;
+                        totalQuestions += r.total || 0;
+                        totalTime += r.timeTaken || 0;
+                        userResults.push({ ...r, testId });
+                    });
+                }
+
+                // Update stats
+                document.getElementById('progressTests').textContent = testsCount;
+                document.getElementById('progressCorrect').textContent = totalCorrect;
+                document.getElementById('progressAccuracy').textContent = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) + '%' : '0%';
+                document.getElementById('progressTime').textContent = Math.round(totalTime / 60) + 'm';
+
+                // Update test history
+                const historyContainer = document.getElementById('testHistory');
+                if (userResults.length === 0) {
+                    historyContainer.innerHTML = '<div class="px-6 py-8 text-center text-gray-500">No test history yet. Complete a test to see your progress here.</div>';
+                    return;
+                }
+
+                // Sort by timestamp (newest first)
+                userResults.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                historyContainer.innerHTML = userResults.slice(0, 10).map(r => {
+                    const tests = adminData?.getAllTests() || [];
+                    const test = tests.find(t => t.id === r.testId);
+                    const testName = test?.name_en || 'Unknown Test';
+                    const accuracy = r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0;
+                    const date = new Date(r.timestamp).toLocaleDateString();
+
+                    return `
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-900">${testName}</div>
+                                <div class="text-xs text-gray-500 mt-1">${date}</div>
+                            </div>
+                            <div class="flex items-center gap-6 text-center">
+                                <div>
+                                    <div class="font-bold text-green-600">${r.correct}/${r.total}</div>
+                                    <div class="text-[10px] text-gray-400">Correct</div>
+                                </div>
+                                <div>
+                                    <div class="font-bold ${accuracy >= 60 ? 'text-green-600' : accuracy >= 40 ? 'text-yellow-600' : 'text-red-600'}">${accuracy}%</div>
+                                    <div class="text-[10px] text-gray-400">Accuracy</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (e) {
+                console.error('Error loading progress:', e);
+                document.getElementById('testHistory').innerHTML = '<div class="px-6 py-8 text-center text-red-500">Failed to load progress</div>';
+            }
+        }
+
+        // Load full leaderboard from Firebase - LIVE DATA
+        async function loadFullLeaderboard() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const userName = userData.name || userData.key || 'User';
+
+            const container = document.getElementById('fullLeaderboard');
+            container.innerHTML = '<div class="px-6 py-8 text-center text-gray-500">Loading...</div>';
+
+            try {
+                const allResults = await FirebaseSync.getAllResults();
+
+                // Aggregate scores by user
+                const userScores = {};
+
+                for (const testId in allResults) {
+                    const results = Object.values(allResults[testId]);
+                    results.forEach(r => {
+                        const user = r.userName || 'Anonymous';
+                        if (!userScores[user]) {
+                            userScores[user] = { correct: 0, total: 0, tests: 0, time: 0 };
+                        }
+                        userScores[user].correct += r.correct || 0;
+                        userScores[user].total += r.total || 0;
+                        userScores[user].tests++;
+                        userScores[user].time += r.timeTaken || 0;
+                    });
+                }
+
+                // Convert to array and sort
+                const leaderboard = Object.entries(userScores).map(([name, stats]) => ({
+                    name,
+                    accuracy: stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
+                    tests: stats.tests,
+                    correct: stats.correct,
+                    total: stats.total
+                })).sort((a, b) => b.accuracy - a.accuracy);
+
+                // Find current user rank
+                const myRank = leaderboard.findIndex(u => u.name === userName) + 1;
+                document.getElementById('yourRankBig').textContent = myRank > 0 ? '#' + myRank : '#--';
+
+                if (leaderboard.length === 0) {
+                    container.innerHTML = '<div class="px-6 py-8 text-center text-gray-500">No data yet. Be the first!</div>';
+                    return;
+                }
+
+                container.innerHTML = leaderboard.slice(0, 20).map((user, idx) => {
+                    const rank = idx + 1;
+                    const isMe = user.name === userName;
+                    const medalIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+
+                    return `
+                        <div class="px-6 py-4 flex items-center justify-between ${isMe ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-gray-50'}">
+                            <div class="flex items-center gap-4">
+                                <span class="text-lg font-bold ${rank <= 3 ? 'text-orange-500' : 'text-gray-400'}">${medalIcon || '#' + rank}</span>
+                                <div class="w-10 h-10 rounded-full ${isMe ? 'bg-blue-600' : 'bg-gray-300'} text-white flex items-center justify-center font-bold">
+                                    ${user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div class="font-semibold ${isMe ? 'text-blue-700' : 'text-gray-900'}">${user.name} ${isMe ? '(You)' : ''}</div>
+                                    <div class="text-xs text-gray-500">${user.tests} tests • ${user.correct}/${user.total} correct</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-lg ${user.accuracy >= 60 ? 'text-green-600' : 'text-orange-600'}">${Math.round(user.accuracy)}%</div>
+                                <div class="text-[10px] text-gray-400">Accuracy</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (e) {
+                console.error('Error loading leaderboard:', e);
+                container.innerHTML = '<div class="px-6 py-8 text-center text-red-500">Failed to load leaderboard</div>';
+            }
+        }
+
         // Modal functions
         function openTestModal(testId, resume = false) {
             currentTestId = testId;
@@ -1184,7 +1454,13 @@
             currentTestId = null;
         }
 
-        function startTest() {
+        function startTest(testId, isRetake = false) {
+            // If testId is provided directly, navigate to test
+            if (testId) {
+                window.location.href = `test-oliveboard.html?id=${testId}`;
+                return;
+            }
+            // Otherwise use currentTestId (from modal)
             if (currentTestId) {
                 window.location.href = `test-oliveboard.html?id=${currentTestId}`;
             }
