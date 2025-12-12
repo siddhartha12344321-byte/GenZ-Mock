@@ -218,6 +218,15 @@
                     </a>
                     <a href="#"
                         class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                        onclick="showPage('analytics')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        📊 Analytics
+                    </a>
+                    <a href="#"
+                        class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                         onclick="showPage('settings')">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -583,6 +592,218 @@
                 </div>
             </div>
 
+            <!-- ANALYTICS VIEW -->
+            <div id="analyticsView" class="page-view h-full flex-col hidden">
+                <header class="bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between shrink-0">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">📊 Test Analytics</h1>
+                        <p class="text-sm text-gray-500 mt-0.5">View all user scores and performance data</p>
+                    </div>
+                    <button onclick="loadAnalytics()"
+                        class="btn-animate flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Refresh
+                    </button>
+                </header>
+                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-gray-900" id="analyticsTotal">0</div>
+                                    <div class="text-sm text-gray-500">Total Attempts</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-gray-900" id="analyticsAvg">0%</div>
+                                    <div class="text-sm text-gray-500">Average Score</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-gray-900" id="analyticsTop">0%</div>
+                                    <div class="text-sm text-gray-500">Top Score</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Selector -->
+                    <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-semibold text-gray-700">Select Test:</label>
+                            <select id="analyticsTestSelect" onchange="loadTestAnalytics(this.value)"
+                                class="flex-1 max-w-md px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                <option value="">-- All Tests --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Results Table -->
+                    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="font-bold text-gray-900">User Results</h3>
+                            <span id="analyticsResultCount" class="text-sm text-gray-500">0 results</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                            Rank</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                            User</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                            Test</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
+                                            Score</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
+                                            Accuracy</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
+                                            Time</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                            Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="analyticsTableBody" class="divide-y divide-gray-100">
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                            <svg class="animate-spin h-6 w-6 mx-auto mb-3 text-blue-500"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                </path>
+                                            </svg>
+                                            Loading analytics...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTIFICATIONS VIEW -->
+            <div id="notificationsView" class="page-view h-full flex-col hidden">
+                <header class="bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between shrink-0">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">📢 Notifications</h1>
+                        <p class="text-sm text-gray-500 mt-0.5">Send announcements to all students</p>
+                    </div>
+                    <button onclick="openNotificationModal()"
+                        class="btn-animate flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 shadow-lg shadow-blue-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create Notification
+                    </button>
+                </header>
+                <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-gray-900" id="notifStatTotal">0</div>
+                                    <div class="text-sm text-gray-500">Total Notifications</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-gray-900" id="notifStatActive">0</div>
+                                    <div class="text-sm text-gray-500">Active</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-gray-900" id="notifStatExpired">0</div>
+                                    <div class="text-sm text-gray-500">Expired</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications List -->
+                    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="font-bold text-gray-900">All Notifications</h3>
+                            <button onclick="loadNotificationsAdmin()"
+                                class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                        <div id="notificationsListAdmin" class="divide-y divide-gray-100">
+                            <div class="px-6 py-12 text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                No notifications created yet. Click "Create Notification" to get started.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
     </div>
@@ -726,6 +947,7 @@
         </div>
     </div>
 
+    <script src="../js/firebase-sync.js"></script>
     <script src="../js/admin-data.js"></script>
     <script>
         // Admin Key - Change this to your secure key
@@ -805,6 +1027,7 @@
 
             if (page === 'tests') loadAllTests();
             if (page === 'users') loadAccessKeys();
+            if (page === 'analytics') loadAnalytics();
         }
 
 
@@ -820,6 +1043,118 @@
             document.getElementById('statQuestions').textContent = totalQuestions;
             document.getElementById('statUsers').textContent = localStorage.getItem('total_users') || '0';
             document.getElementById('statAttempts').textContent = localStorage.getItem('total_attempts') || '0';
+        }
+
+        // Analytics data cache
+        let analyticsCache = { allResults: {}, tests: [] };
+
+        async function loadAnalytics() {
+            if (!window.FirebaseSync) {
+                document.getElementById('analyticsTableBody').innerHTML =
+                    '<tr><td colspan="7" class="px-6 py-12 text-center text-red-500">Firebase not available</td></tr>';
+                return;
+            }
+
+            // Show loading
+            document.getElementById('analyticsTableBody').innerHTML = `
+                <tr><td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                    <svg class="animate-spin h-6 w-6 mx-auto mb-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading analytics...
+                </td></tr>
+            `;
+
+            try {
+                // Fetch all results from Firebase
+                const allResults = await FirebaseSync.getAllResults();
+                analyticsCache.allResults = allResults;
+                analyticsCache.tests = adminData?.getAllTests() || [];
+
+                // Populate test selector
+                const select = document.getElementById('analyticsTestSelect');
+                select.innerHTML = '<option value="">-- All Tests --</option>' +
+                    analyticsCache.tests.map(t => `<option value="${t.id}">${t.name_en || 'Untitled'}</option>`).join('');
+
+                // Calculate stats and display all results
+                displayAnalyticsData(allResults, analyticsCache.tests);
+
+            } catch (e) {
+                console.error('Failed to load analytics:', e);
+                document.getElementById('analyticsTableBody').innerHTML =
+                    '<tr><td colspan="7" class="px-6 py-12 text-center text-red-500">Failed to load analytics</td></tr>';
+            }
+        }
+
+        function loadTestAnalytics(testId) {
+            if (!testId) {
+                // Show all
+                displayAnalyticsData(analyticsCache.allResults, analyticsCache.tests);
+            } else {
+                // Filter to selected test
+                const filtered = {};
+                if (analyticsCache.allResults[testId]) {
+                    filtered[testId] = analyticsCache.allResults[testId];
+                }
+                displayAnalyticsData(filtered, analyticsCache.tests);
+            }
+        }
+
+        function displayAnalyticsData(resultsObj, tests) {
+            const tbody = document.getElementById('analyticsTableBody');
+            const testMap = {};
+            tests.forEach(t => testMap[t.id] = t.name_en || 'Untitled');
+
+            // Flatten all results
+            let allResults = [];
+            let totalCorrect = 0, totalTotal = 0, topScore = 0;
+
+            for (const testId in resultsObj) {
+                const testResults = Object.values(resultsObj[testId]);
+                testResults.forEach(r => {
+                    allResults.push({ ...r, testName: testMap[testId] || testId });
+                    totalCorrect += r.correct || 0;
+                    totalTotal += r.total || 0;
+                    const acc = r.total > 0 ? (r.correct / r.total * 100) : 0;
+                    if (acc > topScore) topScore = acc;
+                });
+            }
+
+            // Sort by score (descending)
+            allResults.sort((a, b) => (b.correct || 0) - (a.correct || 0));
+
+            // Update stats
+            document.getElementById('analyticsTotal').textContent = allResults.length;
+            document.getElementById('analyticsAvg').textContent = totalTotal > 0 ? Math.round(totalCorrect / totalTotal * 100) + '%' : '0%';
+            document.getElementById('analyticsTop').textContent = Math.round(topScore) + '%';
+            document.getElementById('analyticsResultCount').textContent = allResults.length + ' results';
+
+            if (allResults.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-gray-500">No test results yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allResults.map((r, idx) => {
+                const rank = idx + 1;
+                const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '#' + rank;
+                const acc = r.total > 0 ? Math.round(r.correct / r.total * 100) : 0;
+                const timeMins = Math.floor((r.timeTaken || 0) / 60);
+                const timeSecs = Math.floor((r.timeTaken || 0) % 60);
+                const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '-';
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-3 text-sm font-bold ${rank <= 3 ? 'text-lg' : 'text-gray-600'}">${rankBadge}</td>
+                        <td class="px-6 py-3 text-sm font-medium text-gray-900">${r.userName || 'Anonymous'}</td>
+                        <td class="px-6 py-3 text-sm text-gray-500">${r.testName}</td>
+                        <td class="px-6 py-3 text-center text-sm font-bold text-gray-900">${r.correct || 0}/${r.total || 0}</td>
+                        <td class="px-6 py-3 text-center text-sm font-bold ${acc >= 80 ? 'text-green-600' : acc >= 60 ? 'text-blue-600' : 'text-gray-600'}">${acc}%</td>
+                        <td class="px-6 py-3 text-center text-sm text-gray-500">${timeMins}:${String(timeSecs).padStart(2, '0')}</td>
+                        <td class="px-6 py-3 text-sm text-gray-500">${date}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function loadTestsTable() {
@@ -1316,6 +1651,204 @@
             showPage('dashboard');
             loadDashboardStats();
             loadTestsTable();
+        }
+
+        // ==================== NOTIFICATIONS FUNCTIONS ====================
+
+        function openNotificationModal() {
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifMessage').value = '';
+            document.getElementById('notifLink').value = '';
+            document.getElementById('notifType').value = 'info';
+            document.getElementById('notifExpiry').value = '7';
+
+            // Create modal if it doesn't exist
+            if (!document.getElementById('notificationModal')) {
+                const modalHTML = `
+                    <div id="notificationModal" class="modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div class="modal-content bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+                            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                                <h2 class="text-xl font-bold text-gray-900">📢 Create Notification</h2>
+                                <button onclick="closeModal('notificationModal')" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400">✕</button>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-5">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Title *</label>
+                                        <input type="text" id="notifTitle" placeholder="e.g., New Mock Test Available!" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
+                                        <textarea id="notifMessage" rows="3" placeholder="Describe your announcement..." class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100"></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                                            <select id="notifType" class="w-full px-4 py-3 border border-gray-200 rounded-xl">
+                                                <option value="info">ℹ️ Info</option>
+                                                <option value="success">✅ Success</option>
+                                                <option value="warning">⚠️ Warning</option>
+                                                <option value="urgent">🔴 Urgent</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Expires In</label>
+                                            <select id="notifExpiry" class="w-full px-4 py-3 border border-gray-200 rounded-xl">
+                                                <option value="1">1 Day</option>
+                                                <option value="3">3 Days</option>
+                                                <option value="7" selected>7 Days</option>
+                                                <option value="30">30 Days</option>
+                                                <option value="0">Never</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Link (Optional)</label>
+                                        <input type="text" id="notifLink" placeholder="e.g., test.html?id=123" class="w-full px-4 py-3 border border-gray-200 rounded-xl">
+                                    </div>
+                                </div>
+                                <div class="mt-6 flex justify-end gap-3">
+                                    <button onclick="closeModal('notificationModal')" class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">Cancel</button>
+                                    <button onclick="createNotification()" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg">📤 Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            } else {
+                document.getElementById('notificationModal').classList.remove('hidden');
+            }
+        }
+
+        async function createNotification() {
+            const title = document.getElementById('notifTitle').value.trim();
+            const message = document.getElementById('notifMessage').value.trim();
+            const type = document.getElementById('notifType').value;
+            const expiryDays = parseInt(document.getElementById('notifExpiry').value);
+            const link = document.getElementById('notifLink').value.trim();
+
+            if (!title || !message) {
+                alert('Please fill in title and message');
+                return;
+            }
+
+            const notification = {
+                id: 'notif_' + Date.now(),
+                title: title,
+                message: message,
+                type: type,
+                link: link || null,
+                created_at: new Date().toISOString(),
+                expires_at: expiryDays > 0 ? new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000).toISOString() : null,
+                is_active: true
+            };
+
+            try {
+                const saved = await FirebaseSync.saveNotification(notification);
+                if (saved) {
+                    closeModal('notificationModal');
+                    loadNotificationsAdmin();
+                    alert('✅ Notification sent to all users!');
+                } else {
+                    throw new Error('Failed to save');
+                }
+            } catch (e) {
+                console.error('Error creating notification:', e);
+                alert('❌ Failed to create notification. Check console.');
+            }
+        }
+
+        async function loadNotificationsAdmin() {
+            const container = document.getElementById('notificationsListAdmin');
+            if (!container) return;
+
+            container.innerHTML = '<div class="px-6 py-8 text-center text-gray-500">Loading...</div>';
+
+            try {
+                const notifications = await FirebaseSync.getAllNotifications();
+
+                // Update stats
+                const now = new Date();
+                let active = 0, expired = 0;
+                notifications.forEach(n => {
+                    if (!n.expires_at || new Date(n.expires_at) > now) {
+                        active++;
+                    } else {
+                        expired++;
+                    }
+                });
+
+                document.getElementById('notifStatTotal').textContent = notifications.length;
+                document.getElementById('notifStatActive').textContent = active;
+                document.getElementById('notifStatExpired').textContent = expired;
+
+                if (notifications.length === 0) {
+                    container.innerHTML = `
+                        <div class="px-6 py-12 text-center text-gray-500">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            No notifications yet. Click "Create Notification" to get started.
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort by created_at descending
+                notifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                container.innerHTML = notifications.map(n => {
+                    const isExpired = n.expires_at && new Date(n.expires_at) < now;
+                    const typeColors = {
+                        info: 'bg-blue-100 text-blue-700',
+                        success: 'bg-green-100 text-green-700',
+                        warning: 'bg-yellow-100 text-yellow-700',
+                        urgent: 'bg-red-100 text-red-700'
+                    };
+                    const typeIcons = { info: 'ℹ️', success: '✅', warning: '⚠️', urgent: '🔴' };
+
+                    return `
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 ${isExpired ? 'opacity-50' : ''}">
+                            <div class="flex items-center gap-4 flex-1">
+                                <span class="text-2xl">${typeIcons[n.type] || '📢'}</span>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-900">${n.title}</div>
+                                    <div class="text-sm text-gray-500 truncate max-w-md">${n.message}</div>
+                                    <div class="text-xs text-gray-400 mt-1">
+                                        ${new Date(n.created_at).toLocaleDateString()} 
+                                        ${n.expires_at ? '• Expires: ' + new Date(n.expires_at).toLocaleDateString() : '• Never expires'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium ${typeColors[n.type] || 'bg-gray-100'}">${n.type}</span>
+                                ${isExpired ? '<span class="text-xs text-red-500 font-medium">Expired</span>' : '<span class="text-xs text-green-500 font-medium">Active</span>'}
+                                <button onclick="deleteNotification('${n.id}')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Error loading notifications:', e);
+                container.innerHTML = '<div class="px-6 py-8 text-center text-red-500">Failed to load notifications</div>';
+            }
+        }
+
+        async function deleteNotification(id) {
+            if (!confirm('Delete this notification?')) return;
+
+            try {
+                await FirebaseSync.deleteNotification(id);
+                loadNotificationsAdmin();
+            } catch (e) {
+                console.error('Error deleting notification:', e);
+                alert('Failed to delete');
+            }
         }
     </script>
     <script src="../js/ai-extractor.js"></script>

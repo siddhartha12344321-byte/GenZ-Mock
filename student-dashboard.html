@@ -97,6 +97,14 @@
                         </svg>
                         Ask GenZ AI
                     </a>
+                    <a href="current-affairs.html"
+                        class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                        </svg>
+                        Current Affairs
+                    </a>
                 </div>
 
                 <!-- TESTS Section -->
@@ -219,12 +227,16 @@
 
                             <!-- Current Affairs Section -->
                             <div class="mb-6">
-                                <h2 class="text-xl font-bold text-gray-900 mb-2">Current Affairs</h2>
+                                <div class="flex items-center justify-between mb-2">
+                                    <h2 class="text-xl font-bold text-gray-900">Current Affairs</h2>
+                                    <a href="current-affairs.html"
+                                        class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All →</a>
+                                </div>
                                 <p class="text-gray-500 text-base mb-4">Stay updated with daily news and events</p>
 
                                 <div class="grid grid-cols-1 gap-4">
                                     <!-- Current Affairs Card 1 -->
-                                    <div
+                                    <a href="current-affairs.html"
                                         class="bg-white rounded-xl border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer group">
                                         <div
                                             class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
@@ -247,7 +259,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -649,6 +661,7 @@
         </main>
     </div>
 
+    <script src="js/firebase-sync.js"></script>
     <script src="js/admin-data.js"></script>
     <script>
         // Groq API
@@ -777,46 +790,55 @@
             loadNotifications();
         }
 
-        function loadNotifications() {
-            const notifications = JSON.parse(localStorage.getItem('genz_notifications') || '[]');
+        async function loadNotifications() {
             const container = document.getElementById('notificationsList');
             const countEl = document.getElementById('notifCount');
 
             if (!container) return;
 
-            if (notifications.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-6 text-gray-400 text-sm">
-                        No notifications yet
-                    </div>
-                `;
+            // Show loading state
+            container.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Loading...</div>';
+
+            try {
+                // Fetch from Firebase
+                const notifications = await FirebaseSync.getActiveNotifications();
+
+                if (!notifications || notifications.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-6 text-gray-400 text-sm">
+                            No notifications yet
+                        </div>
+                    `;
+                    countEl.textContent = '0 new';
+                    return;
+                }
+
+                container.innerHTML = notifications.map(notif => {
+                    const typeColors = {
+                        'info': 'bg-blue-50 border-blue-200 text-blue-700',
+                        'warning': 'bg-yellow-50 border-yellow-200 text-yellow-700',
+                        'success': 'bg-green-50 border-green-200 text-green-700',
+                        'urgent': 'bg-red-50 border-red-200 text-red-700'
+                    };
+                    const color = typeColors[notif.type] || typeColors.info;
+                    const timeAgo = getTimeAgo(notif.created_at);
+
+                    return `
+                        <div class="p-3 rounded-lg border ${color} ${notif.link ? 'cursor-pointer hover:opacity-80' : ''}" 
+                             ${notif.link ? `onclick="window.location.href='${notif.link}'"` : ''}>
+                            <div class="font-medium text-sm">${notif.title}</div>
+                            <div class="text-xs mt-1 opacity-80">${notif.message}</div>
+                            <div class="text-[10px] mt-2 opacity-60">${timeAgo}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                countEl.textContent = notifications.length + ' new';
+            } catch (e) {
+                console.error('Error loading notifications:', e);
+                container.innerHTML = '<div class="text-center py-4 text-red-400 text-sm">Failed to load</div>';
                 countEl.textContent = '0 new';
-                return;
             }
-
-            // Sort by date (newest first)
-            const sorted = [...notifications].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-            container.innerHTML = sorted.map(notif => {
-                const typeColors = {
-                    'info': 'bg-blue-50 border-blue-200 text-blue-700',
-                    'warning': 'bg-yellow-50 border-yellow-200 text-yellow-700',
-                    'success': 'bg-green-50 border-green-200 text-green-700',
-                    'urgent': 'bg-red-50 border-red-200 text-red-700'
-                };
-                const color = typeColors[notif.type] || typeColors.info;
-                const timeAgo = getTimeAgo(notif.created_at);
-
-                return `
-                    <div class="p-3 rounded-lg border ${color}">
-                        <div class="font-medium text-sm">${notif.title}</div>
-                        <div class="text-xs mt-1 opacity-80">${notif.message}</div>
-                        <div class="text-[10px] mt-2 opacity-60">${timeAgo}</div>
-                    </div>
-                `;
-            }).join('');
-
-            countEl.textContent = sorted.length + ' new';
         }
 
         function getTimeAgo(dateStr) {
@@ -974,15 +996,63 @@
         let currentTestId = null;
         let isResumeMode = false;
 
-        function loadMockTests() {
-            const tests = adminData?.getAllTests() || [];
+        async function loadMockTests() {
+            let tests = adminData?.getAllTests() || [];
             const container = document.getElementById('mockTestsBody');
+
+            // Show loading state if no tests found initially
+            if (tests.length === 0) {
+                container.innerHTML = `
+                <div class="px-6 py-12 text-center text-gray-500 flex flex-col items-center justify-center">
+                    <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p>Syncing mock tests...</p>
+                </div>
+            `;
+
+                // Try fetching from Firebase directly if available
+                if (window.FirebaseSync) {
+                    try {
+                        const firebaseTests = await FirebaseSync.getAllTests();
+                        if (firebaseTests && firebaseTests.length > 0) {
+                            // Merge with local adminData
+                            adminData.mockTests = firebaseTests;
+                            adminData.save('mock_tests', firebaseTests);
+                            tests = firebaseTests;
+
+                            // Also fetch questions in background
+                            for (const test of tests) {
+                                FirebaseSync.getQuestionsByTestId(test.id).then(questions => {
+                                    if (questions && questions.length > 0) {
+                                        const existingQuestions = adminData.getQuestionsByTestId(test.id);
+                                        if (existingQuestions.length === 0) {
+                                            // Add only if we don't have them
+                                            adminData.questions.push(...questions);
+                                            adminData.save('questions', adminData.questions);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Failed to sync tests:", e);
+                    }
+                }
+            }
 
             // Always get fresh data from localStorage
             const currentAttempted = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
 
             if (tests.length === 0) {
-                container.innerHTML = '<div class="px-6 py-12 text-center text-gray-500">No mock tests available yet. Ask admin to create tests.</div>';
+                container.innerHTML = `
+                <div class="px-6 py-12 text-center text-gray-500">
+                    <p class="mb-2">No mock tests available yet.</p>
+                    <button onclick="loadMockTests()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Click to Refresh</button>
+                    ${!window.FirebaseSync ? '<p class="text-xs text-red-400 mt-2">Firebase connection issue.</p>' : ''}
+                </div>
+            `;
                 return;
             }
 
@@ -990,21 +1060,22 @@
                 const isAttempted = currentAttempted.includes(test.id);
                 const questions = test.total_questions || 10;
                 const marks = questions * 2;
+                const buttonHtml = isAttempted
+                    ? `<button onclick="startTest('${test.id}', true)" class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded text-xs font-semibold hover:bg-gray-200">Retake</button>`
+                    : `<button onclick="startTest('${test.id}')" class="px-4 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 shadow-sm shadow-green-200">Start</button>`;
+
                 return `
-                    <div class="px-6 py-4 flex items-center hover:bg-gray-50 transition-colors">
-                        <div class="w-[35%] pr-4 font-medium text-gray-900 text-sm">${test.name_en || 'Untitled Test'}</div>
-                        <div class="w-24 text-center text-gray-500 text-xs font-medium">${questions}</div>
-                        <div class="w-24 text-center text-gray-500 text-xs font-medium">${marks}</div>
-                        <div class="w-24 text-center text-gray-500 text-xs font-medium">${test.time_limit || 10} min</div>
-                        <div class="flex-1 text-gray-500 text-xs pr-4">${test.subject_id || 'General'}</div>
-                        <div class="w-32 text-right">
-                            ${isAttempted
-                        ? `<button onclick="openTestModal('${test.id}', false)" class="border border-green-600 text-green-600 bg-green-50 px-4 py-1.5 rounded text-xs font-bold hover:bg-green-100 transition-colors">✓ Retake</button>`
-                        : `<button onclick="openTestModal('${test.id}', false)" class="border border-blue-200 text-blue-600 bg-white px-4 py-1.5 rounded text-xs font-bold hover:bg-blue-50 hover:border-blue-600 transition-colors">Attempt Now</button>`
-                    }
-                        </div>
+                <div class="px-6 py-4 flex items-center hover:bg-gray-50 transition-colors">
+                    <div class="w-[35%] pr-4 font-medium text-gray-900 text-sm">${test.name_en || 'Untitled Test'}</div>
+                    <div class="w-24 text-center text-gray-500 text-xs font-medium">${questions}</div>
+                    <div class="w-24 text-center text-gray-500 text-xs font-medium">${marks}</div>
+                    <div class="w-24 text-center text-gray-500 text-xs font-medium">${test.time_limit || 10} min</div>
+                    <div class="flex-1 text-gray-500 text-xs pr-4">${test.subject_id || 'General'}</div>
+                    <div class="w-24 text-right">
+                        ${buttonHtml}
                     </div>
-                `;
+                </div>
+            `;
             }).join('');
         }
 

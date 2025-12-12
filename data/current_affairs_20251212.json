@@ -1,0 +1,71 @@
+{
+  "last_updated": "2025-12-12T09:00:00+05:30",
+  "date": "2025-12-12",
+  "total_articles": 4,
+  "articles": [
+    {
+      "id": "sample001",
+      "title": "NSS 80th Round Survey reveals rising education costs in India",
+      "summary": "The survey reveals the financial burden of education despite the constitutional guarantee of free education for children aged 6-14 years under Article 21A.",
+      "source": "hindu",
+      "url": "https://www.thehindu.com/opinion/editorial/",
+      "date": "2025-12-12",
+      "category": "Polity & Governance",
+      "tags": ["★ Editorial", "GS 2: Governance", "GS 3: Economy", "Prelims"],
+      "relevance_score": 0.85,
+      "highlights": [
+        "55.9% of students attend government schools, while 31.9% attend private unaided schools nationally",
+        "Urban areas have higher private school enrolment (51.4%) compared to rural areas (24.3%)",
+        "Fees in private schools range from ₹17,988 to ₹33,567 per academic year in rural areas"
+      ]
+    },
+    {
+      "id": "sample002",
+      "title": "India-Italy Strategic Partnership Elevated",
+      "summary": "PM Modi and Italian Deputy PM Tajani discuss enhanced cooperation in defense, technology, and trade.",
+      "source": "pib",
+      "url": "https://pib.gov.in/",
+      "date": "2025-12-12",
+      "category": "International Relations",
+      "tags": ["Government", "GS: International Relations", "Prelims"],
+      "relevance_score": 0.75,
+      "highlights": [
+        "Italy's Deputy PM Antonio Tajani's visit strengthens bilateral ties",
+        "Focus on defense cooperation, technology transfer, and trade expansion",
+        "G20 cooperation and Mediterranean-Indo-Pacific connectivity discussed"
+      ]
+    },
+    {
+      "id": "sample003",
+      "title": "Madras HC Collegium faces scrutiny over judicial appointments",
+      "summary": "Constitutional questions arise on judicial appointment process transparency and collegium system accountability.",
+      "source": "hindu",
+      "url": "https://www.thehindu.com/opinion/editorial/",
+      "date": "2025-12-12",
+      "category": "Polity & Governance",
+      "tags": ["★ Editorial", "GS 2: Governance"],
+      "relevance_score": 0.80,
+      "highlights": [
+        "Article 217 and 224 of the Constitution govern High Court judge appointments",
+        "Collegium system lacks transparency mechanisms",
+        "Need for reform in judicial appointments discussed"
+      ]
+    },
+    {
+      "id": "sample004",
+      "title": "New Climate Finance Framework at COP29",
+      "summary": "Countries agree on enhanced climate finance mechanisms for developing nations at the latest climate summit.",
+      "source": "ie",
+      "url": "https://indianexpress.com/section/explained/",
+      "date": "2025-12-12",
+      "category": "Environment & Ecology",
+      "tags": ["Explained", "GS: Environment", "Prelims"],
+      "relevance_score": 0.78,
+      "highlights": [
+        "Loss and Damage fund operationalized",
+        "New Collective Quantified Goal (NCQG) for climate finance",
+        "India's position on climate equity highlighted"
+      ]
+    }
+  ]
+}

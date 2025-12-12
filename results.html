@@ -12,19 +12,140 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .score-ring {
-            animation: rotateIn 1s ease-out;
+        /* ===== SPEEDOMETER GAUGE ===== */
+        .speedometer-container {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
         }
 
-        @keyframes rotateIn {
-            from {
-                transform: rotate(-90deg);
-                opacity: 0;
+        .speedometer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .speedometer-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .speedometer-bg {
+            fill: none;
+            stroke: #e5e7eb;
+            stroke-width: 18;
+            stroke-linecap: round;
+        }
+
+        .speedometer-progress {
+            fill: none;
+            stroke: url(#speedoGradient);
+            stroke-width: 18;
+            stroke-linecap: round;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 251;
+            transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+        }
+
+        .speedometer-ticks line {
+            stroke: #9ca3af;
+            stroke-width: 2;
+        }
+
+        .speedometer-tick-label {
+            font-size: 10px;
+            fill: #6b7280;
+            font-weight: 500;
+        }
+
+        .speedometer-needle-container {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            width: 4px;
+            height: 90px;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .speedometer-needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 75px solid #ef4444;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .speedometer-needle::after {
+            content: '';
+            position: absolute;
+            bottom: -85px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .speedometer-center {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #374151, #1f2937);
+            border-radius: 50%;
+            border: 3px solid #6b7280;
+            z-index: 10;
+        }
+
+        .speedometer-value {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        /* Glow effects based on score */
+        .speedometer-container.excellent .speedometer-progress {
+            filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.6));
+        }
+
+        .speedometer-container.good .speedometer-progress {
+            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+        }
+
+        .speedometer-container.average .speedometer-progress {
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+        }
+
+        .speedometer-container.poor .speedometer-progress {
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
             }
 
-            to {
-                transform: rotate(0);
-                opacity: 1;
+            50% {
+                box-shadow: 0 0 18px rgba(239, 68, 68, 0.8);
             }
         }
 
@@ -105,23 +226,52 @@
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Score Card -->
             <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                <div class="relative w-48 h-48 mx-auto mb-6">
-                    <svg class="w-full h-full transform -rotate-90 score-ring" viewBox="0 0 120 120">
-                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8" />
-                        <circle id="scoreCircle" cx="60" cy="60" r="54" fill="none" stroke="url(#gradient)"
-                            stroke-width="8" stroke-linecap="round" stroke-dasharray="339.292"
-                            stroke-dashoffset="339.292" />
-                        <defs>
-                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#3b82f6" />
-                                <stop offset="100%" stop-color="#22c55e" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span id="scorePercent"
-                            class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">0%</span>
-                        <span class="text-gray-500 text-sm">Your Score</span>
+                <div class="speedometer-container" id="speedometerContainer">
+                    <div class="speedometer">
+                        <svg class="speedometer-svg" viewBox="0 0 200 120">
+                            <defs>
+                                <linearGradient id="speedoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ef4444" />
+                                    <stop offset="25%" stop-color="#f59e0b" />
+                                    <stop offset="50%" stop-color="#eab308" />
+                                    <stop offset="75%" stop-color="#22c55e" />
+                                    <stop offset="100%" stop-color="#10b981" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Background Arc -->
+                            <path class="speedometer-bg" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" />
+                            <!-- Progress Arc -->
+                            <path class="speedometer-progress" id="speedoProgress" d="M 20 100 A 80 80 0 0 1 180 100"
+                                fill="none" />
+                            <!-- Tick marks -->
+                            <g class="speedometer-ticks">
+                                <line x1="25" y1="100" x2="35" y2="100" />
+                                <line x1="32" y1="68" x2="40" y2="74" />
+                                <line x1="55" y1="40" x2="62" y2="48" />
+                                <line x1="100" y1="25" x2="100" y2="35" />
+                                <line x1="145" y1="40" x2="138" y2="48" />
+                                <line x1="168" y1="68" x2="160" y2="74" />
+                                <line x1="175" y1="100" x2="165" y2="100" />
+                            </g>
+                            <!-- Tick Labels -->
+                            <text class="speedometer-tick-label" x="15" y="115">0</text>
+                            <text class="speedometer-tick-label" x="50" y="35">25</text>
+                            <text class="speedometer-tick-label" x="93" y="18">50</text>
+                            <text class="speedometer-tick-label" x="140" y="35">75</text>
+                            <text class="speedometer-tick-label" x="175" y="115">100</text>
+                        </svg>
+                        <!-- Needle -->
+                        <div class="speedometer-needle-container" id="speedoNeedle">
+                            <div class="speedometer-needle"></div>
+                        </div>
+                        <!-- Center bolt -->
+                        <div class="speedometer-center"></div>
+                        <!-- Value Display -->
+                        <div class="speedometer-value">
+                            <span id="scorePercent"
+                                class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">0%</span>
+                            <div class="text-gray-500 text-sm">Your Score</div>
+                        </div>
                     </div>
                 </div>
 
@@ -196,9 +346,41 @@
                     </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Leaderboard Section -->
+            <div class="mt-8 bg-white rounded-2xl border border-gray-100 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        🏆 Leaderboard
+                        <span id="leaderboardTestName" class="text-sm font-normal text-gray-500"></span>
+                    </h2>
+                    <button onclick="loadLeaderboard()"
+                        class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+
+                <div id="leaderboardContent" class="space-y-2">
+                    <div class="flex items-center justify-center py-8 text-gray-500">
+                        <svg class="animate-spin h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Loading leaderboard...
+                    </div>
+                </div>
+            </div>
     </main>
 
+    <script src="js/firebase-sync.js"></script>
     <script src="js/admin-data.js"></script>
     <script>
         // Get results from URL
@@ -311,37 +493,70 @@
             }
         }
 
-        // Animate score circle
+        // Animate speedometer
         function animateScore() {
             // Safe percentage value - prevent NaN
             const safePercent = (typeof percentage === 'number' && !isNaN(percentage)) ? percentage : 0;
 
-            const circle = document.getElementById('scoreCircle');
-            const circumference = 2 * Math.PI * 54;
-            const offset = circumference - (safePercent / 100) * circumference;
+            const speedoProgress = document.getElementById('speedoProgress');
+            const speedoNeedle = document.getElementById('speedoNeedle');
+            const speedoContainer = document.getElementById('speedometerContainer');
 
+            // Calculate arc length - semicircle with radius 80: π * r = 251.33
+            const arcLength = Math.PI * 80;
+            const targetOffset = arcLength - (safePercent / 100) * arcLength;
+
+            // Calculate needle rotation - starts at -90deg (left), ends at 90deg (right)
+            const targetRotation = -90 + (safePercent / 100) * 180;
+
+            // Add performance class based on score
+            if (safePercent >= 80) {
+                speedoContainer.classList.add('excellent');
+            } else if (safePercent >= 60) {
+                speedoContainer.classList.add('good');
+            } else if (safePercent >= 40) {
+                speedoContainer.classList.add('average');
+            } else {
+                speedoContainer.classList.add('poor');
+            }
+
+            // Animate after a short delay
             setTimeout(() => {
-                circle.style.transition = 'stroke-dashoffset 1.5s ease-out';
-                circle.style.strokeDashoffset = offset;
+                // Animate the arc
+                speedoProgress.style.strokeDasharray = arcLength;
+                speedoProgress.style.strokeDashoffset = targetOffset;
+
+                // Animate the needle
+                speedoNeedle.style.transform = `translateX(-50%) rotate(${targetRotation}deg)`;
             }, 300);
 
-            // Animate percentage counter
+            // Animate percentage counter with easing
             if (safePercent === 0) {
                 document.getElementById('scorePercent').textContent = '0%';
                 return;
             }
 
-            let current = 0;
-            const duration = 1500;
-            const increment = safePercent / (duration / 16);
-            const counter = setInterval(() => {
-                current += increment;
-                if (current >= safePercent) {
-                    current = safePercent;
-                    clearInterval(counter);
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+
+            function animateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOutCubic(progress);
+                const current = Math.round(safePercent * easedProgress);
+
+                document.getElementById('scorePercent').textContent = current + '%';
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateNumber);
                 }
-                document.getElementById('scorePercent').textContent = Math.round(current) + '%';
-            }, 16);
+            }
+
+            requestAnimationFrame(animateNumber);
         }
 
         // Update UI
@@ -413,14 +628,155 @@
             }).join('');
         }
 
+        // Get current user info
+        function getCurrentUser() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            return {
+                name: userData.name || 'Anonymous',
+                key: userData.key || ''
+            };
+        }
+
+        // Save result to Firebase
+        async function saveResultToFirebase() {
+            if (!window.FirebaseSync || !testId) return;
+
+            const user = getCurrentUser();
+            const resultData = {
+                userName: user.name,
+                userKey: user.key,
+                correct: correct,
+                wrong: wrong,
+                total: total,
+                score: upscScore,
+                accuracy: accuracy,
+                timeTaken: timeTaken
+            };
+
+            try {
+                await FirebaseSync.saveTestResult(testId, resultData);
+                console.log('✅ Result saved to Firebase');
+            } catch (e) {
+                console.error('Failed to save result to Firebase:', e);
+            }
+        }
+
+        // Load and display leaderboard
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboardContent');
+            const testNameEl = document.getElementById('leaderboardTestName');
+
+            if (!testId) {
+                container.innerHTML = '<div class="text-center py-6 text-gray-500">No test selected</div>';
+                return;
+            }
+
+            // Show loading
+            container.innerHTML = `
+                <div class="flex items-center justify-center py-8 text-gray-500">
+                    <svg class="animate-spin h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading leaderboard...
+                </div>
+            `;
+
+            // Get test name
+            const tests = adminData?.getAllTests() || [];
+            const test = tests.find(t => t.id === testId);
+            testNameEl.textContent = test ? `- ${test.name_en}` : '';
+
+            try {
+                if (!window.FirebaseSync) {
+                    container.innerHTML = '<div class="text-center py-6 text-gray-500">Leaderboard unavailable (offline)</div>';
+                    return;
+                }
+
+                const leaderboard = await FirebaseSync.getTestLeaderboard(testId);
+                const currentUser = getCurrentUser();
+
+                if (leaderboard.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="text-4xl mb-3">🏆</div>
+                            <div class="text-gray-500">Be the first to top the leaderboard!</div>
+                            <div class="text-gray-400 text-sm mt-1">Complete this test to appear here</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Find current user's rank
+                const userEntry = leaderboard.find(r => r.userName === currentUser.name || r.userKey === currentUser.key);
+                if (userEntry) {
+                    document.getElementById('rank').textContent = '#' + userEntry.rank;
+                    const percentile = Math.round((1 - (userEntry.rank - 1) / leaderboard.length) * 100);
+                    document.getElementById('percentile').textContent = percentile + '%';
+                }
+
+                // Render leaderboard
+                container.innerHTML = `
+                    <div class="overflow-hidden rounded-xl border border-gray-200">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Rank</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Name</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Score</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Accuracy</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${leaderboard.slice(0, 20).map(entry => {
+                    const isCurrentUser = entry.userName === currentUser.name || entry.userKey === currentUser.key;
+                    const rankBadge = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '#' + entry.rank;
+                    const timeMins = Math.floor(entry.timeTaken / 60);
+                    const timeSecs = Math.floor(entry.timeTaken % 60);
+                    const acc = entry.total > 0 ? Math.round((entry.correct / entry.total) * 100) : 0;
+
+                    return `
+                                        <tr class="${isCurrentUser ? 'bg-blue-50' : 'hover:bg-gray-50'}">
+                                            <td class="px-4 py-3 text-sm font-bold ${entry.rank <= 3 ? 'text-xl' : 'text-gray-600'}">${rankBadge}</td>
+                                            <td class="px-4 py-3">
+                                                <div class="text-sm font-medium text-gray-900">${entry.userName}${isCurrentUser ? ' ⭐' : ''}</div>
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+                                                <span class="text-sm font-bold text-gray-900">${entry.correct}/${entry.total}</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+                                                <span class="text-sm font-bold ${acc >= 80 ? 'text-green-600' : acc >= 60 ? 'text-blue-600' : 'text-gray-600'}">${acc}%</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-center text-sm text-gray-500">${timeMins}:${String(timeSecs).padStart(2, '0')}</td>
+                                        </tr>
+                                    `;
+                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ${leaderboard.length > 20 ? `<div class="text-center text-sm text-gray-500 mt-3">Showing top 20 of ${leaderboard.length} participants</div>` : ''}
+                `;
+
+            } catch (e) {
+                console.error('Failed to load leaderboard:', e);
+                container.innerHTML = '<div class="text-center py-6 text-red-500">Failed to load leaderboard</div>';
+            }
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             // Only save if this is a new attempt (has URL data, not viewing saved)
             if (isNewAttempt) {
                 saveAttempt();
+                // Save to Firebase for leaderboard
+                await saveResultToFirebase();
             }
             updateUI();
             animateScore();
+
+            // Load leaderboard
+            loadLeaderboard();
 
             // Tab click handlers
             const answersUrl = `answers.html?testId=${testId}&attempt=${attemptNum}`;

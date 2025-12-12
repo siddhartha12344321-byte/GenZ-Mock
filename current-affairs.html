@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Affairs - GenZMocks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: #64748b;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .sidebar-link.active {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .sidebar-section {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 16px 16px 8px;
+        }
+
+        .category-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag-editorial {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .tag-gs2 {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .tag-gs3 {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .tag-prelims {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .news-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+
+        .news-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: #3b82f6;
+        }
+
+        .calendar-day {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: #f1f5f9;
+        }
+
+        .calendar-day.today {
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.has-quiz {
+            position: relative;
+        }
+
+        .calendar-day.has-quiz::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+
+        .mcq-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .mcq-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .mcq-toggle.generating {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .source-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .source-hindu {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+        }
+
+        .source-ie {
+            background: linear-gradient(135deg, #dc2626, #f87171);
+            color: white;
+        }
+
+        .source-pib {
+            background: linear-gradient(135deg, #047857, #10b981);
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 overflow-y-auto">
+            <div class="p-4 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 flex items-center justify-center">
+                        <span class="text-white text-lg">🎓</span>
+                    </div>
+                    <span class="font-bold text-lg text-gray-900">GenZ Mocks</span>
+                </div>
+            </div>
+
+            <nav class="p-3">
+                <a href="student-dashboard.html" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Home
+                </a>
+                <a href="#" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Ask AI
+                </a>
+                <a href="current-affairs.html" class="sidebar-link active">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                    Current Affairs
+                </a>
+
+                <div class="sidebar-section">PRELIMS</div>
+                <a href="mcq-practice.html" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    MCQ Practice
+                </a>
+                <a href="tests.html" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    My Tests
+                </a>
+
+                <div class="sidebar-section">PROGRESS</div>
+                <a href="progress.html" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    My Progress
+                </a>
+                <a href="leaderboard.html" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Leaderboard
+                </a>
+            </nav>
+
+            <div class="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-100 bg-white">
+                <a href="#" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Help & Support
+                </a>
+                <div class="flex items-center gap-3 px-4 py-2 mt-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+                        S</div>
+                    <span class="text-sm font-medium text-gray-700">Student</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 flex-1 p-8">
+            <!-- Header Tabs -->
+            <div class="flex items-center gap-6 border-b border-gray-200 mb-8">
+                <button id="tabDailyNews" class="pb-3 font-semibold text-blue-600 border-b-2 border-blue-600">Daily News
+                    Analysis</button>
+                <button id="tabPractice"
+                    class="pb-3 font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent">Practice</button>
+            </div>
+
+            <div class="flex gap-8">
+                <!-- News Content -->
+                <div class="flex-1" id="newsContent">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-4">
+                            <button onclick="changeDate(-1)" class="text-gray-500 hover:text-gray-700 p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <h2 class="text-lg font-semibold text-gray-900" id="currentDateTitle">Today's News</h2>
+                            <button onclick="changeDate(1)" class="text-gray-500 hover:text-gray-700 p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button
+                                class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                                Share
+                            </button>
+                            <button
+                                class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Source Filter -->
+                    <div class="flex items-center gap-2 mb-6">
+                        <button
+                            class="source-filter active px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-700"
+                            data-source="all">All Sources</button>
+                        <button
+                            class="source-filter px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            data-source="hindu">The Hindu</button>
+                        <button
+                            class="source-filter px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            data-source="ie">Indian Express</button>
+                        <button
+                            class="source-filter px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            data-source="pib">PIB</button>
+                    </div>
+
+                    <!-- News Cards -->
+                    <div class="space-y-4" id="newsCards">
+                        <!-- Cards will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Practice Content (Hidden by default) -->
+                <div class="flex-1 hidden" id="practiceContent">
+                    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">Test name</th>
+                                    <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600"># Questions</th>
+                                    <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">Max marks</th>
+                                    <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">View Current
+                                        Affairs</th>
+                                    <th class="px-6 py-4"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="practiceTable">
+                                <!-- Practice rows will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sidebar - Calendar & Progress -->
+                <div class="w-72 flex-shrink-0">
+                    <div class="bg-white rounded-xl border border-gray-100 p-5 mb-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">Daily Progress</h3>
+                        <div class="text-center mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <button onclick="changeMonth(-1)" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <span class="font-semibold text-gray-900" id="calendarMonth">December 2025</span>
+                                <button onclick="changeMonth(1)" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500 mb-2">
+                            <div>Su</div>
+                            <div>M</div>
+                            <div>Tu</div>
+                            <div>W</div>
+                            <div>Th</div>
+                            <div>F</div>
+                            <div>S</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1" id="calendarDays">
+                            <!-- Calendar days rendered by JS -->
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex items-center gap-4 text-xs">
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    Quiz attempted
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    In Progress
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="bg-white rounded-xl border border-gray-100 p-5">
+                        <h3 class="font-semibold text-gray-900 mb-4">This Week</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 text-sm">Articles Read</span>
+                                <span class="font-bold text-gray-900" id="articlesRead">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 text-sm">MCQs Practiced</span>
+                                <span class="font-bold text-gray-900" id="mcqsPracticed">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 text-sm">Accuracy</span>
+                                <span class="font-bold text-green-600" id="weeklyAccuracy">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Article Detail Modal -->
+    <div id="articleModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                <h2 class="font-bold text-lg text-gray-900" id="modalTitle">Article Title</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6" id="modalContent">
+                <!-- Modal content rendered by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample current affairs data
+        const sampleArticles = [
+            {
+                id: 1,
+                title: "The stark reality of educational costs in India",
+                subtitle: "NSS 80th Round Survey reveals rising education costs, impacting access for lower-income families despite free education guarantee.",
+                source: "hindu",
+                tags: ["Editorial", "GS 2: Governance", "GS 3: Economy", "Prelims"],
+                date: new Date().toISOString().split('T')[0],
+                highlights: [
+                    "The NSS 80th Round Survey (April-June 2025) reveals the financial burden of education in India despite the constitutional guarantee of free education for children aged 6-14 years under Article 21A.",
+                    "55.9% of students attend government schools, while 31.9% attend private unaided schools nationally; urban areas have higher private school enrolment (51.4%) compared to rural areas (24.3%).",
+                    "Fees in private schools range from ₹17,988 to ₹33,567 per academic year in rural areas and ₹26,188 to ₹49,075 in urban areas."
+                ],
+                detailedInsights: "The survey highlights the growing disparity in educational access between urban and rural areas, with private coaching becoming increasingly common among middle-class families seeking competitive advantages."
+            },
+            {
+                id: 2,
+                title: "The Madras High Court must break its silence",
+                subtitle: "Madras HC Collegium faces scrutiny over judge exclusion, raising constitutional questions on judicial appointment process and transparency.",
+                source: "hindu",
+                tags: ["Editorial", "GS 2: Governance"],
+                date: new Date().toISOString().split('T')[0],
+                highlights: [
+                    "The Madras High Court Collegium has been criticized for excluding qualified candidates without providing transparent reasons.",
+                    "This raises questions about the collegium system's accountability and the need for reform in judicial appointments.",
+                    "Article 217 and 224 of the Constitution govern High Court judge appointments."
+                ],
+                detailedInsights: "The collegium system, while designed to ensure judicial independence, lacks transparency mechanisms that other democratic institutions have."
+            },
+            {
+                id: 3,
+                title: "Notional security: U.S. National Security Strategy",
+                subtitle: "U.S. National Security Strategy prioritizes economic security, criticizes European allies, and raises concerns about NATO's strength.",
+                source: "hindu",
+                tags: ["Editorial", "GS 2: International Relations"],
+                date: new Date().toISOString().split('T')[0],
+                highlights: [
+                    "The new U.S. National Security Strategy emphasizes 'America First' economic principles.",
+                    "European NATO allies face pressure to increase defense spending to 2% of GDP.",
+                    "Implications for India-US strategic partnership and Indo-Pacific security architecture."
+                ],
+                detailedInsights: "The strategy signals potential shifts in U.S. foreign policy priorities that could affect bilateral relations with key partners including India."
+            },
+            {
+                id: 4,
+                title: "India-Italy Strategic Partnership Elevated",
+                subtitle: "PM Modi and Italian Deputy PM Tajani discuss enhanced cooperation in defense, technology, and trade.",
+                source: "pib",
+                tags: ["GS 2: International Relations", "Prelims"],
+                date: new Date().toISOString().split('T')[0],
+                highlights: [
+                    "Italy's Deputy PM Antonio Tajani's visit strengthens bilateral ties.",
+                    "Focus on defense cooperation, technology transfer, and trade expansion.",
+                    "G20 cooperation and Mediterranean-Indo-Pacific connectivity discussed."
+                ],
+                detailedInsights: "This visit marks another step in India's growing engagement with European partners as part of its multi-alignment strategy."
+            }
+        ];
+
+        let currentDate = new Date();
+        let currentMonth = new Date();
+
+        // Render news cards
+        function renderNewsCards(articles) {
+            const container = document.getElementById('newsCards');
+            container.innerHTML = articles.map(article => `
+                <div class="news-card cursor-pointer" onclick="openArticle(${article.id})">
+                    <div class="flex gap-4">
+                        <div class="source-icon ${article.source === 'hindu' ? 'source-hindu' : article.source === 'ie' ? 'source-ie' : 'source-pib'}">
+                            ${article.source === 'hindu' ? '🅃' : article.source === 'ie' ? 'IE' : '🏛️'}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                ${article.tags.map(tag => `
+                                    <span class="category-tag ${tag.includes('Editorial') ? 'tag-editorial' : tag.includes('GS 2') ? 'tag-gs2' : tag.includes('GS 3') ? 'tag-gs3' : 'tag-prelims'}">
+                                        ${tag.includes('Editorial') ? '★ ' : ''}${tag}
+                                    </span>
+                                `).join('')}
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-1 hover:text-blue-600">${article.title}</h3>
+                            <p class="text-sm text-gray-500 line-clamp-2">${article.subtitle}</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <button class="mcq-toggle" onclick="event.stopPropagation(); generateMCQ(${article.id})" title="Generate MCQs from this article">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Generate MCQ
+                            </button>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open article modal
+        function openArticle(id) {
+            const article = sampleArticles.find(a => a.id === id);
+            if (!article) return;
+
+            document.getElementById('modalTitle').textContent = article.title;
+            document.getElementById('modalContent').innerHTML = `
+                <p class="text-gray-500 mb-6">${article.subtitle}</p>
+                
+                <div class="flex gap-3 mb-6">
+                    <button class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download
+                    </button>
+                    <button class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        Share
+                    </button>
+                    <button class="mcq-toggle ml-auto" onclick="generateMCQ(${article.id})">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Generate MCQ
+                    </button>
+                </div>
+
+                <h3 class="font-bold text-gray-900 mb-4">Key Highlights:</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                    ${article.highlights.map(h => `<li>${h}</li>`).join('')}
+                </ul>
+
+                <h3 class="font-bold text-gray-900 mb-4">Detailed Insights:</h3>
+                <p class="text-gray-700">${article.detailedInsights}</p>
+            `;
+
+            document.getElementById('articleModal').classList.remove('hidden');
+            document.getElementById('articleModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+            document.getElementById('articleModal').classList.remove('flex');
+        }
+
+        // Generate MCQ function
+        async function generateMCQ(articleId) {
+            const article = sampleArticles.find(a => a.id === articleId);
+            if (!article) return;
+
+            const btn = event.target.closest('.mcq-toggle');
+            const originalText = btn.innerHTML;
+            btn.classList.add('generating');
+            btn.innerHTML = `
+                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+            `;
+
+            // Simulate MCQ generation (replace with actual AI call)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            btn.classList.remove('generating');
+            btn.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                MCQ Ready!
+            `;
+            btn.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-purple-600');
+            btn.classList.add('bg-green-500');
+
+            // Reset after 3 seconds
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('bg-green-500');
+            }, 3000);
+
+            alert(`MCQ generated for: "${article.title}"\n\nThis would redirect to the MCQ practice page with auto-generated questions.`);
+        }
+
+        // Calendar rendering
+        function renderCalendar() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+
+            const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+            const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+            const startPadding = firstDay.getDay();
+            const today = new Date();
+
+            let daysHTML = '';
+
+            // Empty cells for days before first of month
+            for (let i = 0; i < startPadding; i++) {
+                daysHTML += '<div class="calendar-day text-gray-300"></div>';
+            }
+
+            // Days of the month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const isToday = day === today.getDate() &&
+                    currentMonth.getMonth() === today.getMonth() &&
+                    currentMonth.getFullYear() === today.getFullYear();
+                const hasQuiz = Math.random() > 0.7; // Simulated
+
+                daysHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} ${hasQuiz ? 'has-quiz' : ''}" onclick="selectDate(${day})">
+                        ${day}
+                    </div>
+                `;
+            }
+
+            document.getElementById('calendarDays').innerHTML = daysHTML;
+        }
+
+        function changeMonth(delta) {
+            currentMonth.setMonth(currentMonth.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function changeDate(delta) {
+            currentDate.setDate(currentDate.getDate() + delta);
+            const options = { day: 'numeric', month: 'short', year: '2-digit' };
+            const isToday = new Date().toDateString() === currentDate.toDateString();
+            document.getElementById('currentDateTitle').textContent = isToday ? "Today's News" : currentDate.toLocaleDateString('en-IN', options);
+        }
+
+        // Tab switching
+        document.getElementById('tabDailyNews').addEventListener('click', () => {
+            document.getElementById('tabDailyNews').classList.add('text-blue-600', 'border-blue-600');
+            document.getElementById('tabDailyNews').classList.remove('text-gray-500', 'border-transparent');
+            document.getElementById('tabPractice').classList.remove('text-blue-600', 'border-blue-600');
+            document.getElementById('tabPractice').classList.add('text-gray-500', 'border-transparent');
+            document.getElementById('newsContent').classList.remove('hidden');
+            document.getElementById('practiceContent').classList.add('hidden');
+        });
+
+        document.getElementById('tabPractice').addEventListener('click', () => {
+            document.getElementById('tabPractice').classList.add('text-blue-600', 'border-blue-600');
+            document.getElementById('tabPractice').classList.remove('text-gray-500', 'border-transparent');
+            document.getElementById('tabDailyNews').classList.remove('text-blue-600', 'border-blue-600');
+            document.getElementById('tabDailyNews').classList.add('text-gray-500', 'border-transparent');
+            document.getElementById('practiceContent').classList.remove('hidden');
+            document.getElementById('newsContent').classList.add('hidden');
+            renderPracticeTable();
+        });
+
+        // Render practice table
+        function renderPracticeTable() {
+            const dates = [];
+            for (let i = 0; i < 10; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                dates.push(d);
+            }
+
+            document.getElementById('practiceTable').innerHTML = dates.map(date => {
+                const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
+                return `
+                    <tr class="border-t border-gray-100 hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900">${dateStr}</td>
+                        <td class="px-6 py-4 text-gray-600">10</td>
+                        <td class="px-6 py-4 text-gray-600">20</td>
+                        <td class="px-6 py-4">
+                            <a href="#" class="text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                                Current Affairs
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 font-medium text-sm">
+                                Practice Now
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Source filter
+        document.querySelectorAll('.source-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.source-filter').forEach(b => {
+                    b.classList.remove('bg-blue-100', 'text-blue-700');
+                    b.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                btn.classList.remove('bg-gray-100', 'text-gray-600');
+                btn.classList.add('bg-blue-100', 'text-blue-700');
+
+                const source = btn.dataset.source;
+                const filtered = source === 'all' ? sampleArticles : sampleArticles.filter(a => a.source === source);
+                renderNewsCards(filtered);
+            });
+        });
+
+        // Initialize
+        renderNewsCards(sampleArticles);
+        renderCalendar();
+    </script>
+</body>
+
+</html>

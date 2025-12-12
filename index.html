@@ -559,6 +559,7 @@
         </div>
     </div>
 
+    <script src="js/firebase-sync.js"></script>
     <script>
         // ===== SESSION MANAGEMENT =====
         const SESSION_DURATION_MS = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
@@ -604,44 +605,60 @@
         });
 
         // Validate access key against admin-generated keys
-        function validateAccessKey(key) {
+        async function validateAccessKey(key) {
             if (!key || key === '') return false;
 
+            console.log('Validating key with Firebase:', key);
+
+            // 1. First check hardcoded default keys (always valid)
+            // This ensures default keys work even if Firebase is down or slow
+            const DEFAULT_KEYS = ['GenZTesting1', 'GenZTesting2', 'GenZTesting3', 'GenZTesting4', 'GenZTesting5'];
+            if (DEFAULT_KEYS.includes(key)) {
+                console.log('Key matches default hardcoded key');
+                return true;
+            }
+
+            // 2. Check Firebase
+            if (window.FirebaseSync) {
+                const isValid = await FirebaseSync.validateKey(key);
+                if (isValid) {
+                    console.log('Key validated via Firebase');
+                    return true;
+                }
+            }
+
+            // 3. Fallback to localStorage (for admin browser or cached keys)
             // Source 1: valid_keys (direct array of key strings)
             const validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
-            console.log('valid_keys:', validKeys);
 
             // Source 2: genz_access_keys (array of key objects from admin-data.js)
             const accessKeysData = JSON.parse(localStorage.getItem('genz_access_keys') || '[]');
             const activeKeys = accessKeysData.filter(k => k.is_active).map(k => k.key);
-            console.log('genz_access_keys:', activeKeys);
 
-            // Source 3: Check if adminData is available (loaded from admin-data.js)
-            let adminDataKeys = [];
-            if (typeof adminData !== 'undefined' && adminData.accessKeys) {
-                adminDataKeys = adminData.accessKeys.filter(k => k.is_active).map(k => k.key);
-                console.log('adminData.accessKeys:', adminDataKeys);
-            }
+            // Merge local sources
+            const localKeys = [...new Set([...validKeys, ...activeKeys])];
 
-            // Merge all sources
-            const allValidKeys = [...new Set([...validKeys, ...activeKeys, ...adminDataKeys])];
-
-            console.log('All valid keys found:', allValidKeys);
-            console.log('Checking key:', key);
-
-            // If no keys exist yet, allow login with any key (for initial setup)
-            if (allValidKeys.length === 0) {
-                console.log('No keys configured - allowing any key for initial setup');
+            if (localKeys.includes(key)) {
+                console.log('Key found in localStorage');
                 return true;
             }
 
-            return allValidKeys.includes(key);
+            // If no keys exist anywhere (fresh setup), allow any key
+            // ONLY if we couldn't connect to Firebase to be sure
+            // But with hardcoded keys above, this shouldn't be needed often
+            if (localKeys.length === 0 && (!window.FirebaseSync || (await FirebaseSync.getAllKeys()).length === 0)) {
+                console.log('No keys found anywhere - allowing for setup');
+                return true;
+            }
+
+            return false;
         }
 
-        function studentLogin(e) {
+        async function studentLogin(e) {
             e.preventDefault();
             const name = document.getElementById('studentName').value.trim();
             const key = document.getElementById('studentKey').value.trim();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
             if (!name) {
                 showError('studentError', 'Please enter your name');
@@ -653,22 +670,39 @@
                 return;
             }
 
-            // Validate the access key
-            if (!validateAccessKey(key)) {
-                showError('studentError', 'Invalid access key. Please contact admin for a valid key.');
-                return;
+            // Show loading state
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Verifying...';
+            submitBtn.disabled = true;
+
+            try {
+                // Validate the access key
+                const isValid = await validateAccessKey(key);
+
+                if (!isValid) {
+                    showError('studentError', 'Invalid access key. Please contact admin for a valid key.');
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // Save to localStorage with timestamp for session management
+                localStorage.setItem('user_data', JSON.stringify({
+                    name: name,
+                    key: key,
+                    type: 'student',
+                    loginTime: Date.now()
+                }));
+
+                // Redirect to dashboard
+                window.location.href = 'student-dashboard.html';
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('studentError', 'Login failed. Please try again.');
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
             }
-
-            // Save to localStorage with timestamp for session management
-            localStorage.setItem('user_data', JSON.stringify({
-                name: name,
-                key: key,
-                type: 'student',
-                loginTime: Date.now()
-            }));
-
-            // Redirect to dashboard
-            window.location.href = 'student-dashboard.html';
         }
 
         function adminLogin(e) {

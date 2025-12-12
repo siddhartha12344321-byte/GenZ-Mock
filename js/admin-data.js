@@ -13,11 +13,15 @@ class AdminDataManager {
         this.accessKeys = this.load('access_keys') || [];
         this.subjects = this.getDefaultSubjects();
 
+        // Initialize Firebase Sync
+        this.initFirebaseSync();
+
         // Add default testing keys if not already present
         this.initDefaultKeys();
 
         // Add demo test if no tests exist
-        this.initDemoTest();
+        // With Firebase, we check if we have tests there first
+        // this.initDemoTest(); // Moved to inside initFirebaseSync
 
         console.log('📦 AdminDataManager initialized');
         console.log(`   - ${this.mockTests.length} tests`);
@@ -25,27 +29,118 @@ class AdminDataManager {
         console.log(`   - ${this.accessKeys.length} access keys`);
     }
 
+    async initFirebaseSync() {
+        if (!window.FirebaseSync) {
+            console.log('⚠️ FirebaseSync not loaded yet');
+            // Fallback to demo test if local is empty and no Firebase
+            if (this.mockTests.length === 0) {
+                this.initDemoTest();
+            }
+            return;
+        }
+
+        console.log('🔄 Syncing with Firebase...');
+
+        try {
+            // 1. Sync Keys
+            const firebaseKeys = await FirebaseSync.getAllKeys();
+            if (firebaseKeys.length > 0) {
+                // Merge with local keys
+                const localKeysMap = new Map(this.accessKeys.map(k => [k.key, k]));
+                firebaseKeys.forEach(k => localKeysMap.set(k.key, k));
+                this.accessKeys = Array.from(localKeysMap.values());
+                this.save('access_keys', this.accessKeys);
+
+                // Also update legacy valid_keys for compatibility
+                const validKeys = this.accessKeys.filter(k => k.is_active).map(k => k.key);
+                localStorage.setItem('valid_keys', JSON.stringify(validKeys));
+                console.log('✅ Keys synced from Firebase');
+            } else {
+                // If Firebase has no keys, push default keys (initDefaultKeys handle this)
+            }
+
+            // 2. Sync Tests
+            const firebaseTests = await FirebaseSync.getAllTests();
+            if (firebaseTests.length > 0) {
+                // Merge tests (prefer Firebase as truth for now)
+                this.mockTests = firebaseTests;
+                this.save('mock_tests', this.mockTests);
+                console.log(`✅ ${firebaseTests.length} tests synced from Firebase`);
+            } else {
+                // If no tests in Firebase, check if we should push local default test
+                if (this.mockTests.length === 0) {
+                    this.initDemoTest();
+                } else if (this.mockTests.some(t => t.id === 'polity_test_1')) {
+                    // Push local demo test to Firebase
+                    console.log('📤 Pushing local demo test to Firebase...');
+                    const demoTest = this.mockTests.find(t => t.id === 'polity_test_1');
+                    await FirebaseSync.saveTest(demoTest);
+                    const demoQuestions = this.getQuestionsByTestId('polity_test_1');
+                    await FirebaseSync.saveQuestions('polity_test_1', demoQuestions);
+                }
+            }
+
+            // 3. Sync Questions
+            // For now, lazy load questions when needed or sync all if small
+            // Let's sync all for simplicity as we have small data
+            const firebaseQuestions = await FirebaseSync.getAllQuestions();
+            if (firebaseQuestions.length > 0) {
+                this.questions = firebaseQuestions;
+                this.save('questions', this.questions);
+                console.log(`✅ ${firebaseQuestions.length} questions synced from Firebase`);
+            }
+
+        } catch (e) {
+            console.error('❌ Firebase sync failed:', e);
+            // Fallback to local if sync fails
+            if (this.mockTests.length === 0) {
+                this.initDemoTest();
+            }
+        }
+    }
+
     initDefaultKeys() {
         const defaultKeys = ['GenZTesting1', 'GenZTesting2', 'GenZTesting3', 'GenZTesting4', 'GenZTesting5'];
+
+        let existingKeys = this.accessKeys.map(k => k.key);
         let validKeys = JSON.parse(localStorage.getItem('valid_keys') || '[]');
 
         let added = false;
-        defaultKeys.forEach(key => {
-            if (!validKeys.includes(key)) {
-                validKeys.push(key);
+
+        defaultKeys.forEach(keyCode => {
+            // Add to legacy valid_keys
+            if (!validKeys.includes(keyCode)) {
+                validKeys.push(keyCode);
+            }
+
+            // Add to access_keys object
+            if (!existingKeys.includes(keyCode)) {
+                const newKey = {
+                    id: `key_${keyCode}`,
+                    key: keyCode,
+                    created_at: new Date().toISOString(),
+                    is_active: true,
+                    description: 'Default Testing Key'
+                };
+                this.accessKeys.push(newKey);
+
+                // Sync to Firebase
+                if (window.FirebaseSync) {
+                    FirebaseSync.saveKey(newKey);
+                }
                 added = true;
             }
         });
 
         if (added) {
+            this.save('access_keys', this.accessKeys);
             localStorage.setItem('valid_keys', JSON.stringify(validKeys));
-            console.log('🔑 Default testing keys added:', defaultKeys);
+            console.log('🔑 Default testing keys initialized');
         }
     }
 
     initDemoTest() {
         // Always set the default test (overwrite old data)
-
         const demoTest = {
             id: 'polity_test_1',
             name_en: 'Polity Test - 1',
@@ -92,10 +187,18 @@ class AdminDataManager {
             { id: 'q31', test_id: 'polity_test_1', question_en: "Final question (Q25): At the commencement of the Indian Constitution, which of the following categories of persons automatically became Indian citizens?\n\nI. Persons domiciled in India and meeting prescribed birth/residency criteria.\nII. Persons who migrated to India from Pakistan before 19 July 1948 and were ordinarily resident in India thereafter.\n\nSelect the correct option:", options: ["Only I", "Only II", "I and II", "Neither I nor II"], correct_option: 2, explanation: "At commencement, persons domiciled in India meeting the Article 5 criteria and persons who migrated from Pakistan before 19 July 1948 (Article 6) and were ordinarily resident thereafter became Indian citizens. So both I and II." }
         ];
 
+        // Keep local storage updated
         this.mockTests = [demoTest];
         this.questions = demoQuestions;
         this.save('mock_tests', this.mockTests);
         this.save('questions', this.questions);
+
+        // Also push to Firebase if available
+        if (window.FirebaseSync) {
+            FirebaseSync.saveTest(demoTest);
+            FirebaseSync.saveQuestions(demoTest.id, demoQuestions);
+        }
+
         console.log('📝 Polity Test - 1 with 31 questions added!');
     }
 
@@ -166,6 +269,12 @@ class AdminDataManager {
 
         this.mockTests.unshift(test);
         this.save('mock_tests', this.mockTests);
+
+        // Sync to Firebase
+        if (window.FirebaseSync) {
+            FirebaseSync.saveTest(test);
+        }
+
         console.log('✅ Test created:', test.name_en);
         return test;
     }
@@ -175,6 +284,12 @@ class AdminDataManager {
         if (index !== -1) {
             this.mockTests[index] = { ...this.mockTests[index], ...updates };
             this.save('mock_tests', this.mockTests);
+
+            // Sync to Firebase
+            if (window.FirebaseSync) {
+                FirebaseSync.saveTest(this.mockTests[index]);
+            }
+
             return true;
         }
         return false;
@@ -188,6 +303,12 @@ class AdminDataManager {
             // Also delete associated questions
             this.questions = this.questions.filter(q => q.test_id !== id);
             this.save('questions', this.questions);
+
+            // Sync to Firebase
+            if (window.FirebaseSync) {
+                FirebaseSync.deleteTest(id);
+            }
+
             return true;
         }
         return false;
@@ -233,6 +354,12 @@ class AdminDataManager {
             this.updateTest(testId, {
                 total_questions: this.getQuestionsByTestId(testId).length
             });
+        }
+
+        // Sync to Firebase
+        if (window.FirebaseSync) {
+            const allTestQuestions = this.getQuestionsByTestId(testId);
+            FirebaseSync.saveQuestions(testId, allTestQuestions);
         }
 
         console.log(`✅ Added ${newQuestions.length} questions to test ${testId}`);
@@ -293,6 +420,12 @@ class AdminDataManager {
             total_questions: this.getQuestionsByTestId(testId).length
         });
 
+        // Sync to Firebase
+        if (window.FirebaseSync) {
+            const allTestQuestions = this.getQuestionsByTestId(testId);
+            FirebaseSync.saveQuestions(testId, allTestQuestions);
+        }
+
         console.log(`✅ Added question #${question.question_number} to test ${testId}`);
         return question;
     }
@@ -300,12 +433,21 @@ class AdminDataManager {
     updateQuestion(questionId, updates) {
         const index = this.questions.findIndex(q => q.id === questionId);
         if (index !== -1) {
+            const testId = this.questions[index].test_id;
+
             this.questions[index] = {
                 ...this.questions[index],
                 ...updates,
                 updated_at: new Date().toISOString()
             };
             this.save('questions', this.questions);
+
+            // Sync to Firebase
+            if (window.FirebaseSync) {
+                const allTestQuestions = this.getQuestionsByTestId(testId);
+                FirebaseSync.saveQuestions(testId, allTestQuestions);
+            }
+
             console.log(`✅ Updated question ${questionId}`);
             return this.questions[index];
         }
@@ -334,6 +476,11 @@ class AdminDataManager {
             this.updateTest(testId, {
                 total_questions: remainingQuestions.length
             });
+
+            // Sync to Firebase
+            if (window.FirebaseSync) {
+                FirebaseSync.saveQuestions(testId, remainingQuestions);
+            }
 
             console.log(`✅ Deleted question ${questionId}`);
             return true;
@@ -460,6 +607,11 @@ class AdminDataManager {
             localStorage.setItem('valid_keys', JSON.stringify(validKeys));
         }
 
+        // Sync to Firebase
+        if (window.FirebaseSync) {
+            FirebaseSync.saveKey(key);
+        }
+
         console.log('🔑 Key generated:', key.key);
         return key;
     }
@@ -480,6 +632,12 @@ class AdminDataManager {
         if (index !== -1) {
             this.accessKeys.splice(index, 1);
             this.save('access_keys', this.accessKeys);
+
+            // Sync to Firebase
+            if (window.FirebaseSync) {
+                FirebaseSync.deleteKey(keyId);
+            }
+
             return true;
         }
         return false;

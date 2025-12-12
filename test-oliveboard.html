@@ -808,6 +808,11 @@
         <div class="exam-title" id="examTitle">General Knowledge: Biology</div>
         <div class="brand-logo">🎓 Gen<span class="highlight">Z</span> Mocks</div>
         <div class="header-right">
+            <div id="syncStatus"
+                class="flex items-center gap-1 px-2 py-1 rounded bg-white/10 text-white text-[10px] hidden">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                Cloud
+            </div>
             <div class="timer-section">
                 <div class="timer-label">Time Left:</div>
                 <div class="timer-value" id="timerDisplay">14:59</div>
@@ -962,6 +967,7 @@
         </div>
     </div>
 
+    <script src="js/firebase-sync.js"></script>
     <script>
         // ===== LOAD TEST AND QUESTIONS FROM LOCALSTORAGE =====
         const urlParams = new URLSearchParams(window.location.search);
@@ -1052,295 +1058,385 @@
             }))
         ];
 
-        // Load test and questions
-        const currentTest = testId ? getTestFromStorage(testId) : null;
-        let questions = testId ? getQuestionsFromStorage(testId) : null;
+        // MAIN INIT FUNCTION
+        async function initTest() {
+            let currentTest = testId ? getTestFromStorage(testId) : null;
+            let questions = testId ? getQuestionsFromStorage(testId) : null;
 
-        // Use demo if no questions found
-        if (!questions || questions.length === 0) {
-            console.log('⚠️ No questions found for test, using demo questions');
-            questions = demoQuestions;
+            // Try Firebase if local storage failed
+            if ((!currentTest || !questions) && window.FirebaseSync && testId) {
+                console.log("⚠️ Local data missing, trying Firebase sync...");
+                try {
+                    // Update UI to show loading
+                    document.getElementById('qText').innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-10">
+                            <svg class="animate-spin h-8 w-8 text-orange-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p>Syncing test data...</p>
+                        </div>
+                    `;
+
+                    // Fetch test details
+                    if (!currentTest) {
+                        const allTests = await FirebaseSync.getAllTests();
+                        currentTest = allTests.find(t => t.id === testId);
+                        if (currentTest) {
+                            // Update local storage
+                            localStorage.setItem('genz_mock_tests', JSON.stringify(allTests));
+                        }
+                    }
+
+                    // Fetch questions
+                    if (!questions) {
+                        const firebaseQuestions = await FirebaseSync.getQuestionsByTestId(testId);
+                        if (firebaseQuestions && firebaseQuestions.length > 0) {
+                            // Update local storage
+                            let allQuestions = JSON.parse(localStorage.getItem('genz_questions') || '[]');
+                            // Remove existing questions for this test to avoid dupes
+                            allQuestions = allQuestions.filter(q => q.test_id !== testId);
+                            // Add new ones
+                            allQuestions.push(...firebaseQuestions);
+                            localStorage.setItem('genz_questions', JSON.stringify(allQuestions));
+
+                            // Re-parse for current usage
+                            questions = firebaseQuestions.map((q, i) => {
+                                let options;
+                                if (q.options && Array.isArray(q.options)) {
+                                    options = q.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`);
+                                } else {
+                                    options = [
+                                        'a) ' + (q.option_a_en || 'Option A'),
+                                        'b) ' + (q.option_b_en || 'Option B'),
+                                        'c) ' + (q.option_c_en || 'Option C'),
+                                        'd) ' + (q.option_d_en || 'Option D')
+                                    ];
+                                }
+                                let correctIdx;
+                                if (typeof q.correct_option === 'number') {
+                                    correctIdx = q.correct_option;
+                                } else {
+                                    correctIdx = ['a', 'b', 'c', 'd'].indexOf((q.correct_option || 'a').toLowerCase());
+                                }
+                                return {
+                                    text: q.question_en || q.question_text_en || 'Question ' + (i + 1),
+                                    options: options,
+                                    correct: correctIdx,
+                                    explanation: q.explanation || q.explanation_en || ''
+                                };
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Firebase sync failed:", e);
+                }
+            }
+
+            // Use demo if still no questions found
+            if (!questions || questions.length === 0) {
+                console.log('⚠️ No questions found for test, using demo questions');
+                questions = demoQuestions;
+            }
+
+            // Update exam title if test found
+            if (currentTest) {
+                document.getElementById('examTitle').textContent = currentTest.name_en || 'Mock Test';
+            }
+
+            return { questions, currentTest };
         }
 
-        // Update exam title if test found
-        if (currentTest) {
-            document.getElementById('examTitle').textContent = currentTest.name_en || 'Mock Test';
-        }
+        // ===== STATE & INIT LOGIC =====
+        let state, questions, currentTest;
 
-        // ===== STATE =====
-        const state = {
-            current: 0,
-            answers: {},
-            marked: new Set(),
-            visited: new Set([0]),
-            total: questions.length,
-            time: currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60
-        };
+        // Timer Interval
+        let timerInterval;
 
-        // ===== SAVE/LOAD PROGRESS FOR RESUME =====
-        const PROGRESS_KEY = `test_progress_${testId}`;
+        initTest().then(data => {
+            questions = data.questions;
+            currentTest = data.currentTest;
 
-        function saveProgress() {
-            if (!testId) return;
-            const progressData = {
-                current: state.current,
-                answers: state.answers,
-                marked: Array.from(state.marked),
-                visited: Array.from(state.visited),
-                time: state.time,
-                savedAt: Date.now()
+            // ===== STATE =====
+            state = {
+                current: 0,
+                answers: {},
+                marked: new Set(),
+                visited: new Set([0]),
+                total: questions.length,
+                time: currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60
             };
-            localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressData));
-            console.log('💾 Progress saved:', progressData);
-        }
 
-        function loadProgress() {
-            if (!testId) return false;
-            const saved = localStorage.getItem(PROGRESS_KEY);
-            if (!saved) return false;
+            // ===== SAVE/LOAD PROGRESS FOR RESUME =====
+            const PROGRESS_KEY = `test_progress_${testId}`;
 
-            try {
-                const data = JSON.parse(saved);
-                // Check if saved less than 24 hours ago
-                if (Date.now() - data.savedAt > 24 * 60 * 60 * 1000) {
-                    localStorage.removeItem(PROGRESS_KEY);
+            function saveProgress() {
+                if (!testId) return;
+                const progressData = {
+                    current: state.current,
+                    answers: state.answers,
+                    marked: Array.from(state.marked),
+                    visited: Array.from(state.visited),
+                    time: state.time,
+                    savedAt: Date.now()
+                };
+                localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressData));
+                console.log('💾 Progress saved:', progressData);
+            }
+
+            function loadProgress() {
+                if (!testId) return false;
+                const saved = localStorage.getItem(PROGRESS_KEY);
+                if (!saved) return false;
+
+                try {
+                    const data = JSON.parse(saved);
+                    // Check if saved less than 24 hours ago
+                    if (Date.now() - data.savedAt > 24 * 60 * 60 * 1000) {
+                        localStorage.removeItem(PROGRESS_KEY);
+                        return false;
+                    }
+
+                    state.current = data.current || 0;
+                    state.answers = data.answers || {};
+                    state.marked = new Set(data.marked || []);
+                    state.visited = new Set(data.visited || [0]);
+                    state.time = data.time || state.time;
+                    console.log('📂 Progress loaded:', data);
+                    return true;
+                } catch (e) {
+                    console.error('Failed to load progress:', e);
                     return false;
                 }
-
-                state.current = data.current || 0;
-                state.answers = data.answers || {};
-                state.marked = new Set(data.marked || []);
-                state.visited = new Set(data.visited || [0]);
-                state.time = data.time || state.time;
-                console.log('📂 Progress loaded:', data);
-                return true;
-            } catch (e) {
-                console.error('Failed to load progress:', e);
-                return false;
             }
-        }
 
-        function clearProgress() {
-            localStorage.removeItem(PROGRESS_KEY);
-        }
+            function clearProgress() {
+                localStorage.removeItem(PROGRESS_KEY);
+            }
 
-        // Flag to prevent auto-save during submit
-        let isSubmitting = false;
+            // Flag to prevent auto-save during submit
+            let isSubmitting = false;
 
-        // Named function for beforeunload (so we can remove it)
-        function handleBeforeUnload(e) {
-            if (isSubmitting) return; // Don't save if submitting
-            saveProgress();
-            e.preventDefault();
-            e.returnValue = 'You have an ongoing test. Are you sure you want to leave?';
-        }
+            // Named function for beforeunload (so we can remove it)
+            function handleBeforeUnload(e) {
+                if (isSubmitting) return; // Don't save if submitting
+                saveProgress();
+                e.preventDefault();
+                e.returnValue = 'You have an ongoing test. Are you sure you want to leave?';
+            }
 
-        // Auto-save on page unload
-        window.addEventListener('beforeunload', handleBeforeUnload);
+            // Auto-save on page unload
+            window.addEventListener('beforeunload', handleBeforeUnload);
 
-        // Load saved progress if exists
-        const hasResume = loadProgress();
+            // Load saved progress if exists
+            const hasResume = loadProgress();
 
-        // ===== RENDER =====
-        function renderQuestion(idx) {
-            state.current = idx;
-            state.visited.add(idx);
+            // ===== RENDER =====
+            window.renderQuestion = function (idx) {
+                state.current = idx;
+                state.visited.add(idx);
 
-            document.getElementById('qNum').textContent = idx + 1;
-            document.getElementById('qText').textContent = questions[idx].text;
+                document.getElementById('qNum').textContent = idx + 1;
+                document.getElementById('qText').textContent = questions[idx].text;
 
-            const letters = ['A', 'B', 'C', 'D'];
-            document.getElementById('optionsList').innerHTML = questions[idx].options.map((opt, i) => {
-                // Remove any existing letter prefix like "a) " or "A. "
-                const cleanOpt = opt.replace(/^[a-dA-D][\)\.\s]+/, '');
-                return `
-                <div class="option-row ${state.answers[idx] === i ? 'selected' : ''}" onclick="selectOption(${i})">
-                    <div class="option-letter-box">${letters[i]}</div>
-                    <div class="option-label">${cleanOpt}</div>
-                </div>
-            `}).join('');
+                const letters = ['A', 'B', 'C', 'D'];
+                document.getElementById('optionsList').innerHTML = questions[idx].options.map((opt, i) => {
+                    // Remove any existing letter prefix like "a) " or "A. "
+                    const cleanOpt = opt.replace(/^[a-dA-D][\)\.\s]+/, '');
+                    return `
+                    <div class="option-row ${state.answers[idx] === i ? 'selected' : ''}" onclick="selectOption(${i})">
+                        <div class="option-letter-box">${letters[i]}</div>
+                        <div class="option-label">${cleanOpt}</div>
+                    </div>
+                `}).join('');
 
-            updatePalette();
-            updateLegend();
-        }
+                updatePalette();
+                updateLegend();
+            }
 
-        function renderPalette() {
-            document.getElementById('paletteGrid').innerHTML =
-                Array.from({ length: state.total }, (_, i) =>
-                    `<button class="palette-btn not-visited" onclick="goTo(${i})">${i + 1}</button>`
-                ).join('');
-        }
+            function renderPalette() {
+                document.getElementById('paletteGrid').innerHTML =
+                    Array.from({ length: state.total }, (_, i) =>
+                        `<button class="palette-btn not-visited" onclick="goTo(${i})">${i + 1}</button>`
+                    ).join('');
+            }
 
-        function updatePalette() {
-            document.querySelectorAll('.palette-btn').forEach((btn, i) => {
-                btn.className = 'palette-btn';
-                if (i === state.current) {
-                    btn.classList.add('current');
-                } else if (state.answers[i] !== undefined && state.marked.has(i)) {
-                    btn.classList.add('answered');
-                } else if (state.answers[i] !== undefined) {
-                    btn.classList.add('answered');
-                } else if (state.marked.has(i)) {
-                    btn.classList.add('marked');
-                } else if (state.visited.has(i)) {
-                    btn.classList.add('not-answered');
-                } else {
-                    btn.classList.add('not-visited');
+            function updatePalette() {
+                document.querySelectorAll('.palette-btn').forEach((btn, i) => {
+                    btn.className = 'palette-btn';
+                    if (i === state.current) {
+                        btn.classList.add('current');
+                    } else if (state.answers[i] !== undefined && state.marked.has(i)) {
+                        btn.classList.add('answered');
+                    } else if (state.answers[i] !== undefined) {
+                        btn.classList.add('answered');
+                    } else if (state.marked.has(i)) {
+                        btn.classList.add('marked');
+                    } else if (state.visited.has(i)) {
+                        btn.classList.add('not-answered');
+                    } else {
+                        btn.classList.add('not-visited');
+                    }
+                });
+            }
+
+            function updateLegend() {
+                const answered = Object.keys(state.answers).length;
+                const notVisited = state.total - state.visited.size;
+                const notAnswered = state.total - answered;
+
+                document.getElementById('legAnswered').textContent = answered;
+                document.getElementById('legNotAns').textContent = notAnswered;
+                document.getElementById('legMarked').textContent = state.marked.size;
+                document.getElementById('legNotVis').textContent = notVisited;
+            }
+
+            // ===== ACTIONS =====
+            window.selectOption = function (i) {
+                state.answers[state.current] = i;
+                document.querySelectorAll('.option-row').forEach((row, idx) => {
+                    row.classList.toggle('selected', idx === i);
+                });
+                updatePalette();
+                updateLegend();
+            }
+
+            window.goTo = function (idx) {
+                renderQuestion(idx);
+            }
+
+            document.getElementById('saveNextBtn').addEventListener('click', () => {
+                if (state.current < state.total - 1) renderQuestion(state.current + 1);
+            });
+
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                delete state.answers[state.current];
+                document.querySelectorAll('.option-row').forEach(r => r.classList.remove('selected'));
+                updatePalette();
+                updateLegend();
+            });
+
+            document.getElementById('markBtn').addEventListener('click', () => {
+                state.marked.has(state.current) ? state.marked.delete(state.current) : state.marked.add(state.current);
+                if (state.current < state.total - 1) renderQuestion(state.current + 1);
+                else { updatePalette(); updateLegend(); }
+            });
+
+            // ===== PAUSE TEST - Save progress and go to dashboard =====
+            document.getElementById('pauseBtn').addEventListener('click', () => {
+                // Save current progress
+                saveProgress();
+
+                // Show confirmation
+                if (confirm('Test paused! Your progress has been saved. You can resume from Mock Tests section.\n\nGo to Dashboard?')) {
+                    window.location.href = 'student-dashboard.html';
                 }
             });
-        }
 
-        function updateLegend() {
-            const answered = Object.keys(state.answers).length;
-            const notVisited = state.total - state.visited.size;
-            const notAnswered = state.total - answered;
-
-            document.getElementById('legAnswered').textContent = answered;
-            document.getElementById('legNotAns').textContent = notAnswered;
-            document.getElementById('legMarked').textContent = state.marked.size;
-            document.getElementById('legNotVis').textContent = notVisited;
-        }
-
-        // ===== ACTIONS =====
-        function selectOption(i) {
-            state.answers[state.current] = i;
-            document.querySelectorAll('.option-row').forEach((row, idx) => {
-                row.classList.toggle('selected', idx === i);
+            // ===== SUBMIT =====
+            document.getElementById('submitBtn').addEventListener('click', () => {
+                const answered = Object.keys(state.answers).length;
+                document.getElementById('modAnswered').textContent = answered;
+                document.getElementById('modNotAns').textContent = state.total - answered;
+                document.getElementById('modMarked').textContent = state.marked.size;
+                document.getElementById('submitModal').classList.add('active');
             });
-            updatePalette();
-            updateLegend();
-        }
 
-        function goTo(idx) {
-            renderQuestion(idx);
-        }
-
-        document.getElementById('saveNextBtn').addEventListener('click', () => {
-            if (state.current < state.total - 1) renderQuestion(state.current + 1);
-        });
-
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            delete state.answers[state.current];
-            document.querySelectorAll('.option-row').forEach(r => r.classList.remove('selected'));
-            updatePalette();
-            updateLegend();
-        });
-
-        document.getElementById('markBtn').addEventListener('click', () => {
-            state.marked.has(state.current) ? state.marked.delete(state.current) : state.marked.add(state.current);
-            if (state.current < state.total - 1) renderQuestion(state.current + 1);
-            else { updatePalette(); updateLegend(); }
-        });
-
-        // ===== PAUSE TEST - Save progress and go to dashboard =====
-        document.getElementById('pauseBtn').addEventListener('click', () => {
-            // Save current progress
-            saveProgress();
-
-            // Show confirmation
-            if (confirm('Test paused! Your progress has been saved. You can resume from Mock Tests section.\\n\\nGo to Dashboard?')) {
-                window.location.href = 'student-dashboard.html';
-            }
-        });
-
-        // ===== SUBMIT =====
-        document.getElementById('submitBtn').addEventListener('click', () => {
-            const answered = Object.keys(state.answers).length;
-            document.getElementById('modAnswered').textContent = answered;
-            document.getElementById('modNotAns').textContent = state.total - answered;
-            document.getElementById('modMarked').textContent = state.marked.size;
-            document.getElementById('submitModal').classList.add('active');
-        });
-
-        document.getElementById('cancelSubmit').addEventListener('click', () => {
-            document.getElementById('submitModal').classList.remove('active');
-        });
-
-        document.getElementById('confirmSubmit').addEventListener('click', () => {
-            // CRITICAL: Set flag and remove listener FIRST to prevent race condition
-            isSubmitting = true;
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-
-            let correct = 0;
-            questions.forEach((q, i) => {
-                if (state.answers[i] === q.correct) correct++;
+            document.getElementById('cancelSubmit').addEventListener('click', () => {
+                document.getElementById('submitModal').classList.remove('active');
             });
-            const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
-            const timeTaken = totalTime - state.time;
 
-            // Save answers for answers page
-            const answersKey = `test_answers_${testId}`;
-            localStorage.setItem(answersKey, JSON.stringify({
-                answers: state.answers,
-                marked: Array.from(state.marked),
-                submittedAt: Date.now()
-            }));
+            document.getElementById('confirmSubmit').addEventListener('click', () => {
+                // CRITICAL: Set flag and remove listener FIRST to prevent race condition
+                isSubmitting = true;
+                window.removeEventListener('beforeunload', handleBeforeUnload);
 
-            // Save attempt to test_attempts history
-            const allAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
-            if (!allAttempts[testId]) {
-                allAttempts[testId] = [];
-            }
-            allAttempts[testId].push({
-                date: Date.now(),
-                correct,
-                wrong: Object.keys(state.answers).length - correct,
-                total: state.total,
-                timeTaken
+                let correct = 0;
+                questions.forEach((q, i) => {
+                    if (state.answers[i] === q.correct) correct++;
+                });
+                const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
+                const timeTaken = totalTime - state.time;
+
+                // Save answers for answers page
+                const answersKey = `test_answers_${testId}`;
+                localStorage.setItem(answersKey, JSON.stringify({
+                    answers: state.answers,
+                    marked: Array.from(state.marked),
+                    submittedAt: Date.now()
+                }));
+
+                // Save attempt to test_attempts history
+                const allAttempts = JSON.parse(localStorage.getItem('test_attempts') || '{}');
+                if (!allAttempts[testId]) {
+                    allAttempts[testId] = [];
+                }
+                allAttempts[testId].push({
+                    date: Date.now(),
+                    correct,
+                    wrong: Object.keys(state.answers).length - correct,
+                    total: state.total,
+                    timeTaken
+                });
+                localStorage.setItem('test_attempts', JSON.stringify(allAttempts));
+
+                // Update user progress
+                const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
+                userProgress.tests += 1;
+                userProgress.correct += correct;
+                userProgress.total += state.total;
+                userProgress.time += Math.round(timeTaken / 60);
+                localStorage.setItem('user_progress', JSON.stringify(userProgress));
+
+                // Update attempted tests list
+                const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
+                if (!attemptedTests.includes(testId)) {
+                    attemptedTests.push(testId);
+                    localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+                }
+
+                const params = new URLSearchParams({
+                    testId: testId || '',
+                    correct,
+                    wrong: Object.keys(state.answers).length - correct,
+                    total: state.total,
+                    time: timeTaken,
+                    attempt: allAttempts[testId].length
+                });
+
+                // Clear progress AFTER removing listener
+                clearProgress();
+                window.location.href = `results.html?${params}`;
             });
-            localStorage.setItem('test_attempts', JSON.stringify(allAttempts));
 
-            // Update user progress
-            const userProgress = JSON.parse(localStorage.getItem('user_progress') || '{"tests":0,"correct":0,"total":0,"time":0}');
-            userProgress.tests += 1;
-            userProgress.correct += correct;
-            userProgress.total += state.total;
-            userProgress.time += Math.round(timeTaken / 60);
-            localStorage.setItem('user_progress', JSON.stringify(userProgress));
+            // ===== TIMER =====
+            timerInterval = setInterval(() => {
+                if (state.time <= 0) return;
+                state.time--;
+                const m = Math.floor(state.time / 60);
+                const s = state.time % 60;
+                document.getElementById('timerDisplay').textContent =
+                    `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }, 1000);
 
-            // Update attempted tests list
-            const attemptedTests = JSON.parse(localStorage.getItem('attempted_tests') || '[]');
-            if (!attemptedTests.includes(testId)) {
-                attemptedTests.push(testId);
-                localStorage.setItem('attempted_tests', JSON.stringify(attemptedTests));
+            // ===== MOBILE =====
+            document.getElementById('mobileToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            // ===== INIT =====
+            if (window.FirebaseSync) {
+                document.getElementById('syncStatus').classList.remove('hidden');
+                document.getElementById('syncStatus').classList.add('flex');
             }
 
-            const params = new URLSearchParams({
-                testId: testId || '',
-                correct,
-                wrong: Object.keys(state.answers).length - correct,
-                total: state.total,
-                time: timeTaken,
-                attempt: allAttempts[testId].length
-            });
-
-            // Clear progress AFTER removing listener
-            clearProgress();
-            window.location.href = `results.html?${params}`;
+            renderPalette();
+            // Resume from saved question or start from beginning
+            renderQuestion(hasResume ? state.current : 0);
+            if (hasResume) {
+                console.log('🔄 Resumed test from question', state.current + 1);
+            }
         });
-
-        // ===== TIMER =====
-        setInterval(() => {
-            if (state.time <= 0) return;
-            state.time--;
-            const m = Math.floor(state.time / 60);
-            const s = state.time % 60;
-            document.getElementById('timerDisplay').textContent =
-                `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        }, 1000);
-
-        // ===== MOBILE =====
-        document.getElementById('mobileToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
-
-        // ===== INIT =====
-        renderPalette();
-        // Resume from saved question or start from beginning
-        renderQuestion(hasResume ? state.current : 0);
-        if (hasResume) {
-            console.log('🔄 Resumed test from question', state.current + 1);
-        }
     </script>
 </body>
 
