@@ -821,10 +821,14 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Results page loaded:', { testId, correct, wrong, total, timeTaken, isNewAttempt });
 
+            // Update UI immediately
+            updateUI();
+            animateScore();
+
             // Only save if this is a new attempt (has URL data, not viewing saved)
             if (isNewAttempt && testId) {
                 saveAttempt();
-                // Save to Firebase for leaderboard and analytics
+                // Save to Firebase for leaderboard and analytics FIRST
                 console.log('💾 Saving result to Firebase...');
                 try {
                     if (window.FirebaseSync) {
@@ -846,17 +850,17 @@
                 console.log('ℹ️ Not saving - isNewAttempt:', isNewAttempt, 'testId:', testId);
             }
 
-            updateUI();
-            animateScore();
-
-            // Load leaderboard
-            loadLeaderboard();
+            // Load leaderboard AFTER Firebase save completes (so user's data appears)
+            await loadLeaderboard();
 
             // View Answers button handler
             const answersUrl = `answers.html?testId=${testId}&attempt=${attemptNum}`;
-            document.getElementById('viewAnswersBtn').onclick = () => {
-                window.location.href = answersUrl;
-            };
+            const viewBtn = document.getElementById('viewAnswersBtn');
+            if (viewBtn) {
+                viewBtn.onclick = () => {
+                    window.location.href = answersUrl;
+                };
+            }
         });
     </script>
 </body>

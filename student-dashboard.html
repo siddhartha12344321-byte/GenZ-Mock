@@ -963,7 +963,7 @@
         // Streak calculation and display
         function updateStreakDisplay(streakData) {
             const today = new Date().toISOString().split('T')[0];
-            const streakTitle = document.querySelector('#homeView .bg-white.border h3');
+            const streakTitle = document.getElementById('streakTitle');
 
             // Check if user was active today
             if (streakData.lastActivityDate === today) {
