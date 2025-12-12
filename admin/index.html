@@ -1194,6 +1194,9 @@
                             <button onclick="editTest('${test.id}')" class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
+                            <button onclick="translateTest('${test.id}')" class="p-2 hover:bg-purple-50 rounded-lg text-purple-500 hover:text-purple-700" title="Translate to Hindi">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            </button>
                             <button onclick="deleteTest('${test.id}')" class="p-2 hover:bg-red-50 rounded-lg text-gray-500 hover:text-red-600">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
@@ -1229,6 +1232,7 @@
                     <td class="px-6 py-4">
                         <div class="flex gap-2">
                             ${isDraft ? `<button onclick="publishTest('${test.id}')" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-medium">Publish</button>` : ''}
+                            <button onclick="translateTest('${test.id}')" class="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white rounded text-xs font-medium" title="Auto-translate to Hindi">🔄 हिंदी</button>
                             <button onclick="editTest('${test.id}')" class="p-2 hover:bg-gray-100 rounded-lg">Edit</button>
                             <button onclick="deleteTest('${test.id}')" class="p-2 hover:bg-red-50 rounded-lg text-red-600">Delete</button>
                         </div>
@@ -1812,6 +1816,159 @@
             loadDashboardStats();
             loadTestsTable();
             if (currentPage === 'tests') loadAllTests();
+        }
+
+        // Auto-translate test questions to Hindi using Groq API
+        async function translateTest(testId) {
+            const apiKey = localStorage.getItem('genz_groq_api_key');
+            if (!apiKey) {
+                alert('⚠️ Please set your Groq API key in Settings first!');
+                return;
+            }
+
+            const questions = adminData.getQuestionsByTestId(testId);
+            if (!questions || questions.length === 0) {
+                alert('⚠️ No questions found in this test');
+                return;
+            }
+
+            // Check if already translated
+            const hasHindi = questions.some(q => q.question_text_hi && q.question_text_hi.trim());
+            if (hasHindi && !confirm('This test already has some Hindi translations. Overwrite all with new translations?')) {
+                return;
+            }
+
+            // Show progress
+            const progressDiv = document.createElement('div');
+            progressDiv.id = 'translateProgress';
+            progressDiv.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            progressDiv.innerHTML = `
+                <div class="bg-white rounded-2xl p-8 max-w-sm text-center shadow-2xl">
+                    <div class="text-4xl mb-4">🔄</div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Translating to Hindi...</h3>
+                    <p class="text-gray-500 mb-4" id="translateStatus">Preparing...</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="translateBar" class="bg-purple-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(progressDiv);
+
+            const updateProgress = (current, total, status) => {
+                const pct = Math.round((current / total) * 100);
+                document.getElementById('translateBar').style.width = pct + '%';
+                document.getElementById('translateStatus').textContent = status;
+            };
+
+            try {
+                const translatedQuestions = [];
+                const total = questions.length;
+
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    updateProgress(i, total, `Translating question ${i + 1} of ${total}...`);
+
+                    // Prepare text for translation
+                    const textToTranslate = `
+Question: ${q.question_text_en || q.question_en || ''}
+Option A: ${q.option_a_en || ''}
+Option B: ${q.option_b_en || ''}
+Option C: ${q.option_c_en || ''}
+Option D: ${q.option_d_en || ''}
+Explanation: ${q.explanation_en || q.explanation || ''}
+                    `.trim();
+
+                    const prompt = `Translate the following UPSC exam question and options from English to Hindi. Use formal, grammatically correct Hindi suitable for competitive exam preparation. Keep technical terms in English where appropriate.
+
+${textToTranslate}
+
+Respond ONLY in this JSON format (no extra text):
+{
+  "question_hi": "Hindi question text",
+  "option_a_hi": "Hindi option A",
+  "option_b_hi": "Hindi option B", 
+  "option_c_hi": "Hindi option C",
+  "option_d_hi": "Hindi option D",
+  "explanation_hi": "Hindi explanation"
+}`;
+
+                    try {
+                        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                model: 'llama-3.1-70b-versatile',
+                                messages: [{ role: 'user', content: prompt }],
+                                temperature: 0.3,
+                                max_tokens: 2000
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`API error: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        const content = data.choices[0]?.message?.content || '';
+
+                        // Parse JSON response
+                        const jsonMatch = content.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const translated = JSON.parse(jsonMatch[0]);
+                            translatedQuestions.push({
+                                ...q,
+                                question_text_hi: translated.question_hi || '',
+                                option_a_hi: translated.option_a_hi || '',
+                                option_b_hi: translated.option_b_hi || '',
+                                option_c_hi: translated.option_c_hi || '',
+                                option_d_hi: translated.option_d_hi || '',
+                                explanation_hi: translated.explanation_hi || ''
+                            });
+                        } else {
+                            translatedQuestions.push(q); // Keep original if translation fails
+                        }
+                    } catch (err) {
+                        console.error('Translation error for Q' + (i + 1), err);
+                        translatedQuestions.push(q); // Keep original
+                    }
+
+                    // Small delay to avoid rate limiting
+                    await new Promise(r => setTimeout(r, 300));
+                }
+
+                updateProgress(total, total, 'Saving translations...');
+
+                // Update questions in localStorage
+                let allQuestions = JSON.parse(localStorage.getItem('genz_questions') || '[]');
+                translatedQuestions.forEach(tq => {
+                    const idx = allQuestions.findIndex(q => q.id === tq.id);
+                    if (idx !== -1) {
+                        allQuestions[idx] = tq;
+                    }
+                });
+                localStorage.setItem('genz_questions', JSON.stringify(allQuestions));
+
+                // Sync to Firebase
+                if (window.FirebaseSync) {
+                    await FirebaseSync.saveQuestions(testId, translatedQuestions);
+                }
+
+                // Reload adminData
+                if (window.adminData) {
+                    adminData.questions = allQuestions;
+                }
+
+                document.getElementById('translateProgress')?.remove();
+                alert(`✅ Successfully translated ${translatedQuestions.length} questions to Hindi!`);
+
+            } catch (err) {
+                document.getElementById('translateProgress')?.remove();
+                console.error('Translation failed:', err);
+                alert('❌ Translation failed: ' + err.message);
+            }
         }
 
         function loadApiKey() {
