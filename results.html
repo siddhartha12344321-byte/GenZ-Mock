@@ -975,6 +975,16 @@
                 };
             }
         });
+
+        // BACKUP: Call loadLeaderboard directly after a short delay
+        // This ensures it runs even if DOMContentLoaded has issues
+        setTimeout(() => {
+            console.log('⏰ Backup leaderboard call...');
+            if (document.getElementById('leaderboardContent')?.innerHTML.includes('Loading leaderboard')) {
+                console.log('🔄 Leaderboard still loading, triggering backup call');
+                loadLeaderboard();
+            }
+        }, 1000);
     </script>
 </body>
 
