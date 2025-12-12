@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="js/admin-data.js"></script>
     <script src="js/firebase-sync.js"></script>
+    <!-- jsPDF for professional PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -156,14 +158,14 @@
                         <option>1st Attempt - 11 Dec '25</option>
                     </select>
 
-                    <!-- Download Button -->
+                    <!-- Download PDF Button -->
                     <button onclick="downloadAnswers()"
-                        class="flex items-center gap-2 px-4 py-2 text-orange-500 hover:text-orange-600 font-medium">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        class="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9v4h2v-4h2l-3-3-3 3h2z" />
                         </svg>
-                        Download Answers
+                        Download PDF
                     </button>
                 </div>
             </div>
@@ -512,26 +514,278 @@
         }
 
         function downloadAnswers() {
-            // Generate text content
-            let content = `GenZMocks - Test Answers\n${'='.repeat(50)}\n\n`;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+            let yPos = 15;
+
             const letters = ['A', 'B', 'C', 'D'];
             const correctMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
 
-            questions.forEach((q, idx) => {
-                const correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
-                content += `Q${idx + 1}. ${q.question_text_en || q.text}\n\n`;
-                content += `Correct Answer: ${letters[correctIdx]}\n`;
-                content += `Explanation: ${q.explanation_en || q.explanation || 'N/A'}\n`;
-                content += `\n${'-'.repeat(50)}\n\n`;
+            // Colors
+            const primaryOrange = [249, 115, 22];
+            const darkGray = [55, 65, 81];
+            const mediumGray = [107, 114, 128];
+            const lightGray = [229, 231, 235];
+            const correctGreen = [34, 197, 94];
+            const blue = [59, 130, 246];
+            const bgLight = [248, 250, 252];
+
+            // Get test info
+            const testName = testData?.name_en || 'GenZMocks Answer Key';
+            const totalMarks = questions.length * 2;
+            const totalTime = testData?.duration_minutes || 10;
+            const attemptDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+
+            // ===== HELPER FUNCTIONS =====
+            function drawWatermark() {
+                doc.setGState(new doc.GState({ opacity: 0.06 }));
+                doc.setFontSize(100);
+                doc.setTextColor(...mediumGray);
+                doc.text('GZ', pageWidth / 2, pageHeight / 2 + 20, { align: 'center', angle: 30 });
+                doc.setGState(new doc.GState({ opacity: 1 }));
+            }
+
+            function checkPageBreak(requiredHeight) {
+                if (yPos + requiredHeight > pageHeight - 25) {
+                    doc.addPage();
+                    yPos = 20;
+                    drawWatermark();
+                    return true;
+                }
+                return false;
+            }
+
+            function wrapText(text, maxWidth, fontSize) {
+                doc.setFontSize(fontSize);
+                const lines = doc.splitTextToSize(text, maxWidth);
+                return lines;
+            }
+
+            // ===== PAGE 1 HEADER =====
+            drawWatermark();
+
+            // Header bar with branding
+            doc.setFillColor(249, 115, 22);
+            doc.rect(0, 0, pageWidth, 22, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('genzmocks.com', pageWidth / 2, 10, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Ace your exams with GenZMocks', pageWidth / 2, 17, { align: 'center' });
+
+            yPos = 35;
+
+            // Logo/Icon circle
+            doc.setFillColor(...primaryOrange);
+            doc.circle(pageWidth / 2, yPos, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('GZ', pageWidth / 2, yPos + 4, { align: 'center' });
+
+            yPos += 18;
+
+            // Test Title
+            doc.setTextColor(...primaryOrange);
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            const titleLines = wrapText(testName, contentWidth, 18);
+            titleLines.forEach(line => {
+                doc.text(line, pageWidth / 2, yPos, { align: 'center' });
+                yPos += 8;
             });
 
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'GenZMocks_Answers.txt';
-            a.click();
-            URL.revokeObjectURL(url);
+            yPos += 5;
+
+            // Test Details Table
+            const tableStartY = yPos;
+            const tableWidth = 100;
+            const tableX = (pageWidth - tableWidth) / 2;
+
+            // Table header row
+            doc.setFillColor(...lightGray);
+            doc.rect(tableX, tableStartY, tableWidth, 8, 'F');
+            doc.setDrawColor(...mediumGray);
+            doc.rect(tableX, tableStartY, 50, 8, 'S');
+            doc.rect(tableX + 50, tableStartY, 50, 8, 'S');
+
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Total Marks', tableX + 25, tableStartY + 5.5, { align: 'center' });
+            doc.text('Total Time', tableX + 75, tableStartY + 5.5, { align: 'center' });
+
+            // Table value row
+            doc.setFillColor(255, 255, 255);
+            doc.rect(tableX, tableStartY + 8, 50, 8, 'F');
+            doc.rect(tableX + 50, tableStartY + 8, 50, 8, 'F');
+            doc.rect(tableX, tableStartY + 8, 50, 8, 'S');
+            doc.rect(tableX + 50, tableStartY + 8, 50, 8, 'S');
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(String(totalMarks), tableX + 25, tableStartY + 13.5, { align: 'center' });
+            doc.text(`${totalTime} min`, tableX + 75, tableStartY + 13.5, { align: 'center' });
+
+            yPos = tableStartY + 25;
+
+            // Answer Key Header
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Answer Key', margin, yPos);
+            yPos += 10;
+
+            // ===== QUESTIONS LOOP =====
+            questions.forEach((q, idx) => {
+                // Support both formats
+                let options;
+                if (q.options && Array.isArray(q.options)) {
+                    options = q.options;
+                } else {
+                    options = [
+                        q.option_a_en || q.option_a || '',
+                        q.option_b_en || q.option_b || '',
+                        q.option_c_en || q.option_c || '',
+                        q.option_d_en || q.option_d || ''
+                    ];
+                }
+
+                let correctIdx;
+                if (typeof q.correct_option === 'number') {
+                    correctIdx = q.correct_option;
+                } else {
+                    correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
+                }
+
+                const questionText = (q.question_en || q.question_text_en || q.question_text || q.text || '')
+                    .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                const explanation = (q.explanation || q.explanation_en || 'No explanation available.')
+                    .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+
+                // Estimate height needed
+                const qLines = wrapText(questionText, contentWidth - 5, 10);
+                const expLines = wrapText(explanation, contentWidth - 15, 9);
+                const estimatedHeight = (qLines.length * 5) + (options.length * 7) + (expLines.length * 4) + 45;
+
+                checkPageBreak(estimatedHeight);
+
+                // Question number
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(...darkGray);
+                doc.text(`Question ${idx + 1}`, margin, yPos);
+                yPos += 6;
+
+                // Question text
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(...darkGray);
+                qLines.forEach(line => {
+                    checkPageBreak(6);
+                    doc.text(line, margin + 2, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 3;
+
+                // Options
+                options.forEach((opt, i) => {
+                    checkPageBreak(8);
+                    const optText = `${letters[i]}   ${opt}`;
+                    const optLines = wrapText(optText, contentWidth - 15, 9);
+
+                    if (i === correctIdx) {
+                        // Highlight correct answer with green background
+                        doc.setFillColor(220, 252, 231);
+                        doc.roundedRect(margin, yPos - 3.5, contentWidth, (optLines.length * 4) + 3, 2, 2, 'F');
+                        doc.setTextColor(...correctGreen);
+                        doc.setFont('helvetica', 'bold');
+                    } else {
+                        doc.setTextColor(...darkGray);
+                        doc.setFont('helvetica', 'normal');
+                    }
+
+                    doc.setFontSize(9);
+                    optLines.forEach(line => {
+                        doc.text(line, margin + 5, yPos);
+                        yPos += 4;
+                    });
+                    yPos += 2;
+                });
+
+                yPos += 2;
+
+                // Correct Answer line
+                checkPageBreak(8);
+                doc.setTextColor(...darkGray);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Correct Answer: ', margin, yPos);
+                doc.setTextColor(...correctGreen);
+                doc.text(letters[correctIdx], margin + 32, yPos);
+                yPos += 8;
+
+                // Explanation box
+                checkPageBreak(15);
+                doc.setFillColor(248, 250, 255);
+                doc.setDrawColor(...blue);
+                const expBoxHeight = Math.max((expLines.length * 4) + 12, 20);
+
+                if (yPos + expBoxHeight > pageHeight - 20) {
+                    doc.addPage();
+                    yPos = 20;
+                    drawWatermark();
+                }
+
+                doc.rect(margin, yPos - 2, contentWidth, expBoxHeight, 'F');
+                doc.setLineWidth(0.8);
+                doc.line(margin, yPos - 2, margin, yPos + expBoxHeight - 2);
+
+                yPos += 4;
+                doc.setTextColor(...blue);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Explanation:', margin + 4, yPos);
+                yPos += 5;
+
+                doc.setTextColor(...darkGray);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                expLines.forEach(line => {
+                    doc.text(line, margin + 4, yPos);
+                    yPos += 4;
+                });
+
+                yPos += 12;
+
+                // Separator line between questions
+                if (idx < questions.length - 1) {
+                    checkPageBreak(5);
+                    doc.setDrawColor(...lightGray);
+                    doc.setLineWidth(0.3);
+                    doc.line(margin, yPos - 5, pageWidth - margin, yPos - 5);
+                }
+            });
+
+            // Footer on last page
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(...mediumGray);
+                doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                doc.text(`Generated on ${attemptDate}   |   GenZMocks.com`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+            }
+
+            // Generate filename
+            const safeName = testName.replace(/[^a-z0-9]/gi, '-').substring(0, 40);
+            doc.save(`${safeName}-answer-key.pdf`);
         }
 
         // Update attempt dropdown
