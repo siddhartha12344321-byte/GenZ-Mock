@@ -245,6 +245,11 @@ class AdminDataManager {
         return this.mockTests;
     }
 
+    // Get only active tests (not drafts) - for student dashboard
+    getActiveTests() {
+        return this.mockTests.filter(t => t.status !== 'draft');
+    }
+
     getTestById(id) {
         return this.mockTests.find(t => t.id === id);
     }
@@ -262,6 +267,7 @@ class AdminDataManager {
             mark_wrong: testData.mark_wrong || 0.66,
             source: testData.source || '',
             description: testData.description || '',
+            status: testData.status || 'active', // 'active' or 'draft'
             is_active: true,
             created_at: new Date().toISOString(),
             attempts: 0

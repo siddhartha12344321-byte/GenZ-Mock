@@ -597,8 +597,13 @@
             const mediumGray = [107, 114, 128];
             const lightGray = [229, 231, 235];
             const correctGreen = [34, 197, 94];
+            const wrongRed = [239, 68, 68]; // Red for wrong answers
             const blue = [59, 130, 246];
             const bgLight = [248, 250, 252];
+
+            // Get user info
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const userName = userData.name || 'Student';
 
             // Get current language (from body class)
             const currentLang = document.body.classList.contains('lang-hi') ? 'hi' : 'en';
@@ -670,6 +675,17 @@
             doc.setTextColor(...mediumGray);
             doc.setFont('helvetica', 'normal');
             doc.text(isHindi ? 'UPSC परीक्षाओं के लिए निःशुल्क मॉक टेस्ट' : 'Free Mock Tests for UPSC Exams', pageWidth / 2, yPos, { align: 'center' });
+
+            // User name in upper right corner
+            doc.setFontSize(9);
+            doc.setTextColor(...darkGray);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`👤 ${userName}`, pageWidth - margin, 15, { align: 'right' });
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...mediumGray);
+            doc.text(attemptDate, pageWidth - margin, 20, { align: 'right' });
+
             yPos += 12;
 
             // Logo circle
@@ -797,17 +813,29 @@
 
                 yPos += 3;
 
-                // Options
+                // Options - show user's answer and correct answer
+                const userAnswer = userAnswers[idx]; // User's selected option (0-3)
+
                 options.forEach((opt, i) => {
                     checkPageBreak(8);
                     const optText = `${letters[i]}   ${opt}`;
                     const optLines = wrapText(optText, contentWidth - 15, 9);
 
-                    if (i === correctIdx) {
+                    const isCorrect = (i === correctIdx);
+                    const isUserAnswer = (userAnswer !== undefined && userAnswer === i);
+                    const isWrongUserAnswer = isUserAnswer && !isCorrect;
+
+                    if (isCorrect) {
                         // Highlight correct answer with green background
                         doc.setFillColor(220, 252, 231);
                         doc.roundedRect(margin, yPos - 3.5, contentWidth, (optLines.length * 4) + 3, 2, 2, 'F');
                         doc.setTextColor(...correctGreen);
+                        doc.setFont('helvetica', 'bold');
+                    } else if (isWrongUserAnswer) {
+                        // Highlight wrong user answer with red background
+                        doc.setFillColor(254, 226, 226); // Light red
+                        doc.roundedRect(margin, yPos - 3.5, contentWidth, (optLines.length * 4) + 3, 2, 2, 'F');
+                        doc.setTextColor(...wrongRed);
                         doc.setFont('helvetica', 'bold');
                     } else {
                         doc.setTextColor(...darkGray);
@@ -819,6 +847,19 @@
                         doc.text(line, margin + 5, yPos);
                         yPos += 4;
                     });
+
+                    // Add indicator for user's answer
+                    if (isUserAnswer) {
+                        doc.setFontSize(7);
+                        if (isCorrect) {
+                            doc.setTextColor(...correctGreen);
+                            doc.text('✓ Your Answer (Correct)', pageWidth - margin - 35, yPos - 3);
+                        } else {
+                            doc.setTextColor(...wrongRed);
+                            doc.text('✗ Your Answer (Wrong)', pageWidth - margin - 35, yPos - 3);
+                        }
+                    }
+
                     yPos += 2;
                 });
 
