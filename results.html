@@ -173,14 +173,10 @@
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-center justify-between py-4">
                 <div class="flex items-center gap-8">
-                    <!-- Tabs -->
+                    <!-- Tab - My Answers only -->
                     <a href="#" id="tabAnalysis"
                         class="text-orange-500 font-semibold py-2 px-1 border-b-2 border-orange-500">
-                        Test Analysis
-                    </a>
-                    <a href="#" id="tabAnswers"
-                        class="text-gray-500 hover:text-gray-700 font-medium py-2 px-1 border-b-2 border-transparent">
-                        Answers
+                        My Answers
                     </a>
                 </div>
 
@@ -226,52 +222,38 @@
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Score Card -->
             <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                <div class="speedometer-container" id="speedometerContainer">
-                    <div class="speedometer">
-                        <svg class="speedometer-svg" viewBox="0 0 200 120">
+                <!-- Animated Score Display with Circular Progress -->
+                <div class="mb-6">
+                    <div class="relative w-40 h-40 mx-auto">
+                        <!-- SVG Circular Progress -->
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                            <!-- Background Circle -->
+                            <circle cx="60" cy="60" r="52" fill="none" stroke="#e5e7eb" stroke-width="12" />
+                            <!-- Gradient Definition -->
                             <defs>
-                                <linearGradient id="speedoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#ef4444" />
-                                    <stop offset="25%" stop-color="#f59e0b" />
-                                    <stop offset="50%" stop-color="#eab308" />
-                                    <stop offset="75%" stop-color="#22c55e" />
-                                    <stop offset="100%" stop-color="#10b981" />
+                                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#3b82f6" />
+                                    <stop offset="50%" stop-color="#8b5cf6" />
+                                    <stop offset="100%" stop-color="#06b6d4" />
                                 </linearGradient>
                             </defs>
-                            <!-- Background Arc -->
-                            <path class="speedometer-bg" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" />
-                            <!-- Progress Arc -->
-                            <path class="speedometer-progress" id="speedoProgress" d="M 20 100 A 80 80 0 0 1 180 100"
-                                fill="none" />
-                            <!-- Tick marks -->
-                            <g class="speedometer-ticks">
-                                <line x1="25" y1="100" x2="35" y2="100" />
-                                <line x1="32" y1="68" x2="40" y2="74" />
-                                <line x1="55" y1="40" x2="62" y2="48" />
-                                <line x1="100" y1="25" x2="100" y2="35" />
-                                <line x1="145" y1="40" x2="138" y2="48" />
-                                <line x1="168" y1="68" x2="160" y2="74" />
-                                <line x1="175" y1="100" x2="165" y2="100" />
-                            </g>
-                            <!-- Tick Labels -->
-                            <text class="speedometer-tick-label" x="15" y="115">0</text>
-                            <text class="speedometer-tick-label" x="50" y="35">25</text>
-                            <text class="speedometer-tick-label" x="93" y="18">50</text>
-                            <text class="speedometer-tick-label" x="140" y="35">75</text>
-                            <text class="speedometer-tick-label" x="175" y="115">100</text>
+                            <!-- Progress Circle - Animated -->
+                            <circle id="progressCircle" cx="60" cy="60" r="52" fill="none" stroke="url(#scoreGradient)"
+                                stroke-width="12" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="327"
+                                style="transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1); filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));" />
                         </svg>
-                        <!-- Needle -->
-                        <div class="speedometer-needle-container" id="speedoNeedle">
-                            <div class="speedometer-needle"></div>
+                        <!-- Score Text Overlay -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <div id="scoreDisplay"
+                                class="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
+                                0</div>
+                            <div class="text-gray-400 text-xs font-semibold tracking-wider">MARKS</div>
                         </div>
-                        <!-- Center bolt -->
-                        <div class="speedometer-center"></div>
-                        <!-- Value Display -->
-                        <div class="speedometer-value">
-                            <span id="scorePercent"
-                                class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">0%</span>
-                            <div class="text-gray-500 text-sm">Your Score</div>
-                        </div>
+                    </div>
+                    <!-- Accuracy below -->
+                    <div class="mt-4">
+                        <span id="scorePercent" class="text-2xl font-bold text-gray-700">0%</span>
+                        <span class="text-gray-500 text-sm ml-1">accuracy</span>
                     </div>
                 </div>
 
@@ -312,43 +294,8 @@
                 </div>
             </div>
 
-            <!-- Analysis Card -->
+            <!-- Leaderboard Card (Replaces Performance Analysis) -->
             <div class="bg-white rounded-2xl border border-gray-100 p-8">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">📊 Performance Analysis</h2>
-
-                <div class="grid grid-cols-2 gap-4 mb-8 pb-6 border-b border-gray-100">
-                    <div class="text-center">
-                        <div id="timeTaken" class="text-2xl font-bold text-blue-600">00:00</div>
-                        <div class="text-sm text-gray-500">Time Taken</div>
-                    </div>
-                    <div class="text-center">
-                        <div id="accuracy" class="text-2xl font-bold text-green-600">0%</div>
-                        <div class="text-sm text-gray-500">Accuracy</div>
-                    </div>
-                </div>
-
-                <h3 class="font-semibold text-gray-700 mb-4">Topic Performance</h3>
-                <div class="space-y-3" id="topicBars">
-                    <!-- Generated dynamically -->
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-gray-100">
-                    <h3 class="font-semibold text-gray-700 mb-4">Quick Stats</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-gray-50 rounded-lg p-3 flex justify-between">
-                            <span class="text-gray-500">Rank</span>
-                            <span id="rank" class="font-bold">#--</span>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-3 flex justify-between">
-                            <span class="text-gray-500">Percentile</span>
-                            <span id="percentile" class="font-bold text-green-600">--</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leaderboard Section -->
-            <div class="mt-8 bg-white rounded-2xl border border-gray-100 p-8">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
                         🏆 Leaderboard
@@ -364,7 +311,24 @@
                     </button>
                 </div>
 
-                <div id="leaderboardContent" class="space-y-2">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-100">
+                    <div class="text-center">
+                        <div id="timeTaken" class="text-2xl font-bold text-blue-600">00:00</div>
+                        <div class="text-sm text-gray-500">Time Taken</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="rank" class="text-2xl font-bold text-orange-600">#--</div>
+                        <div class="text-sm text-gray-500">Your Rank</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="accuracy" class="text-2xl font-bold text-green-600">0%</div>
+                        <div class="text-sm text-gray-500">Accuracy</div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard List -->
+                <div id="leaderboardContent" class="space-y-2 max-h-[400px] overflow-y-auto">
                     <div class="flex items-center justify-center py-8 text-gray-500">
                         <svg class="animate-spin h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24">
@@ -378,6 +342,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </main>
 
     <script src="js/firebase-sync.js"></script>
@@ -579,6 +544,32 @@
             document.getElementById('wrongCount').textContent = safeWrong;
             document.getElementById('skippedCount').textContent = safeSkipped;
 
+            // Animate the circular progress gauge
+            const progressCircle = document.getElementById('progressCircle');
+            if (progressCircle) {
+                // Circle circumference = 2 * π * r = 2 * 3.14159 * 52 = 327
+                const circumference = 327;
+                const progressPercent = Math.min(safeAccuracy, 100); // Cap at 100%
+                const offset = circumference - (circumference * progressPercent / 100);
+
+                // Trigger animation after a small delay
+                setTimeout(() => {
+                    progressCircle.style.strokeDashoffset = offset;
+                }, 100);
+            }
+
+            // Animate score number counting up
+            const scoreDisplayEl = document.getElementById('scoreDisplay');
+            if (scoreDisplayEl) {
+                animateValue(scoreDisplayEl, 0, safeUpscScore, 2000);
+            }
+
+            // Display accuracy percentage with animation
+            const scorePercentEl = document.getElementById('scorePercent');
+            if (scorePercentEl) {
+                animateValueInt(scorePercentEl, 0, safeAccuracy, 2000, '%');
+            }
+
             document.getElementById('upscScore').textContent = safeUpscScore.toFixed(1);
             document.getElementById('upscBreakdown').textContent = `(+2 × ${safeCorrect}) - (0.66 × ${safeWrong}) = ${safeUpscScore.toFixed(1)} marks`;
 
@@ -607,25 +598,36 @@
                 msgEl.className = 'text-xl font-semibold text-red-600 mb-6';
             }
 
-            // Rank
-            document.getElementById('rank').textContent = '#' + (Math.floor(Math.random() * 100) + 1);
-            document.getElementById('percentile').textContent = Math.max(50, 100 - Math.floor(Math.random() * 30)) + '%';
+            // Rank will be set by loadLeaderboard()
+            document.getElementById('rank').textContent = '#--';
+        }
 
-            // Topic bars
-            const topics = ['General', 'Polity', 'History', 'Geography'];
-            document.getElementById('topicBars').innerHTML = topics.map(topic => {
-                const score = Math.floor(Math.random() * 40) + 60;
-                const color = score >= 80 ? 'bg-green-500' : score >= 60 ? 'bg-blue-500' : score >= 40 ? 'bg-yellow-500' : 'bg-red-500';
-                return `
-                    <div class="flex items-center gap-3">
-                        <span class="w-24 text-sm text-gray-600">${topic}</span>
-                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="${color} h-full rounded-full" style="width: ${score}%"></div>
-                        </div>
-                        <span class="text-sm font-medium w-10">${score}%</span>
-                    </div>
-                `;
-            }).join('');
+        // Animate float value (for UPSC marks) - smooth counting effect
+        function animateValue(el, start, end, duration) {
+            const startTime = performance.now();
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+                const current = start + (end - start) * eased;
+                el.textContent = current.toFixed(1);
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Animate integer value (for percentages)
+        function animateValueInt(el, start, end, duration, suffix = '') {
+            const startTime = performance.now();
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + (end - start) * eased);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
         }
 
         // Get current user info
@@ -766,12 +768,23 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Results page loaded:', { testId, correct, wrong, total, timeTaken, isNewAttempt });
+
             // Only save if this is a new attempt (has URL data, not viewing saved)
-            if (isNewAttempt) {
+            if (isNewAttempt && testId) {
                 saveAttempt();
-                // Save to Firebase for leaderboard
-                await saveResultToFirebase();
+                // Save to Firebase for leaderboard and analytics
+                console.log('💾 Saving result to Firebase...');
+                try {
+                    await saveResultToFirebase();
+                    console.log('✅ Firebase save completed');
+                } catch (e) {
+                    console.error('❌ Firebase save failed:', e);
+                }
+            } else {
+                console.log('ℹ️ Not saving - isNewAttempt:', isNewAttempt, 'testId:', testId);
             }
+
             updateUI();
             animateScore();
 

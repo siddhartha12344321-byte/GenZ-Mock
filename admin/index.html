@@ -1593,16 +1593,34 @@
             key += '-';
             for (let i = 0; i < 5; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
 
-            // Save to localStorage
+            // Save to localStorage (both keys for compatibility)
             const keys = JSON.parse(localStorage.getItem('admin_access_keys') || '[]');
-            keys.unshift({
+            const keyObj = {
                 key: key,
                 name: customName || null,
                 created: new Date().toISOString(),
                 used: false,
-                usedBy: null
-            });
+                usedBy: null,
+                is_active: true
+            };
+            keys.unshift(keyObj);
             localStorage.setItem('admin_access_keys', JSON.stringify(keys));
+
+            // ALSO save to genz_access_keys (this is what login page checks!)
+            const genzKeys = JSON.parse(localStorage.getItem('genz_access_keys') || '[]');
+            genzKeys.unshift(keyObj);
+            localStorage.setItem('genz_access_keys', JSON.stringify(genzKeys));
+
+            // Sync to Firebase for cross-device validation
+            if (window.FirebaseSync) {
+                FirebaseSync.saveKey({
+                    id: 'key_' + Date.now(),
+                    key: key,
+                    name: customName || null,
+                    created: new Date().toISOString(),
+                    is_active: true
+                });
+            }
 
             // Clear input
             document.getElementById('customKeyName').value = '';
@@ -1631,9 +1649,17 @@
 
         function deleteKey(key) {
             if (!confirm('Delete this key?')) return;
+
+            // Remove from admin_access_keys
             let keys = JSON.parse(localStorage.getItem('admin_access_keys') || '[]');
             keys = keys.filter(k => k.key !== key);
             localStorage.setItem('admin_access_keys', JSON.stringify(keys));
+
+            // Also remove from genz_access_keys
+            let genzKeys = JSON.parse(localStorage.getItem('genz_access_keys') || '[]');
+            genzKeys = genzKeys.filter(k => k.key !== key);
+            localStorage.setItem('genz_access_keys', JSON.stringify(genzKeys));
+
             loadAccessKeys();
         }
 

@@ -1164,7 +1164,8 @@
                 marked: new Set(),
                 visited: new Set([0]),
                 total: questions.length,
-                time: currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60
+                time: currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60,
+                startTime: Date.now() // Track when test started for accurate time calculation
             };
 
             // ===== SAVE/LOAD PROGRESS FOR RESUME =====
@@ -1178,6 +1179,7 @@
                     marked: Array.from(state.marked),
                     visited: Array.from(state.visited),
                     time: state.time,
+                    startTime: state.startTime, // Save start timestamp for accurate time calculation
                     savedAt: Date.now()
                 };
                 localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressData));
@@ -1202,6 +1204,10 @@
                     state.marked = new Set(data.marked || []);
                     state.visited = new Set(data.visited || [0]);
                     state.time = data.time || state.time;
+                    // Restore startTime if available, otherwise keep original start
+                    if (data.startTime) {
+                        state.startTime = data.startTime;
+                    }
                     console.log('📂 Progress loaded:', data);
                     return true;
                 } catch (e) {
@@ -1355,8 +1361,11 @@
                 questions.forEach((q, i) => {
                     if (state.answers[i] === q.correct) correct++;
                 });
-                const totalTime = currentTest?.time_limit ? currentTest.time_limit * 60 : 15 * 60;
-                const timeTaken = totalTime - state.time;
+
+                // Calculate time taken using timestamp (more reliable than countdown)
+                const elapsedMs = Date.now() - state.startTime;
+                const timeTaken = Math.round(elapsedMs / 1000); // Convert to seconds
+                console.log('⏱️ Time calculation:', { startTime: state.startTime, now: Date.now(), elapsedMs, timeTaken });
 
                 // Save answers for answers page
                 const answersKey = `test_answers_${testId}`;
@@ -1404,19 +1413,56 @@
                     attempt: allAttempts[testId].length
                 });
 
+                // Save to Firebase BEFORE redirect (for analytics)
+                if (window.FirebaseSync && testId) {
+                    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+                    const resultData = {
+                        userName: userData.name || 'Anonymous',
+                        userKey: userData.key || '',
+                        correct: correct,
+                        wrong: Object.keys(state.answers).length - correct,
+                        total: state.total,
+                        score: (correct * 2) - (Object.keys(state.answers).length - correct) * 0.66,
+                        accuracy: state.total > 0 ? Math.round(correct / state.total * 100) : 0,
+                        timeTaken: timeTaken
+                    };
+                    console.log('💾 Saving to Firebase:', resultData);
+                    FirebaseSync.saveTestResult(testId, resultData).then(() => {
+                        console.log('✅ Test result saved to Firebase');
+                    }).catch(e => {
+                        console.error('❌ Firebase save error:', e);
+                    });
+                }
+
                 // Clear progress AFTER removing listener
                 clearProgress();
                 window.location.href = `results.html?${params}`;
             });
 
             // ===== TIMER =====
-            timerInterval = setInterval(() => {
-                if (state.time <= 0) return;
-                state.time--;
+            // Initialize timer display IMMEDIATELY (don't wait for first interval)
+            function updateTimerDisplay() {
                 const m = Math.floor(state.time / 60);
                 const s = state.time % 60;
                 document.getElementById('timerDisplay').textContent =
                     `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+
+            // Show initial time right away
+            updateTimerDisplay();
+            console.log('⏱️ Timer started:', state.time, 'seconds');
+
+            // Countdown timer
+            timerInterval = setInterval(() => {
+                if (state.time <= 0) {
+                    clearInterval(timerInterval);
+                    // Auto-submit when time runs out
+                    alert('⏱️ Time is up! Your test will be submitted.');
+                    document.getElementById('confirmSubmit').click();
+                    return;
+                }
+                state.time--;
+                updateTimerDisplay();
             }, 1000);
 
             // ===== MOBILE =====
