@@ -1094,9 +1094,9 @@
             document.getElementById('difficultyBadge').textContent = q.difficulty;
             document.getElementById('difficultyBadge').className = `question-badge difficulty-${q.difficulty.toLowerCase()}`;
 
-            // Update question text
-            document.getElementById('questionTextEn').innerHTML = q.questionEn;
-            document.getElementById('questionTextHi').innerHTML = q.questionHi;
+            // Update question text (with Hindi fallback to English if not available)
+            document.getElementById('questionTextEn').innerHTML = q.questionEn || '';
+            document.getElementById('questionTextHi').innerHTML = q.questionHi || q.questionEn || '';
 
             // Handle table
             const tableWrapper = document.getElementById('tableWrapper');
@@ -1126,21 +1126,25 @@
             updateStats();
         }
 
-        // Render Options
+        // Render Options (with Hindi fallback to English)
         function renderOptions(q, qIndex) {
             const letters = ['a', 'b', 'c', 'd'];
             const selectedOption = testState.answers[qIndex];
 
-            optionsContainer.innerHTML = q.options.map((opt, i) => `
+            optionsContainer.innerHTML = q.options.map((opt, i) => {
+                // Fallback: if Hindi not available, use English
+                const hiText = opt.hi || opt.en;
+                return `
                 <div class="option-item ${selectedOption === i ? 'selected' : ''}" 
                      data-index="${i}" onclick="selectOption(${i})">
                     <div class="option-letter">${letters[i]}</div>
                     <div class="option-text">
                         <span class="option-text-en">${opt.en}</span>
-                        <span class="option-text-hi">${opt.hi}</span>
+                        <span class="option-text-hi">${hiText}</span>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         // Select Option
@@ -1331,12 +1335,16 @@
             window.location.href = `results.html?${params.toString()}`;
         }
 
-        // Language Toggle
+        // Language Toggle - saves preference for answers page
         document.querySelector('.lang-toggle').addEventListener('click', (e) => {
             if (e.target.dataset.lang) {
+                const lang = e.target.dataset.lang;
                 document.querySelectorAll('.lang-toggle span').forEach(s => s.classList.remove('active'));
                 e.target.classList.add('active');
-                document.body.classList.toggle('lang-hi', e.target.dataset.lang === 'hi');
+                document.body.classList.toggle('lang-hi', lang === 'hi');
+
+                // Save language preference for this test
+                localStorage.setItem(`test_lang_${testId}`, lang);
             }
         });
 

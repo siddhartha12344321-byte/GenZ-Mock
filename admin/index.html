@@ -849,13 +849,17 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Paste JSON Here:</label>
                 <textarea id="jsonInput" rows="12" placeholder='{
   "test_name": "Polity Mock Test 1",
+  "test_name_hi": "राजव्यवस्था मॉक टेस्ट 1",
   "subject": "Polity",
   "questions": [
     {
       "question": "Who is the head of state?",
+      "question_hi": "राज्य का प्रमुख कौन है?",
       "options": ["PM", "President", "CJI", "Speaker"],
+      "options_hi": ["प्रधानमंत्री", "राष्ट्रपति", "CJI", "अध्यक्ष"],
       "correct": 1,
-      "explanation": "President is the ceremonial head."
+      "explanation": "President is the ceremonial head.",
+      "explanation_hi": "राष्ट्रपति औपचारिक प्रमुख है।"
     }
   ]
 }' class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 font-mono text-sm"></textarea>
@@ -1362,7 +1366,7 @@
             }
         }
 
-        // JSON Bulk Upload
+        // JSON Bulk Upload - Now supports bilingual (English + Hindi)
         function createTestFromJson() {
             const jsonText = document.getElementById('jsonInput').value.trim();
             const errorEl = document.getElementById('jsonError');
@@ -1395,9 +1399,10 @@
                 }
 
                 // Create test with user-specified timing/marking
-                // NOTE: createTest expects 'subject', 'time', 'questions' as property names
+                // Supports both English and Hindi test names
                 const test = {
-                    name_en: data.test_name,
+                    name_en: data.test_name || data.test_name_en || 'Mock Test',
+                    name_hi: data.test_name_hi || '',
                     subject: data.subject || 'General',
                     time: timeLimit,
                     mark_correct: markCorrect,
@@ -1407,16 +1412,34 @@
 
                 const testId = adminData.createTest(test).id;
 
-                // Prepare questions array for addQuestionsToTest
-                const questionsData = data.questions.map((q, idx) => ({
-                    question_text: q.question,
-                    option_a: q.options[0] || '',
-                    option_b: q.options[1] || '',
-                    option_c: q.options[2] || '',
-                    option_d: q.options[3] || '',
-                    correct_option: ['a', 'b', 'c', 'd'][q.correct] || 'a',
-                    explanation: q.explanation || ''
-                }));
+                // Prepare questions array for addQuestionsToTest (bilingual support)
+                const questionsData = data.questions.map((q, idx) => {
+                    // Support both old format (question/options) and new bilingual format
+                    const questionEn = q.question_en || q.question || '';
+                    const questionHi = q.question_hi || '';
+
+                    // Options can be array or separate fields
+                    const optionsEn = q.options || q.options_en || [];
+                    const optionsHi = q.options_hi || [];
+
+                    return {
+                        question_text_en: questionEn,
+                        question_text_hi: questionHi,
+                        option_a_en: optionsEn[0] || q.option_a || '',
+                        option_b_en: optionsEn[1] || q.option_b || '',
+                        option_c_en: optionsEn[2] || q.option_c || '',
+                        option_d_en: optionsEn[3] || q.option_d || '',
+                        option_a_hi: optionsHi[0] || q.option_a_hi || '',
+                        option_b_hi: optionsHi[1] || q.option_b_hi || '',
+                        option_c_hi: optionsHi[2] || q.option_c_hi || '',
+                        option_d_hi: optionsHi[3] || q.option_d_hi || '',
+                        correct_option: typeof q.correct === 'number'
+                            ? ['a', 'b', 'c', 'd'][q.correct]
+                            : (q.correct_option || q.correct || 'a'),
+                        explanation_en: q.explanation_en || q.explanation || '',
+                        explanation_hi: q.explanation_hi || ''
+                    };
+                });
 
                 // Add all questions at once
                 adminData.addQuestionsToTest(testId, questionsData);
@@ -1779,12 +1802,6 @@
         // ==================== NOTIFICATIONS FUNCTIONS ====================
 
         function openNotificationModal() {
-            document.getElementById('notifTitle').value = '';
-            document.getElementById('notifMessage').value = '';
-            document.getElementById('notifLink').value = '';
-            document.getElementById('notifType').value = 'info';
-            document.getElementById('notifExpiry').value = '7';
-
             // Create modal if it doesn't exist
             if (!document.getElementById('notificationModal')) {
                 const modalHTML = `
@@ -1840,8 +1857,16 @@
                 `;
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
             } else {
+                // Modal exists, show it and clear fields
                 document.getElementById('notificationModal').classList.remove('hidden');
             }
+
+            // Now clear the form fields (modal exists at this point)
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifMessage').value = '';
+            document.getElementById('notifLink').value = '';
+            document.getElementById('notifType').value = 'info';
+            document.getElementById('notifExpiry').value = '7';
         }
 
         async function createNotification() {

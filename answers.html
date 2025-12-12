@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Answers - GenZMocks</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="js/admin-data.js"></script>
     <script src="js/firebase-sync.js"></script>
     <!-- jsPDF for professional PDF generation -->
@@ -24,6 +26,12 @@
             --unattempted-gray: #9ca3af;
             --subject-purple: #a855f7;
             --explanation-blue: #3b82f6;
+            --font-hindi: 'Noto Sans Devanagari', sans-serif;
+        }
+
+        /* Hindi text font */
+        .text-hi {
+            font-family: var(--font-hindi);
         }
 
         .tab-active {
@@ -132,6 +140,35 @@
             color: white;
             font-size: 14px;
         }
+
+        /* Language Toggle Styles */
+        .lang-btn {
+            transition: all 0.2s ease;
+            color: #6b7280;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: var(--primary-orange);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: #374151;
+        }
+
+        /* Hindi Text Visibility */
+        .text-hi {
+            display: none;
+        }
+
+        body.lang-hi .text-en {
+            display: none;
+        }
+
+        body.lang-hi .text-hi {
+            display: block;
+        }
     </style>
 </head>
 
@@ -152,6 +189,13 @@
                 </div>
 
                 <div class="flex items-center gap-4">
+                    <!-- Language Toggle -->
+                    <div class="lang-toggle flex bg-gray-100 rounded-lg p-1" id="langToggle">
+                        <button class="lang-btn active px-3 py-1 text-sm font-semibold rounded-md"
+                            data-lang="en">EN</button>
+                        <button class="lang-btn px-3 py-1 text-sm font-semibold rounded-md" data-lang="hi">हिं</button>
+                    </div>
+
                     <!-- Attempt Selector -->
                     <select id="attemptSelect"
                         class="border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium bg-white">
@@ -395,11 +439,21 @@
                 const subject = q.subject_id || testData?.subject_id || 'General';
                 const subjectName = subject.charAt(0).toUpperCase() + subject.slice(1).replace('_', ' ');
 
-                // Format question text with line breaks
-                const questionText = (q.question_en || q.question_text_en || q.question_text || q.text || '')
+                // Format question text with line breaks (bilingual support)
+                const questionTextEn = (q.question_en || q.question_text_en || q.question_text || q.text || '')
+                    .replace(/\n/g, '<br>');
+                const questionTextHi = (q.question_hi || q.question_text_hi || questionTextEn)
                     .replace(/\n/g, '<br>');
 
-                // Render options
+                // Get Hindi options with fallback to English
+                const optionsHi = [
+                    q.option_a_hi || options[0],
+                    q.option_b_hi || options[1],
+                    q.option_c_hi || options[2],
+                    q.option_d_hi || options[3]
+                ];
+
+                // Render options (bilingual)
                 const optionsHtml = options.map((opt, i) => {
                     let optionClass = 'border border-gray-200 bg-white';
                     let letterClass = 'letter-circle default';
@@ -421,16 +475,21 @@
                     return `
                         <div class="${optionClass} rounded-xl p-4 flex items-center gap-4">
                             <div class="${letterClass}">${letters[i]}</div>
-                            <div class="flex-1 text-gray-700">${opt}</div>
+                            <div class="flex-1 text-gray-700">
+                                <span class="text-en">${opt}</span>
+                                <span class="text-hi">${optionsHi[i]}</span>
+                            </div>
                             ${i === correctIdx ? checkmark : ''}
                         </div>
                     `;
                 }).join('');
 
-                // Format explanation
-                const explanation = (q.explanation || q.explanation_en || 'No explanation available.')
+                // Format explanation (bilingual)
+                const explanationEn = (q.explanation || q.explanation_en || 'No explanation available.')
                     .replace(/\n/g, '<br>')
                     .replace(/Statement (\d+): (Correct|Incorrect)/g, '<strong>Statement $1: $2</strong>');
+                const explanationHi = (q.explanation_hi || explanationEn)
+                    .replace(/\n/g, '<br>');
 
                 return `
                     <div class="bg-white rounded-2xl border border-gray-200 p-6" id="question-${idx}">
@@ -443,9 +502,10 @@
                             <span class="subject-tag px-3 py-1 rounded-full text-sm font-medium">${subjectName}</span>
                         </div>
 
-                        <!-- Question Text -->
+                        <!-- Question Text (Bilingual) -->
                         <div class="text-gray-800 leading-relaxed mb-6">
-                            ${questionText}
+                            <div class="text-en">${questionTextEn}</div>
+                            <div class="text-hi">${questionTextHi}</div>
                         </div>
 
                         <!-- Options -->
@@ -456,14 +516,20 @@
                         <!-- Correct Answer -->
                         <div class="border-t border-gray-100 pt-6">
                             <div class="font-semibold text-gray-800 mb-3">
-                                Correct Answer: <span class="text-blue-600">${letters[correctIdx]}</span>
+                                <span class="text-en">Correct Answer:</span>
+                                <span class="text-hi">सही उत्तर:</span>
+                                <span class="text-blue-600">${letters[correctIdx]}</span>
                             </div>
 
-                            <!-- Explanation -->
+                            <!-- Explanation (Bilingual) -->
                             <div class="explanation-box rounded-lg p-4">
-                                <div class="text-blue-600 font-semibold mb-2">Explanation:</div>
+                                <div class="text-blue-600 font-semibold mb-2">
+                                    <span class="text-en">Explanation:</span>
+                                    <span class="text-hi">व्याख्या:</span>
+                                </div>
                                 <div class="text-gray-700 leading-relaxed">
-                                    ${explanation}
+                                    <div class="text-en">${explanationEn}</div>
+                                    <div class="text-hi">${explanationHi}</div>
                                 </div>
                             </div>
                         </div>
@@ -534,11 +600,36 @@
             const blue = [59, 130, 246];
             const bgLight = [248, 250, 252];
 
-            // Get test info
-            const testName = testData?.name_en || 'GenZMocks Answer Key';
+            // Get current language (from body class)
+            const currentLang = document.body.classList.contains('lang-hi') ? 'hi' : 'en';
+            const isHindi = currentLang === 'hi';
+
+            // Get test info (bilingual)
+            const testName = isHindi
+                ? (testData?.name_hi || testData?.name_en || 'GenZMocks उत्तर कुंजी')
+                : (testData?.name_en || 'GenZMocks Answer Key');
             const totalMarks = questions.length * 2;
             const totalTime = testData?.duration_minutes || 10;
             const attemptDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+
+            // Bilingual labels
+            const labels = isHindi ? {
+                totalMarks: 'कुल अंक',
+                totalTime: 'कुल समय',
+                answerKey: 'उत्तर कुंजी',
+                question: 'प्रश्न',
+                correctAnswer: 'सही उत्तर: ',
+                explanation: 'व्याख्या:',
+                noExplanation: 'कोई व्याख्या उपलब्ध नहीं है।'
+            } : {
+                totalMarks: 'Total Marks',
+                totalTime: 'Total Time',
+                answerKey: 'Answer Key',
+                question: 'Question',
+                correctAnswer: 'Correct Answer: ',
+                explanation: 'Explanation:',
+                noExplanation: 'No explanation available.'
+            };
 
             // ===== HELPER FUNCTIONS =====
             function drawWatermark() {
@@ -565,52 +656,46 @@
                 return lines;
             }
 
-            // ===== PAGE 1 HEADER =====
+            // ===== HEADER =====
             drawWatermark();
 
-            // Header bar with branding
-            doc.setFillColor(249, 115, 22);
-            doc.rect(0, 0, pageWidth, 22, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.text('genzmocks.com', pageWidth / 2, 10, { align: 'center' });
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Ace your exams with GenZMocks', pageWidth / 2, 17, { align: 'center' });
-
-            yPos = 35;
-
-            // Logo/Icon circle
-            doc.setFillColor(...primaryOrange);
-            doc.circle(pageWidth / 2, yPos, 8, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text('GZ', pageWidth / 2, yPos + 4, { align: 'center' });
-
-            yPos += 18;
-
-            // Test Title
+            // Website branding
+            doc.setFontSize(10);
             doc.setTextColor(...primaryOrange);
-            doc.setFontSize(18);
             doc.setFont('helvetica', 'bold');
-            const titleLines = wrapText(testName, contentWidth, 18);
-            titleLines.forEach(line => {
-                doc.text(line, pageWidth / 2, yPos, { align: 'center' });
-                yPos += 8;
-            });
-
+            doc.text('genzmocks.com', pageWidth / 2, yPos, { align: 'center' });
             yPos += 5;
 
-            // Test Details Table
-            const tableStartY = yPos;
+            doc.setFontSize(8);
+            doc.setTextColor(...mediumGray);
+            doc.setFont('helvetica', 'normal');
+            doc.text(isHindi ? 'UPSC परीक्षाओं के लिए निःशुल्क मॉक टेस्ट' : 'Free Mock Tests for UPSC Exams', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 12;
+
+            // Logo circle
+            doc.setFillColor(...primaryOrange);
+            doc.circle(pageWidth / 2, yPos + 8, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('GZ', pageWidth / 2, yPos + 11, { align: 'center' });
+            yPos += 25;
+
+            // Test Name
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text(testName, pageWidth / 2, yPos, { align: 'center' });
+            yPos += 10;
+
+            // Test details table
             const tableWidth = 100;
             const tableX = (pageWidth - tableWidth) / 2;
+            const tableStartY = yPos;
 
-            // Table header row
-            doc.setFillColor(...lightGray);
-            doc.rect(tableX, tableStartY, tableWidth, 8, 'F');
+            doc.setFillColor(...bgLight);
+            doc.rect(tableX, tableStartY, 50, 8, 'F');
+            doc.rect(tableX + 50, tableStartY, 50, 8, 'F');
             doc.setDrawColor(...mediumGray);
             doc.rect(tableX, tableStartY, 50, 8, 'S');
             doc.rect(tableX + 50, tableStartY, 50, 8, 'S');
@@ -618,8 +703,8 @@
             doc.setTextColor(...darkGray);
             doc.setFontSize(9);
             doc.setFont('helvetica', 'bold');
-            doc.text('Total Marks', tableX + 25, tableStartY + 5.5, { align: 'center' });
-            doc.text('Total Time', tableX + 75, tableStartY + 5.5, { align: 'center' });
+            doc.text(labels.totalMarks, tableX + 25, tableStartY + 5.5, { align: 'center' });
+            doc.text(labels.totalTime, tableX + 75, tableStartY + 5.5, { align: 'center' });
 
             // Table value row
             doc.setFillColor(255, 255, 255);
@@ -630,7 +715,7 @@
 
             doc.setFont('helvetica', 'normal');
             doc.text(String(totalMarks), tableX + 25, tableStartY + 13.5, { align: 'center' });
-            doc.text(`${totalTime} min`, tableX + 75, tableStartY + 13.5, { align: 'center' });
+            doc.text(`${totalTime} ${isHindi ? 'मिनट' : 'min'}`, tableX + 75, tableStartY + 13.5, { align: 'center' });
 
             yPos = tableStartY + 25;
 
@@ -638,22 +723,32 @@
             doc.setTextColor(...darkGray);
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
-            doc.text('Answer Key', margin, yPos);
+            doc.text(labels.answerKey, margin, yPos);
             yPos += 10;
 
             // ===== QUESTIONS LOOP =====
             questions.forEach((q, idx) => {
-                // Support both formats
+                // Support both formats - get options based on language
                 let options;
-                if (q.options && Array.isArray(q.options)) {
-                    options = q.options;
-                } else {
+                if (isHindi) {
+                    // Try Hindi first, fallback to English
                     options = [
-                        q.option_a_en || q.option_a || '',
-                        q.option_b_en || q.option_b || '',
-                        q.option_c_en || q.option_c || '',
-                        q.option_d_en || q.option_d || ''
+                        q.option_a_hi || q.option_a_en || q.option_a || '',
+                        q.option_b_hi || q.option_b_en || q.option_b || '',
+                        q.option_c_hi || q.option_c_en || q.option_c || '',
+                        q.option_d_hi || q.option_d_en || q.option_d || ''
                     ];
+                } else {
+                    if (q.options && Array.isArray(q.options)) {
+                        options = q.options;
+                    } else {
+                        options = [
+                            q.option_a_en || q.option_a || '',
+                            q.option_b_en || q.option_b || '',
+                            q.option_c_en || q.option_c || '',
+                            q.option_d_en || q.option_d || ''
+                        ];
+                    }
                 }
 
                 let correctIdx;
@@ -663,10 +758,18 @@
                     correctIdx = correctMap[q.correct_option?.toLowerCase()] ?? 0;
                 }
 
-                const questionText = (q.question_en || q.question_text_en || q.question_text || q.text || '')
-                    .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-                const explanation = (q.explanation || q.explanation_en || 'No explanation available.')
-                    .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                // Get text based on language (with fallback)
+                const questionText = isHindi
+                    ? (q.question_hi || q.question_text_hi || q.question_en || q.question_text_en || q.question_text || q.text || '')
+                        .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+                    : (q.question_en || q.question_text_en || q.question_text || q.text || '')
+                        .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+
+                const explanation = isHindi
+                    ? (q.explanation_hi || q.explanation_en || q.explanation || labels.noExplanation)
+                        .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+                    : (q.explanation || q.explanation_en || labels.noExplanation)
+                        .replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
                 // Estimate height needed
                 const qLines = wrapText(questionText, contentWidth - 5, 10);
@@ -679,7 +782,7 @@
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(...darkGray);
-                doc.text(`Question ${idx + 1}`, margin, yPos);
+                doc.text(`${labels.question} ${idx + 1}`, margin, yPos);
                 yPos += 6;
 
                 // Question text
@@ -726,9 +829,9 @@
                 doc.setTextColor(...darkGray);
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
-                doc.text('Correct Answer: ', margin, yPos);
+                doc.text(labels.correctAnswer, margin, yPos);
                 doc.setTextColor(...correctGreen);
-                doc.text(letters[correctIdx], margin + 32, yPos);
+                doc.text(letters[correctIdx], margin + (isHindi ? 25 : 32), yPos);
                 yPos += 8;
 
                 // Explanation box
@@ -751,7 +854,7 @@
                 doc.setTextColor(...blue);
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
-                doc.text('Explanation:', margin + 4, yPos);
+                doc.text(labels.explanation, margin + 4, yPos);
                 yPos += 5;
 
                 doc.setTextColor(...darkGray);
@@ -815,10 +918,40 @@
         // Update tab link to preserve testId
         document.getElementById('tabAnalysis').href = `results.html?testId=${testId}&attempt=${attemptNum}`;
 
+        // Read saved language preference from test
+        const savedLang = localStorage.getItem(`test_lang_${testId}`) || 'en';
+
+        // Language Toggle - also saves changes
+        document.getElementById('langToggle').addEventListener('click', (e) => {
+            if (e.target.classList.contains('lang-btn')) {
+                const lang = e.target.dataset.lang;
+                document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                document.body.classList.toggle('lang-hi', lang === 'hi');
+                // Save preference
+                localStorage.setItem(`test_lang_${testId}`, lang);
+            }
+        });
+
+        // Apply saved language on load
+        function applyLanguage(lang) {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+            document.body.classList.toggle('lang-hi', lang === 'hi');
+        }
+
+        // Get current language
+        function getCurrentLang() {
+            return document.body.classList.contains('lang-hi') ? 'hi' : 'en';
+        }
+
         // Initialize
         (async () => {
             await renderQuestions();
             updateAttemptDropdown();
+            // Apply saved language after rendering
+            applyLanguage(savedLang);
         })();
     </script>
 </body>
