@@ -999,15 +999,22 @@
                         console.log(`📚 Loaded ${testQuestions.length} questions for test ${testId}`);
                         return testQuestions.map((q, i) => {
                             // Support both old format (option_a_en) and new format (options array)
-                            let options;
+                            let options_en, options_hi;
                             if (q.options && Array.isArray(q.options)) {
-                                options = q.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`);
+                                options_en = q.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`);
+                                options_hi = options_en; // No Hindi in this format
                             } else {
-                                options = [
+                                options_en = [
                                     'a) ' + (q.option_a_en || 'Option A'),
                                     'b) ' + (q.option_b_en || 'Option B'),
                                     'c) ' + (q.option_c_en || 'Option C'),
                                     'd) ' + (q.option_d_en || 'Option D')
+                                ];
+                                options_hi = [
+                                    'a) ' + (q.option_a_hi || q.option_a_en || 'Option A'),
+                                    'b) ' + (q.option_b_hi || q.option_b_en || 'Option B'),
+                                    'c) ' + (q.option_c_hi || q.option_c_en || 'Option C'),
+                                    'd) ' + (q.option_d_hi || q.option_d_en || 'Option D')
                                 ];
                             }
 
@@ -1020,10 +1027,16 @@
                             }
 
                             return {
-                                text: q.question_en || q.question_text_en || 'Question ' + (i + 1),
-                                options: options,
+                                id: q.id,
+                                text_en: q.question_en || q.question_text_en || 'Question ' + (i + 1),
+                                text_hi: q.question_hi || q.question_text_hi || q.question_en || q.question_text_en || '',
+                                options_en: options_en,
+                                options_hi: options_hi,
                                 correct: correctIdx,
-                                explanation: q.explanation || q.explanation_en || ''
+                                explanation_en: q.explanation || q.explanation_en || '',
+                                explanation_hi: q.explanation_hi || q.explanation || q.explanation_en || '',
+                                // Keep raw data for translation
+                                raw: q
                             };
                         });
                     }
@@ -1242,11 +1255,20 @@
                 state.current = idx;
                 state.visited.add(idx);
 
+                // Get current language
+                const lang = document.getElementById('langSelect')?.value || 'en';
+                const isHindi = lang === 'hi';
+
                 document.getElementById('qNum').textContent = idx + 1;
-                document.getElementById('qText').textContent = questions[idx].text;
+
+                // Use English or Hindi based on selection
+                const qText = isHindi ? (questions[idx].text_hi || questions[idx].text_en) : questions[idx].text_en;
+                const qOptions = isHindi ? (questions[idx].options_hi || questions[idx].options_en) : questions[idx].options_en;
+
+                document.getElementById('qText').textContent = qText;
 
                 const letters = ['A', 'B', 'C', 'D'];
-                document.getElementById('optionsList').innerHTML = questions[idx].options.map((opt, i) => {
+                document.getElementById('optionsList').innerHTML = qOptions.map((opt, i) => {
                     // Remove any existing letter prefix like "a) " or "A. "
                     const cleanOpt = opt.replace(/^[a-dA-D][\)\.\s]+/, '');
                     return `
@@ -1477,6 +1499,133 @@
             document.getElementById('mobileToggle').addEventListener('click', () => {
                 document.getElementById('sidebar').classList.toggle('open');
             });
+
+            // ===== LANGUAGE CHANGE HANDLER WITH AUTO-TRANSLATE =====
+            document.getElementById('langSelect').addEventListener('change', async function (e) {
+                const lang = e.target.value;
+
+                if (lang === 'hi') {
+                    // Check if Hindi content exists
+                    const hasHindi = questions.some(q =>
+                        q.text_hi && q.text_hi !== q.text_en && q.text_hi.trim()
+                    );
+
+                    if (!hasHindi) {
+                        if (confirm('Hindi translation not available. Auto-translate using AI?\n\nहिंदी अनुवाद उपलब्ध नहीं है। AI से अनुवाद करें?')) {
+                            await translateToHindi();
+                        } else {
+                            e.target.value = 'en'; // Reset to English
+                            return;
+                        }
+                    }
+                }
+
+                // Re-render current question in selected language
+                renderQuestion(state.current);
+            });
+
+            // Auto-translate function using Groq API
+            async function translateToHindi() {
+                const apiKey = localStorage.getItem('genz_groq_api_key');
+                if (!apiKey) {
+                    alert('⚠️ API key not set. Contact admin.');
+                    return false;
+                }
+
+                // Show progress overlay
+                const overlay = document.createElement('div');
+                overlay.id = 'translateOverlay';
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+                overlay.innerHTML = `
+                    <div style="background:white;border-radius:12px;padding:24px;text-align:center;max-width:280px;">
+                        <div style="font-size:32px;margin-bottom:12px;">🔄</div>
+                        <h3 style="font-weight:bold;margin-bottom:8px;">Translating...</h3>
+                        <p id="transProgress" style="color:#666;margin-bottom:12px;">Preparing...</p>
+                        <div style="background:#e5e7eb;border-radius:6px;height:6px;overflow:hidden;">
+                            <div id="transBar" style="background:#8b5cf6;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                try {
+                    for (let i = 0; i < questions.length; i++) {
+                        const q = questions[i];
+                        document.getElementById('transProgress').textContent = `Question ${i + 1} of ${questions.length}`;
+                        document.getElementById('transBar').style.width = Math.round(((i + 1) / questions.length) * 100) + '%';
+
+                        // Skip if already has Hindi
+                        if (q.text_hi && q.text_hi !== q.text_en) continue;
+
+                        const raw = q.raw;
+                        const prompt = `Translate to formal Hindi. Keep technical terms in English. JSON only:
+Question: ${raw.question_text_en || raw.question_en || ''}
+A: ${raw.option_a_en || ''}, B: ${raw.option_b_en || ''}, C: ${raw.option_c_en || ''}, D: ${raw.option_d_en || ''}
+Explanation: ${raw.explanation_en || raw.explanation || ''}
+
+{"q":"","a":"","b":"","c":"","d":"","exp":""}`;
+
+                        try {
+                            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    model: 'llama-3.1-70b-versatile',
+                                    messages: [{ role: 'user', content: prompt }],
+                                    temperature: 0.3, max_tokens: 1500
+                                })
+                            });
+
+                            if (res.ok) {
+                                const data = await res.json();
+                                const content = data.choices[0]?.message?.content || '';
+                                const match = content.match(/\{[\s\S]*\}/);
+                                if (match) {
+                                    const t = JSON.parse(match[0]);
+                                    q.text_hi = t.q || q.text_en;
+                                    q.options_hi = [
+                                        'a) ' + (t.a || ''),
+                                        'b) ' + (t.b || ''),
+                                        'c) ' + (t.c || ''),
+                                        'd) ' + (t.d || '')
+                                    ];
+                                    q.explanation_hi = t.exp || q.explanation_en;
+
+                                    // Also update raw for storage
+                                    if (raw) {
+                                        raw.question_text_hi = t.q;
+                                        raw.option_a_hi = t.a;
+                                        raw.option_b_hi = t.b;
+                                        raw.option_c_hi = t.c;
+                                        raw.option_d_hi = t.d;
+                                        raw.explanation_hi = t.exp;
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Translation error Q' + (i + 1), err);
+                        }
+                        await new Promise(r => setTimeout(r, 200));
+                    }
+
+                    // Save translations to localStorage
+                    const allQ = JSON.parse(localStorage.getItem('genz_questions') || '[]');
+                    questions.forEach(q => {
+                        if (!q.raw) return;
+                        const idx = allQ.findIndex(aq => aq.id === q.raw.id);
+                        if (idx !== -1) Object.assign(allQ[idx], q.raw);
+                    });
+                    localStorage.setItem('genz_questions', JSON.stringify(allQ));
+
+                    overlay.remove();
+                    alert('✅ Translation complete! / अनुवाद पूर्ण!');
+                    return true;
+                } catch (err) {
+                    overlay?.remove();
+                    alert('❌ Translation failed: ' + err.message);
+                    return false;
+                }
+            }
 
             // ===== INIT =====
             if (window.FirebaseSync) {
