@@ -1548,22 +1548,37 @@
                 `;
                 document.body.appendChild(overlay);
 
+                let successCount = 0;
+
                 try {
                     for (let i = 0; i < questions.length; i++) {
                         const q = questions[i];
                         document.getElementById('transProgress').textContent = `Question ${i + 1} of ${questions.length}`;
                         document.getElementById('transBar').style.width = Math.round(((i + 1) / questions.length) * 100) + '%';
 
-                        // Skip if already has Hindi
-                        if (q.text_hi && q.text_hi !== q.text_en) continue;
+                        // Skip if already has good Hindi
+                        if (q.text_hi && q.text_hi !== q.text_en && !q.text_hi.includes('Question')) continue;
 
-                        const raw = q.raw;
-                        const prompt = `Translate to formal Hindi. Keep technical terms in English. JSON only:
-Question: ${raw.question_text_en || raw.question_en || ''}
-A: ${raw.option_a_en || ''}, B: ${raw.option_b_en || ''}, C: ${raw.option_c_en || ''}, D: ${raw.option_d_en || ''}
-Explanation: ${raw.explanation_en || raw.explanation || ''}
+                        // Get English text - try raw first, then direct fields
+                        const raw = q.raw || {};
+                        const questionText = raw.question_text_en || raw.question_en || q.text_en || '';
+                        const optA = raw.option_a_en || (q.options_en?.[0]?.replace(/^[a-d]\)\s*/i, '')) || '';
+                        const optB = raw.option_b_en || (q.options_en?.[1]?.replace(/^[a-d]\)\s*/i, '')) || '';
+                        const optC = raw.option_c_en || (q.options_en?.[2]?.replace(/^[a-d]\)\s*/i, '')) || '';
+                        const optD = raw.option_d_en || (q.options_en?.[3]?.replace(/^[a-d]\)\s*/i, '')) || '';
+                        const explanation = raw.explanation_en || raw.explanation || q.explanation_en || '';
 
-{"q":"","a":"","b":"","c":"","d":"","exp":""}`;
+                        if (!questionText) continue; // Skip empty questions
+
+                        const prompt = `Translate this UPSC question to formal Hindi. Keep technical/proper nouns in English. Return JSON only:
+Question: ${questionText}
+A: ${optA}
+B: ${optB}
+C: ${optC}
+D: ${optD}
+Explanation: ${explanation}
+
+{"q":"Hindi question","a":"Hindi A","b":"Hindi B","c":"Hindi C","d":"Hindi D","exp":"Hindi explanation"}`;
 
                         try {
                             const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -1582,46 +1597,70 @@ Explanation: ${raw.explanation_en || raw.explanation || ''}
                                 const match = content.match(/\{[\s\S]*\}/);
                                 if (match) {
                                     const t = JSON.parse(match[0]);
+
+                                    // Update the question object directly
                                     q.text_hi = t.q || q.text_en;
                                     q.options_hi = [
-                                        'a) ' + (t.a || ''),
-                                        'b) ' + (t.b || ''),
-                                        'c) ' + (t.c || ''),
-                                        'd) ' + (t.d || '')
+                                        'a) ' + (t.a || optA),
+                                        'b) ' + (t.b || optB),
+                                        'c) ' + (t.c || optC),
+                                        'd) ' + (t.d || optD)
                                     ];
                                     q.explanation_hi = t.exp || q.explanation_en;
+                                    successCount++;
 
-                                    // Also update raw for storage
-                                    if (raw) {
-                                        raw.question_text_hi = t.q;
-                                        raw.option_a_hi = t.a;
-                                        raw.option_b_hi = t.b;
-                                        raw.option_c_hi = t.c;
-                                        raw.option_d_hi = t.d;
-                                        raw.explanation_hi = t.exp;
+                                    // Also update raw for localStorage save
+                                    if (q.raw) {
+                                        q.raw.question_text_hi = t.q;
+                                        q.raw.option_a_hi = t.a;
+                                        q.raw.option_b_hi = t.b;
+                                        q.raw.option_c_hi = t.c;
+                                        q.raw.option_d_hi = t.d;
+                                        q.raw.explanation_hi = t.exp;
                                     }
+
+                                    console.log(`✅ Q${i + 1} translated`);
                                 }
                             }
                         } catch (err) {
                             console.error('Translation error Q' + (i + 1), err);
                         }
-                        await new Promise(r => setTimeout(r, 200));
+                        await new Promise(r => setTimeout(r, 250));
                     }
 
                     // Save translations to localStorage
-                    const allQ = JSON.parse(localStorage.getItem('genz_questions') || '[]');
-                    questions.forEach(q => {
-                        if (!q.raw) return;
-                        const idx = allQ.findIndex(aq => aq.id === q.raw.id);
-                        if (idx !== -1) Object.assign(allQ[idx], q.raw);
-                    });
-                    localStorage.setItem('genz_questions', JSON.stringify(allQ));
+                    if (successCount > 0) {
+                        const allQ = JSON.parse(localStorage.getItem('genz_questions') || '[]');
+                        questions.forEach(q => {
+                            if (!q.raw || !q.raw.id) return;
+                            const idx = allQ.findIndex(aq => aq.id === q.raw.id);
+                            if (idx !== -1) {
+                                allQ[idx].question_text_hi = q.raw.question_text_hi;
+                                allQ[idx].option_a_hi = q.raw.option_a_hi;
+                                allQ[idx].option_b_hi = q.raw.option_b_hi;
+                                allQ[idx].option_c_hi = q.raw.option_c_hi;
+                                allQ[idx].option_d_hi = q.raw.option_d_hi;
+                                allQ[idx].explanation_hi = q.raw.explanation_hi;
+                            }
+                        });
+                        localStorage.setItem('genz_questions', JSON.stringify(allQ));
+                    }
 
                     overlay.remove();
-                    alert('✅ Translation complete! / अनुवाद पूर्ण!');
-                    return true;
+
+                    if (successCount > 0) {
+                        alert(`✅ ${successCount} questions translated to Hindi!`);
+                        // Keep Hindi selected and re-render
+                        document.getElementById('langSelect').value = 'hi';
+                        renderQuestion(state.current);
+                        return true;
+                    } else {
+                        alert('⚠️ No questions were translated. Check API key or console for errors.');
+                        return false;
+                    }
                 } catch (err) {
                     overlay?.remove();
+                    console.error('Translation error:', err);
                     alert('❌ Translation failed: ' + err.message);
                     return false;
                 }
