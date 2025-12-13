@@ -1047,27 +1047,47 @@
             return null;
         }
 
-        // Demo questions fallback
+        // Demo questions fallback (same format as localStorage/Firebase)
         const demoQuestions = [
             {
-                text: 'The yellow and orange colour of fruits and flowers is mainly due to ____________.',
-                options: ['a) Leucoplasts', 'b) Chloroplasts', 'c) Gerontoplasts', 'd) Chromoplast'],
-                correct: 3
+                id: 'demo_1',
+                text_en: 'The yellow and orange colour of fruits and flowers is mainly due to ____________.',
+                text_hi: '',
+                options_en: ['a) Leucoplasts', 'b) Chloroplasts', 'c) Gerontoplasts', 'd) Chromoplast'],
+                options_hi: ['a) Leucoplasts', 'b) Chloroplasts', 'c) Gerontoplasts', 'd) Chromoplast'],
+                correct: 3,
+                explanation_en: 'Chromoplasts give yellow and orange color to fruits and flowers.',
+                explanation_hi: ''
             },
             {
-                text: 'Which organelle is known as the "powerhouse of the cell"?',
-                options: ['a) Nucleus', 'b) Mitochondria', 'c) Ribosome', 'd) Golgi body'],
-                correct: 1
+                id: 'demo_2',
+                text_en: 'Which organelle is known as the "powerhouse of the cell"?',
+                text_hi: '',
+                options_en: ['a) Nucleus', 'b) Mitochondria', 'c) Ribosome', 'd) Golgi body'],
+                options_hi: ['a) Nucleus', 'b) Mitochondria', 'c) Ribosome', 'd) Golgi body'],
+                correct: 1,
+                explanation_en: 'Mitochondria produce ATP through cellular respiration.',
+                explanation_hi: ''
             },
             {
-                text: 'DNA replication occurs during which phase of cell cycle?',
-                options: ['a) G1 phase', 'b) S phase', 'c) G2 phase', 'd) M phase'],
-                correct: 1
+                id: 'demo_3',
+                text_en: 'DNA replication occurs during which phase of cell cycle?',
+                text_hi: '',
+                options_en: ['a) G1 phase', 'b) S phase', 'c) G2 phase', 'd) M phase'],
+                options_hi: ['a) G1 phase', 'b) S phase', 'c) G2 phase', 'd) M phase'],
+                correct: 1,
+                explanation_en: 'S phase (Synthesis phase) is when DNA replication occurs.',
+                explanation_hi: ''
             },
             ...Array.from({ length: 21 }, (_, i) => ({
-                text: `Sample question ${i + 4}: Which of the following is correct?`,
-                options: ['a) Option A', 'b) Option B', 'c) Option C', 'd) Option D'],
-                correct: Math.floor(Math.random() * 4)
+                id: `demo_${i + 4}`,
+                text_en: `Sample question ${i + 4}: Which of the following is correct?`,
+                text_hi: '',
+                options_en: ['a) Option A', 'b) Option B', 'c) Option C', 'd) Option D'],
+                options_hi: ['a) Option A', 'b) Option B', 'c) Option C', 'd) Option D'],
+                correct: Math.floor(Math.random() * 4),
+                explanation_en: '',
+                explanation_hi: ''
             }))
         ];
 
@@ -1113,17 +1133,24 @@
                             allQuestions.push(...firebaseQuestions);
                             localStorage.setItem('genz_questions', JSON.stringify(allQuestions));
 
-                            // Re-parse for current usage
+                            // Re-parse for current usage (same format as localStorage)
                             questions = firebaseQuestions.map((q, i) => {
-                                let options;
+                                let options_en, options_hi;
                                 if (q.options && Array.isArray(q.options)) {
-                                    options = q.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`);
+                                    options_en = q.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`);
+                                    options_hi = options_en;
                                 } else {
-                                    options = [
+                                    options_en = [
                                         'a) ' + (q.option_a_en || 'Option A'),
                                         'b) ' + (q.option_b_en || 'Option B'),
                                         'c) ' + (q.option_c_en || 'Option C'),
                                         'd) ' + (q.option_d_en || 'Option D')
+                                    ];
+                                    options_hi = [
+                                        'a) ' + (q.option_a_hi || q.option_a_en || 'Option A'),
+                                        'b) ' + (q.option_b_hi || q.option_b_en || 'Option B'),
+                                        'c) ' + (q.option_c_hi || q.option_c_en || 'Option C'),
+                                        'd) ' + (q.option_d_hi || q.option_d_en || 'Option D')
                                     ];
                                 }
                                 let correctIdx;
@@ -1133,10 +1160,15 @@
                                     correctIdx = ['a', 'b', 'c', 'd'].indexOf((q.correct_option || 'a').toLowerCase());
                                 }
                                 return {
-                                    text: q.question_en || q.question_text_en || 'Question ' + (i + 1),
-                                    options: options,
+                                    id: q.id,
+                                    text_en: q.question_en || q.question_text_en || 'Question ' + (i + 1),
+                                    text_hi: q.question_hi || q.question_text_hi || '',
+                                    options_en: options_en,
+                                    options_hi: options_hi,
                                     correct: correctIdx,
-                                    explanation: q.explanation || q.explanation_en || ''
+                                    explanation_en: q.explanation || q.explanation_en || '',
+                                    explanation_hi: q.explanation_hi || '',
+                                    raw: q // Keep raw for translation save
                                 };
                             });
                         }
