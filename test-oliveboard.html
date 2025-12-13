@@ -1588,19 +1588,26 @@
                         document.getElementById('transProgress').textContent = `Question ${i + 1} of ${questions.length}`;
                         document.getElementById('transBar').style.width = Math.round(((i + 1) / questions.length) * 100) + '%';
 
-                        // Skip if already has good Hindi
-                        if (q.text_hi && q.text_hi !== q.text_en && !q.text_hi.includes('Question')) continue;
+                        // Skip if already has good Hindi (different from English)
+                        if (q.text_hi && q.text_hi.trim() && q.text_hi !== q.text_en) {
+                            console.log(`Q${i + 1} skipped - already has Hindi`);
+                            continue;
+                        }
 
-                        // Get English text - try raw first, then direct fields
-                        const raw = q.raw || {};
-                        const questionText = raw.question_text_en || raw.question_en || q.text_en || '';
-                        const optA = raw.option_a_en || (q.options_en?.[0]?.replace(/^[a-d]\)\s*/i, '')) || '';
-                        const optB = raw.option_b_en || (q.options_en?.[1]?.replace(/^[a-d]\)\s*/i, '')) || '';
-                        const optC = raw.option_c_en || (q.options_en?.[2]?.replace(/^[a-d]\)\s*/i, '')) || '';
-                        const optD = raw.option_d_en || (q.options_en?.[3]?.replace(/^[a-d]\)\s*/i, '')) || '';
-                        const explanation = raw.explanation_en || raw.explanation || q.explanation_en || '';
+                        // Get English text directly from question object
+                        const questionText = q.text_en || '';
+                        const optA = q.options_en?.[0]?.replace(/^[a-d]\)\s*/i, '') || '';
+                        const optB = q.options_en?.[1]?.replace(/^[a-d]\)\s*/i, '') || '';
+                        const optC = q.options_en?.[2]?.replace(/^[a-d]\)\s*/i, '') || '';
+                        const optD = q.options_en?.[3]?.replace(/^[a-d]\)\s*/i, '') || '';
+                        const explanation = q.explanation_en || '';
 
-                        if (!questionText) continue; // Skip empty questions
+                        console.log(`Q${i + 1} translating:`, { questionText, optA, optB, optC, optD });
+
+                        if (!questionText || questionText.length < 3) {
+                            console.log(`Q${i + 1} skipped - empty or too short`);
+                            continue;
+                        }
 
                         const prompt = `Translate this UPSC question to formal Hindi. Keep technical/proper nouns in English. Return JSON only:
 Question: ${questionText}
