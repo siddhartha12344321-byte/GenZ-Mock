@@ -1037,6 +1037,25 @@
             questions = demoQuestions;
         } else {
             console.log(`📚 Loaded ${questions.length} questions for test ${testId}`);
+
+            // Transform questions to match expected format
+            questions = questions.map(q => ({
+                id: q.id,
+                questionEn: q.question_text_en || q.question_en || '',
+                questionHi: q.question_text_hi || q.question_hi || q.question_text_en || '',
+                hasTable: false,
+                options: [
+                    { en: q.option_a_en || q.option_a || '', hi: q.option_a_hi || q.option_a_en || q.option_a || '' },
+                    { en: q.option_b_en || q.option_b || '', hi: q.option_b_hi || q.option_b_en || q.option_b || '' },
+                    { en: q.option_c_en || q.option_c || '', hi: q.option_c_hi || q.option_c_en || q.option_c || '' },
+                    { en: q.option_d_en || q.option_d || '', hi: q.option_d_hi || q.option_d_en || q.option_d || '' }
+                ],
+                correctAnswer: q.correct_option ? ['a', 'b', 'c', 'd'].indexOf(q.correct_option) : 0,
+                explanationEn: q.explanation_en || q.explanation || '',
+                explanationHi: q.explanation_hi || q.explanation_en || q.explanation || '',
+                source: q.source || 'GenZMocks',
+                difficulty: q.difficulty || 'Moderate'
+            }));
         }
 
         // Update exam title if test found
@@ -1049,6 +1068,7 @@
 
         // Test State
         const testState = {
+            questions: questions,  // Store questions for translation access
             currentQuestion: 0,
             answers: {},           // { questionIndex: selectedOptionIndex }
             marked: new Set(),     // Set of marked question indices
@@ -1405,15 +1425,15 @@
                     updateProgress(i + 1, total);
 
                     // Skip if already has Hindi
-                    if (q.question_text_hi && q.question_text_hi.trim()) continue;
+                    if (q.questionHi && q.questionHi.trim() && q.questionHi !== q.questionEn) continue;
 
                     const textToTranslate = `
-Question: ${q.question_text_en || q.question_en || ''}
-Option A: ${q.option_a_en || q.options?.[0] || ''}
-Option B: ${q.option_b_en || q.options?.[1] || ''}
-Option C: ${q.option_c_en || q.options?.[2] || ''}
-Option D: ${q.option_d_en || q.options?.[3] || ''}
-Explanation: ${q.explanation_en || q.explanation || ''}`.trim();
+Question: ${q.questionEn || ''}
+Option A: ${q.options?.[0]?.en || ''}
+Option B: ${q.options?.[1]?.en || ''}
+Option C: ${q.options?.[2]?.en || ''}
+Option D: ${q.options?.[3]?.en || ''}
+Explanation: ${q.explanationEn || ''}`.trim();
 
                     const prompt = `Translate this UPSC exam question to formal Hindi. Keep technical terms in English. Respond ONLY in JSON:
 ${textToTranslate}
@@ -1437,12 +1457,13 @@ ${textToTranslate}
                             const jsonMatch = content.match(/\{[\s\S]*\}/);
                             if (jsonMatch) {
                                 const t = JSON.parse(jsonMatch[0]);
-                                q.question_text_hi = t.question_hi || '';
-                                q.option_a_hi = t.option_a_hi || '';
-                                q.option_b_hi = t.option_b_hi || '';
-                                q.option_c_hi = t.option_c_hi || '';
-                                q.option_d_hi = t.option_d_hi || '';
-                                q.explanation_hi = t.explanation_hi || '';
+                                // Update question object with Hindi content
+                                q.questionHi = t.question_hi || q.questionEn;
+                                q.options[0].hi = t.option_a_hi || q.options[0].en;
+                                q.options[1].hi = t.option_b_hi || q.options[1].en;
+                                q.options[2].hi = t.option_c_hi || q.options[2].en;
+                                q.options[3].hi = t.option_d_hi || q.options[3].en;
+                                q.explanationHi = t.explanation_hi || q.explanationEn;
                             }
                         }
                     } catch (err) {
