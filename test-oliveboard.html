@@ -1293,9 +1293,20 @@
 
                 document.getElementById('qNum').textContent = idx + 1;
 
+                // Debug: log what's being displayed
+                console.log(`Rendering Q${idx + 1}:`, {
+                    lang: lang,
+                    isHindi: isHindi,
+                    text_en: questions[idx].text_en?.substring(0, 50),
+                    text_hi: questions[idx].text_hi?.substring(0, 50),
+                    options_hi: questions[idx].options_hi
+                });
+
                 // Use English or Hindi based on selection
                 const qText = isHindi ? (questions[idx].text_hi || questions[idx].text_en) : questions[idx].text_en;
                 const qOptions = isHindi ? (questions[idx].options_hi || questions[idx].options_en) : questions[idx].options_en;
+
+                console.log(`Displaying:`, { qText: qText?.substring(0, 50), qOptions });
 
                 document.getElementById('qText').textContent = qText;
 
@@ -1609,15 +1620,24 @@
                             continue;
                         }
 
-                        const prompt = `Translate this UPSC question to formal Hindi. Keep technical/proper nouns in English. Return JSON only:
-Question: ${questionText}
-A: ${optA}
-B: ${optB}
-C: ${optC}
-D: ${optD}
-Explanation: ${explanation}
+                        const prompt = `You are translating UPSC exam questions from English to Hindi.
 
-{"q":"Hindi question","a":"Hindi A","b":"Hindi B","c":"Hindi C","d":"Hindi D","exp":"Hindi explanation"}`;
+RULES:
+1. Translate the COMPLETE question including all lists, options, and statements
+2. Keep proper nouns (names, places, commissions) in English
+3. Preserve ALL formatting including numbered lists, bullet points
+4. Return valid JSON only
+
+ENGLISH CONTENT:
+Question: ${questionText}
+Option A: ${optA}
+Option B: ${optB}
+Option C: ${optC}
+Option D: ${optD}
+${explanation ? `Explanation: ${explanation}` : ''}
+
+Return ONLY this JSON (with full translated content, not summaries):
+{"q":"full Hindi question with all lists preserved","a":"Hindi option A","b":"Hindi option B","c":"Hindi option C","d":"Hindi option D","exp":"Hindi explanation if present"}`;
 
                         try {
                             console.log(`Q${i + 1} API call starting...`);
@@ -1627,7 +1647,7 @@ Explanation: ${explanation}
                                 body: JSON.stringify({
                                     model: 'llama-3.3-70b-versatile',
                                     messages: [{ role: 'user', content: prompt }],
-                                    temperature: 0.3, max_tokens: 1500
+                                    temperature: 0.3, max_tokens: 4000
                                 })
                             });
 
