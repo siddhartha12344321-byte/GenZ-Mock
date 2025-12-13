@@ -1620,6 +1620,7 @@ Explanation: ${explanation}
 {"q":"Hindi question","a":"Hindi A","b":"Hindi B","c":"Hindi C","d":"Hindi D","exp":"Hindi explanation"}`;
 
                         try {
+                            console.log(`Q${i + 1} API call starting...`);
                             const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                                 method: 'POST',
                                 headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -1630,12 +1631,17 @@ Explanation: ${explanation}
                                 })
                             });
 
+                            console.log(`Q${i + 1} API response status:`, res.status);
+
                             if (res.ok) {
                                 const data = await res.json();
                                 const content = data.choices[0]?.message?.content || '';
+                                console.log(`Q${i + 1} API content:`, content.substring(0, 200));
+
                                 const match = content.match(/\{[\s\S]*\}/);
                                 if (match) {
                                     const t = JSON.parse(match[0]);
+                                    console.log(`Q${i + 1} parsed:`, t);
 
                                     // Update the question object directly
                                     q.text_hi = t.q || q.text_en;
@@ -1658,8 +1664,13 @@ Explanation: ${explanation}
                                         q.raw.explanation_hi = t.exp;
                                     }
 
-                                    console.log(`✅ Q${i + 1} translated`);
+                                    console.log(`✅ Q${i + 1} translated successfully`);
+                                } else {
+                                    console.log(`❌ Q${i + 1} no JSON match in response`);
                                 }
+                            } else {
+                                const errText = await res.text();
+                                console.error(`❌ Q${i + 1} API error:`, res.status, errText);
                             }
                         } catch (err) {
                             console.error('Translation error Q' + (i + 1), err);
